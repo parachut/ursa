@@ -1,0 +1,48 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/ursa/src",
+  "monorepo": true,
+  "root": "apps/ursa",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/ursa/tsconfig.app.json"
+  },
+  "projects": {
+    "ursa": {
+      "type": "application",
+      "root": "apps/ursa",
+      "entryFile": "main",
+      "sourceRoot": "apps/ursa/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ursa/tsconfig.app.json"
+      }
+    },
+    "forest": {
+      "type": "application",
+      "root": "apps/forest",
+      "entryFile": "main",
+      "sourceRoot": "apps/forest/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/forest/tsconfig.app.json"
+      }
+    },
+    "forage": {
+      "type": "application",
+      "root": "apps/forage",
+      "entryFile": "main",
+      "sourceRoot": "apps/forage/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/forage/tsconfig.app.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    }
+  }
+}
