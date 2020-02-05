@@ -35,10 +35,10 @@ import { UserMarketingSource } from './user-marketing-source.entity';
 import { UserSocialHandle } from './user-social-handle.entity';
 import { UserTermAgreement } from './user-term-agreement.entity';
 import { UserVerification } from './user-verification.entity';
-import { createAuthyUser } from '../utils/createAuthyUser';
-import { createRecurlyUser } from '../utils/createRecurlyUser';
-import { createFrontContact } from '../utils/createFrontContact';
-import checkClearbit from '../utils/checkClearbit';
+import { createAuthyUser } from '../utils/create-authy-user';
+import { createRecurlyUser } from '../utils/create-recurly-user';
+import { createFrontContact } from '../utils/create-front-contact';
+import checkClearbit from '../utils/check-clearbit';
 
 @ObjectType()
 @Table({

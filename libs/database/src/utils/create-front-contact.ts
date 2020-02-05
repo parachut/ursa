@@ -1,18 +1,15 @@
 import to from 'await-to-js';
 import * as request from 'superagent';
 
-import { User } from '../models/User';
-import { UserIntegration } from '../models/UserIntegration';
+import { User } from '../entities/user.entity';
+import { UserIntegration } from '../entities/user-integration.entity';
 
 const { FRONT_JWT_TOKEN } = process.env;
 
 export async function createFrontContact(
   user: User,
 ): Promise<Partial<UserIntegration>> {
-  let err: any;
-  let result: any;
-
-  [err, result] = await to(
+  const [err, result] = await to(
     request
       .post('https://api2.frontapp.com/contacts')
       .send({

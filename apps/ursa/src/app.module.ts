@@ -1,14 +1,17 @@
+import { DatabaseModule } from '@app/database/database.module';
 import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+
+import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { GraphQLModule } from '@nestjs/graphql';
-import { DatabaseModule } from '@app/database/database.module';
 
 @Module({
   imports: [
     DatabaseModule,
+    AddressModule,
     GraphQLModule.forRoot({
-      installSubscriptionHandlers: true,
+      installSubscriptionHandlers: false,
       autoSchemaFile: 'schema.gql',
     }),
   ],

@@ -1,4 +1,4 @@
-import EasyPost from '@easypost/api';
+import * as EasyPost from '@easypost/api';
 import { groupBy, sortBy } from 'lodash';
 import { Op } from 'sequelize';
 import {
@@ -34,8 +34,6 @@ import { ShipmentInspection } from './shipment-inspection.entity';
 import { ShipmentInventory } from './shipment-inventory.entity';
 import { User } from './user.entity';
 import { Warehouse } from './warehouse.entity';
-
-const easyPost = new EasyPost(process.env.EASYPOST);
 
 @ObjectType()
 @Table({
@@ -251,6 +249,8 @@ export class Shipment extends Model<Shipment> {
 
   @BeforeCreate
   static async createEasyPostShipment(instance: Shipment) {
+    const easyPost = new EasyPost(process.env.EASYPOST);
+
     let cart: Cart;
 
     if (instance.cartId) {
@@ -396,6 +396,8 @@ export class Shipment extends Model<Shipment> {
 
   @BeforeDestroy
   static async refundShipment(instance: Shipment) {
+    const easyPost = new EasyPost(process.env.EASYPOST);
+
     const easyPostShipment = await easyPost.Shipment.retrieve(
       instance.easyPostId,
     );

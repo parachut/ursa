@@ -1,13 +1,13 @@
-import { User } from '../models/User';
-import { UserEmployment } from '../models/UserEmployment';
-import { UserSocialHandle } from '../models/UserSocialHandle';
-import { UserVerification } from '../models/UserVerification';
+import { User } from '../entities/user.entity';
+import { UserEmployment } from '../entities/user-employment.entity';
+import { UserSocialHandle } from '../entities/user-social-handle.entity';
+import { UserVerification } from '../entities/user-verification.entity';
 import { Client } from 'clearbit';
-import pick from 'lodash/pick';
-
-const clearbit = new Client({ key: process.env.CLEARBIT });
+import { pick } from 'lodash';
 
 async function checkClearbit(user: User): Promise<UserVerification> {
+  const clearbit = new Client({ key: process.env.CLEARBIT });
+
   const personFilter: {
     email: string;
     company?: string;

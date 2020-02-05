@@ -1,4 +1,4 @@
-import EasyPost from '@easypost/api';
+import * as EasyPost from '@easypost/api';
 import {
   BeforeCreate,
   BelongsTo,
@@ -18,8 +18,6 @@ import { Field, ID, ObjectType } from 'type-graphql';
 
 import { Shipment } from './shipment.entity';
 import { User } from './user.entity';
-
-const easyPost = new EasyPost(process.env.EASYPOST);
 
 @ObjectType()
 @Table({
@@ -103,6 +101,8 @@ export class Warehouse extends Model<Warehouse> {
 
   @BeforeCreate
   static async createEasyPostId(instance: Warehouse) {
+    const easyPost = new EasyPost(process.env.EASYPOST);
+
     instance.country = instance.country || 'US';
 
     const easyPostAddress = new easyPost.Address({

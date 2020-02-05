@@ -1,4 +1,5 @@
-import EasyPost from '@easypost/api';
+import * as EasyPost from '@easypost/api';
+import { ConfigService } from '@nestjs/config';
 import {
   AfterCreate,
   BeforeCreate,
@@ -21,8 +22,6 @@ import { Cart } from './cart.entity';
 import { CensusData } from './census-data.entity';
 import { Shipment } from './shipment.entity';
 import { User } from './user.entity';
-
-const easyPost = new EasyPost(process.env.EASYPOST);
 
 @ObjectType()
 @Table({
@@ -124,6 +123,8 @@ export class Address extends Model<Address> {
 
   @BeforeCreate
   static async normalize(instance: Address) {
+    const easyPost = new EasyPost(process.env.EASYPOST);
+
     const user = await User.findByPk(instance.userId);
     if (instance.primary) {
       await Address.update(
