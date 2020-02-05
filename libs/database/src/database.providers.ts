@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import { readFileSync } from 'fs';
-// import { Cat } from '../cats/cat.entity';
+import { homedir } from 'os';
 
 export const databaseProviders = [
   {
@@ -19,9 +19,9 @@ export const databaseProviders = [
             ssl:
               process.env.NODE_ENV !== 'production'
                 ? {
-                    ca: readFileSync('~/ursa-certs/server-ca.pem'),
-                    cert: readFileSync('~/ursa-certs/client.pem'),
-                    key: readFileSync('~/ursa-certs/client.key'),
+                    ca: readFileSync(homedir + '/ursa-certs/server-ca.pem'),
+                    cert: readFileSync(homedir + '/ursa-certs/client.pem'),
+                    key: readFileSync(homedir + '/ursa-certs/client.key'),
                     rejectUnauthorized: false,
                   }
                 : undefined,
@@ -32,7 +32,6 @@ export const databaseProviders = [
           },
         },
       );
-      // sequelize.addModels([Cat]);
       // await sequelize.sync();
       return sequelize;
     },
