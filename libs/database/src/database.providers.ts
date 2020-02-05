@@ -12,7 +12,7 @@ export const databaseProviders = [
         'CJC6QupaPb3rcR4r8dJpj8W77',
         {
           dialect: 'postgres',
-          modelPaths: [`${__dirname}/models`],
+          modelPaths: [`${__dirname}/entities`],
           logging: false,
           host: process.env.POSTGRES_HOST,
           dialectOptions: {
