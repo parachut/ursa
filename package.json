@@ -20,16 +20,26 @@
     "test:e2e": "jest --config ./apps/ursa/test/jest-e2e.json"
   },
   "dependencies": {
+    "@easypost/api": "^3.8.0",
+    "@elastic/elasticsearch": "^7.5.1",
     "@nestjs/common": "^6.10.14",
     "@nestjs/core": "^6.10.14",
+    "@nestjs/graphql": "^6.5.4",
     "@nestjs/platform-express": "^6.11.5",
     "@nestjs/platform-fastify": "^6.11.5",
+    "@sindresorhus/slugify": "^0.10.0",
+    "another-name-parser": "^0.0.8",
+    "apollo-server-fastify": "^2.9.16",
+    "graphql": "^14.6.0",
+    "lodash": "^4.17.15",
+    "p-map": "^3.0.0",
     "pg": "^7.18.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.4",
     "sequelize": "^5.21.3",
-    "sequelize-typescript": "^1.1.0"
+    "sequelize-typescript": "^1.1.0",
+    "type-graphql": "^0.17.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^6.13.2",
@@ -73,7 +83,9 @@
     ],
     "moduleNameMapper": {
       "@app/database/(.*)": "<rootDir>/libs/database/src/$1",
-      "@app/database": "<rootDir>/libs/database/src"
+      "@app/database": "<rootDir>/libs/database/src",
+      "@app/calculator/(.*)": "<rootDir>/libs/calculator/src/$1",
+      "@app/calculator": "<rootDir>/libs/calculator/src"
     }
   }
 }
