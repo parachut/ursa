@@ -26,6 +26,8 @@
     "@nestjs/config": "^0.1.0",
     "@nestjs/core": "^6.10.14",
     "@nestjs/graphql": "^6.5.4",
+    "@nestjs/jwt": "^6.1.1",
+    "@nestjs/passport": "^6.1.1",
     "@nestjs/platform-express": "^6.11.5",
     "@nestjs/platform-fastify": "^6.11.5",
     "@sindresorhus/slugify": "^0.10.0",
@@ -39,6 +41,8 @@
     "graphql": "^14.6.0",
     "lodash": "^4.17.15",
     "p-map": "^3.0.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
     "pg": "^7.18.1",
     "recurly": "^3.3.1",
     "reflect-metadata": "^0.1.13",
@@ -92,7 +96,9 @@
       "@app/database/(.*)": "<rootDir>/libs/database/src/$1",
       "@app/database": "<rootDir>/libs/database/src",
       "@app/calculator/(.*)": "<rootDir>/libs/calculator/src/$1",
-      "@app/calculator": "<rootDir>/libs/calculator/src"
+      "@app/calculator": "<rootDir>/libs/calculator/src",
+      "@app/auth/(.*)": "<rootDir>/libs/auth/src/$1",
+      "@app/auth": "<rootDir>/libs/auth/src"
     }
   }
 }

@@ -12,11 +12,28 @@
     "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@app/database": ["libs/database/src"],
-      "@app/database/*": ["libs/database/src/*"],
-      "@app/calculator": ["libs/calculator/src"],
-      "@app/calculator/*": ["libs/calculator/src/*"]
+      "@app/database": [
+        "libs/database/src"
+      ],
+      "@app/database/*": [
+        "libs/database/src/*"
+      ],
+      "@app/calculator": [
+        "libs/calculator/src"
+      ],
+      "@app/calculator/*": [
+        "libs/calculator/src/*"
+      ],
+      "@app/auth": [
+        "libs/auth/src"
+      ],
+      "@app/auth/*": [
+        "libs/auth/src/*"
+      ]
     }
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

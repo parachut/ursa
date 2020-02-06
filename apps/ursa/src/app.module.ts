@@ -13,6 +13,7 @@ import { AppService } from './app.service';
     GraphQLModule.forRoot({
       installSubscriptionHandlers: false,
       autoSchemaFile: 'schema.gql',
+      context: ({ req }) => ({ req }),
     }),
   ],
   controllers: [AppController],
