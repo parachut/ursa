@@ -1,4 +1,3 @@
-import { DatabaseModule } from '@app/database/database.module';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 
@@ -9,7 +8,6 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    DatabaseModule,
     AddressModule,
     AuthModule,
     GraphQLModule.forRoot({

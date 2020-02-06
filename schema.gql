@@ -59,6 +59,26 @@ enum AuthenticateMethod {
   EMAIL
 }
 
+type BillingInfo {
+  id: ID!
+  company: String
+  firstName: String!
+  lastName: String!
+  valid: Boolean!
+  vatNumber: String
+  paymentMethod: PaymentMethod!
+  updatedBy: BillingInfoUpdatedBy!
+  object: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+}
+
+type BillingInfoUpdatedBy {
+  country: String!
+  ip: String!
+}
+
 type Bin {
   id: ID!
   cell: Float!
@@ -105,6 +125,58 @@ type Category {
 type CategoryInspectionTask {
   id: ID!
   name: String!
+}
+
+type Coupon {
+  id: ID!
+  appliesToAllPlans: Boolean!
+  appliesToNonPlanCharges: Boolean!
+  couponType: String!
+  discount: CouponDiscount!
+  code: String!
+  duration: String!
+  freeTrialAmount: Float
+  freeTrialUnit: String
+  invoiceDescription: String
+  maxRedemptions: Float
+  maxRedemptionsPerAccount: Float
+  name: String!
+  object: String!
+  state: String!
+  temporalAmount: Float
+  temporalUnit: String
+  uniqueCodeTemplate: String
+  uniqueCouponCodesCount: Float
+  createdAt: DateTime!
+  expiredAt: DateTime
+  redeemBy: DateTime
+}
+
+type CouponDiscount {
+  currencies: [CouponDiscountCurrency!]
+  percent: Float
+  trial: CouponDiscountTrial
+  type: String!
+}
+
+type CouponDiscountCurrency {
+  currency: String!
+  amount: Float!
+}
+
+type CouponDiscountTrial {
+  length: Float!
+  unit: String!
+}
+
+type CouponRedemption {
+  id: ID!
+  discounted: Float
+  object: String!
+  state: String!
+  createdAt: DateTime!
+  couponId: String!
+  subscriptionId: String!
 }
 
 """
@@ -177,6 +249,34 @@ enum InventoryStatus {
   LOST
 }
 
+type Invoice {
+  id: ID!
+  balance: Float
+  collectionMethod: String!
+  customerNotes: String
+  discount: Float
+  netTerms: Float
+  number: Float
+  object: String!
+  origin: String!
+  paid: Float!
+  poNumber: String
+  previousInvoiceId: String
+  refundableAmount: String
+  state: String!
+  subtotal: Float!
+  tax: Float
+  total: Float!
+  termsAndConditions: String
+  type: String
+  vatNumber: String
+  vatReverseChargeNotes: String
+  currencies: [Pricing!]!
+  dueAt: DateTime!
+  createdAt: DateTime!
+  closedAt: DateTime
+}
+
 input MarketingSourceInput {
   campaign: String!
   source: String!
@@ -191,6 +291,61 @@ type Mutation {
   authenticate(input: AuthenticateInput!): Token!
   agreeToTerms(type: String!): UserTermAgreement!
   register(input: RegisterInput!): Token!
+}
+
+type PaymentMethod {
+  accountType: String!
+  billingAgreementId: String
+  cardType: String
+  expMonth: Float
+  expYear: Float
+  firstSix: String
+  lastFour: String
+  object: String!
+  routingNumber: String
+  routingNumberBank: String
+}
+
+type Plan {
+  id: ID!
+  accountingCode: String
+  autoRenew: Boolean
+  code: String!
+  currencies: [Pricing!]!
+  description: String
+  intervalLength: Float
+  intervalUnit: String
+  name: String!
+  object: String!
+  setupFeeAccountingCode: String
+  state: String!
+  taxCode: String
+  taxExempt: Boolean!
+  totalBillingCycles: Float!
+  trialLength: Float!
+  trialUnit: String
+  deletedAt: DateTime
+}
+
+type PlanAddOn {
+  id: ID!
+  accountingCode: String
+  code: String!
+  currencies: [Pricing!]!
+  defaultQuantity: Float!
+  displayQuantity: Boolean!
+  object: String!
+  name: String!
+  state: String!
+  taxCode: String
+  createdAt: DateTime!
+  deletedAt: DateTime
+}
+
+type Pricing {
+  currency: String
+  setupFee: Float
+  unitAmount: Float!
 }
 
 type Product {
@@ -220,6 +375,15 @@ type ProductAttribute {
 type ProductAttributeValue {
   id: ID!
   value: String!
+}
+
+type ProductValue {
+  id: ID!
+  value: String!
+  condition: InventoryCondition!
+  source: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Query {
@@ -306,9 +470,91 @@ enum ShipmentType {
   EARN
 }
 
+type Subscription {
+  id: ID!
+  activatedAt: DateTime!
+  addOnsTotal: Float!
+  autoRenew: Boolean!
+  bankAccountAuthorizedAt: DateTime
+  canceledAt: DateTime
+  collectionMethod: String!
+  currency: String!
+  currentPeriodEndsAt: DateTime
+  currentPeriodStartedAt: DateTime
+  currentTermEndsAt: DateTime
+  currentTermStartedAt: DateTime
+  customerNotes: String
+  expirationReason: String
+  netTerms: Float
+  object: String!
+  quantity: Float
+  remainingBillingCycles: Float
+  remainingPauseCycles: Float
+  renewalBillingCycles: Float
+  state: String!
+  subtotal: Float!
+  totalBillingCycles: Float
+  unitAmount: Float
+  trialEndsAt: DateTime
+  trialStartedAt: DateTime
+  createdAt: DateTime!
+  deletedAt: DateTime
+  expiresAt: DateTime
+  pausedAt: DateTime
+}
+
+type SubscriptionAddOn {
+  id: ID!
+  object: String!
+  quantity: Float!
+  unitAmount: Float
+  createdAt: DateTime!
+  expiredAt: DateTime
+}
+
 type Token {
   token: String
   user: User
+}
+
+type Transaction {
+  id: ID!
+  amount: Float!
+  avsCheck: String
+  collectionMethod: String
+  currency: String
+  customerMessage: String
+  customerMessageLocale: String
+  cvvCheck: String
+  gatewayApprovalCode: String
+  gatewayMessage: String
+  gatewayReference: String
+  gatewayResponseCode: String
+  gatewayResponseTime: Float
+  ipAddressCountry: String
+  ipAddressV4: String
+  object: String!
+  origin: String
+  originalTransactionId: String
+  postage: TransactionPaymentGateway
+  paymentMethod: PaymentMethod!
+  refunded: Boolean
+  status: String!
+  statusCode: String!
+  statusMessage: String!
+  success: Boolean!
+  type: String!
+  uuid: String!
+  createdAt: DateTime!
+  collectedAt: DateTime
+  voidedAt: DateTime
+}
+
+type TransactionPaymentGateway {
+  id: ID!
+  name: String!
+  object: String!
+  type: String!
 }
 
 type User {

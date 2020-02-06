@@ -1,13 +1,12 @@
-import { UserGeolocation } from '@app/database/entities/user-geolocation.entity';
-import { UserMarketingSource } from '@app/database/entities/user-marketing-source.entity';
-import { UserTermAgreement } from '@app/database/entities/user-term-agreement.entity';
-import { User } from '@app/database/entities/user.entity';
+import { UserGeolocation } from '@app/database/entities';
+import { UserMarketingSource } from '@app/database/entities';
+import { UserTermAgreement } from '@app/database/entities';
+import { User } from '@app/database/entities';
 import { UserRole } from '@app/database/enums/user-role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { Op } from 'sequelize';
 import { Args, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
-import { getRepository } from 'sequelize-typescript';
 
 import { Context as ContextInterface } from '../context.interface';
 import { Phone } from '../phone.decorator';
@@ -21,7 +20,6 @@ import { Token } from './dto/token.type';
 @Resolver(Token)
 export class AuthResolver {
   private readonly logger = new Logger(AuthResolver.name);
-  private readonly userRepository = getRepository(User);
 
   constructor(
     private readonly authService: AuthService,
@@ -34,9 +32,6 @@ export class AuthResolver {
     @Phone() phone: string,
     @Context() ctx: ContextInterface,
   ) {
-    console.log('hello');
-    this.logger.log(phone, passcode);
-
     if (!passcode) {
       await this.authService.request(phone, method);
 

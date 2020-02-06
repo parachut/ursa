@@ -1,5 +1,5 @@
-import { User } from '@app/database/entities/user.entity';
-import { Injectable } from '@nestjs/common';
+import { User } from '@app/database/entities';
+import { Injectable, Inject } from '@nestjs/common';
 import { Client as Authy } from 'authy-client';
 
 import { AuthenticateMethod } from './dto/authenticate-method.enum';
@@ -7,13 +7,17 @@ import { AuthenticateMethod } from './dto/authenticate-method.enum';
 @Injectable()
 export class AuthService {
   private readonly authyClient: any;
+  private readonly userRepository: typeof User = this.sequelize.getRepository(
+    'User',
+  );
 
-  constructor() {
+  constructor(@Inject('SEQUELIZE') private readonly sequelize) {
     this.authyClient = new Authy({ key: process.env.AUTHY });
   }
 
   private async getAuthyId(phone: string): Promise<[string, User]> {
-    const user = await User.findOne({
+    console.log();
+    const user = await this.userRepository.findOne({
       where: { phone },
       include: ['integrations'],
     });
