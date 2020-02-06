@@ -1,3 +1,4 @@
+require('dotenv').config();
 import { Sequelize } from 'sequelize-typescript';
 import { readFileSync } from 'fs';
 import { homedir } from 'os';
@@ -19,11 +20,11 @@ export const databaseProvider = {
           ssl:
             process.env.NODE_ENV !== 'production'
               ? {
-                  ca: readFileSync(homedir + '/ursa-certs/server-ca.pem'),
-                  cert: readFileSync(homedir + '/ursa-certs/client.pem'),
-                  key: readFileSync(homedir + '/ursa-certs/client.key'),
-                  rejectUnauthorized: false,
-                }
+                ca: readFileSync(homedir + '/ursa-certs/server-ca.pem'),
+                cert: readFileSync(homedir + '/ursa-certs/client-cert.pem'),
+                key: readFileSync(homedir + '/ursa-certs/client-key.pem'),
+                rejectUnauthorized: false,
+              }
               : undefined,
         },
         pool: {

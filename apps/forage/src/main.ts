@@ -1,3 +1,4 @@
+require('dotenv').config();
 import { NestFactory } from '@nestjs/core';
 import * as xmlparser from 'express-xml-bodyparser';
 
