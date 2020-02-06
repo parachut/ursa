@@ -1,11 +1,12 @@
+require('dotenv').config();
+
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
 
-require('dotenv').config();
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const port = process.env.PORT;

@@ -32,6 +32,7 @@
     "@nestjs/platform-fastify": "^6.11.5",
     "@sindresorhus/slugify": "^0.10.0",
     "another-name-parser": "^0.0.8",
+    "apollo-server-express": "^2.9.16",
     "apollo-server-fastify": "^2.9.16",
     "authy-client": "^1.1.4",
     "await-to-js": "^2.1.1",

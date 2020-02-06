@@ -47,6 +47,18 @@ input AddressWhereUniqueInput {
   id: ID!
 }
 
+input AuthenticateInput {
+  phone: String!
+  passcode: String
+  method: AuthenticateMethod
+}
+
+enum AuthenticateMethod {
+  CALL
+  SMS
+  EMAIL
+}
+
 type Bin {
   id: ID!
   cell: Float!
@@ -165,11 +177,20 @@ enum InventoryStatus {
   LOST
 }
 
+input MarketingSourceInput {
+  campaign: String!
+  source: String!
+  medium: String!
+}
+
 type Mutation {
   addressSetPrimary(where: AddressWhereUniqueInput!): Address!
   addressCreate(input: AddressCreateInput!): Address!
   addressUpdate(where: AddressWhereUniqueInput!, input: AddressUpdateInput!): Address!
   addressDestroy(where: AddressWhereUniqueInput!): Address!
+  authenticate(input: AuthenticateInput!): Token!
+  agreeToTerms(type: String!): UserTermAgreement!
+  register(input: RegisterInput!): Token!
 }
 
 type Product {
@@ -209,6 +230,14 @@ type Query {
 type Queue {
   id: ID!
   lastNotified: DateTime
+}
+
+input RegisterInput {
+  email: String!
+  name: String!
+  phone: String!
+  roles: [UserRole!]
+  marketingSource: MarketingSourceInput
 }
 
 type ShipKit {
@@ -275,6 +304,11 @@ enum ShipmentStatus {
 enum ShipmentType {
   ACCESS
   EARN
+}
+
+type Token {
+  token: String
+  user: User
 }
 
 type User {
