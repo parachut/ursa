@@ -1,21 +1,19 @@
-import { UserGeolocation } from '@app/database/entities';
-import { UserMarketingSource } from '@app/database/entities';
-import { UserTermAgreement } from '@app/database/entities';
+import { UserRole } from '@app/database/enums';
 import { User } from '@app/database/entities';
-import { UserRole } from '@app/database/enums/user-role.enum';
+import { Logger, UseGuards } from '@nestjs/common';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
-import { Op } from 'sequelize';
-import { Args, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
-import { Logger } from '@nestjs/common';
 
 import { Context as ContextInterface } from '../context.interface';
+import { EmailService } from '../email.service';
 import { Phone } from '../phone.decorator';
+import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { AuthenticateInput } from './dto/authenticate.input';
 import { RegisterInput } from './dto/register.input';
 import { Token } from './dto/token.type';
-
-// import { sendEmail } from '../utils/sendEmail';
+import { GqlAuthGuard } from '../gql-auth-guard.guard';
+import { CurrentUser } from '../current-user.decorator';
 
 @Resolver(Token)
 export class AuthResolver {
@@ -23,15 +21,23 @@ export class AuthResolver {
 
   constructor(
     private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
-  @Mutation(() => Token)
+  @Query(type => User)
+  @UseGuards(GqlAuthGuard)
+  async me(@CurrentUser() user: User) {
+    return this.userService.findUser(user.id);
+  }
+
+  @Mutation(type => Token)
   async authenticate(
     @Args('input') { passcode, method }: AuthenticateInput,
     @Phone() phone: string,
     @Context() ctx: ContextInterface,
-  ) {
+  ): Promise<Token> {
     if (!passcode) {
       await this.authService.request(phone, method);
 
@@ -42,35 +48,16 @@ export class AuthResolver {
       const user = await this.authService.verify(phone, passcode);
 
       if (user) {
-        await this.authService.createUserGeolocation(user, ctx.req);
+        await this.authService.createGeolocation(user, ctx.req);
 
         const payload = { sub: user.id };
 
         return {
           token: this.jwtService.sign(payload),
+          user,
         };
       }
     }
-  }
-
-  @Mutation(() => UserTermAgreement)
-  async agreeToTerms(
-    @Args('type') type: string,
-    @Context() ctx: ContextInterface,
-  ) {
-    if (ctx.user) {
-      const agree = new UserTermAgreement({
-        type,
-        agreed: true,
-        userId: ctx.user.id,
-      });
-
-      await agree.save();
-
-      return agree;
-    }
-
-    throw new Error('Unauthorized');
   }
 
   @Mutation(() => Token)
@@ -80,11 +67,9 @@ export class AuthResolver {
     @Args('input')
     { email, name, marketingSource, roles }: RegisterInput,
     @Context() ctx: ContextInterface,
-  ) {
+  ): Promise<Token> {
     // Find if there is an existing account
-    const userExists = await User.findOne({
-      where: { [Op.or]: [{ email }, { phone }] },
-    });
+    const userExists = await this.authService.checkUserExists(phone, email);
 
     if (userExists) {
       throw new Error('Sorry, this user already exists, please try again.');
@@ -92,65 +77,31 @@ export class AuthResolver {
 
     await this.authService.checkMobile(phone);
 
-    const filteredRoles =
-      roles && roles.length
-        ? roles.filter(role =>
-            [UserRole.CONTRIBUTOR, UserRole.MEMBER].includes(role),
-          )
-        : [UserRole.MEMBER];
+    const user = await this.userService.createUser(
+      {
+        email,
+        phone,
+        name,
+      },
+      roles,
+      marketingSource,
+    );
 
-    const user = await User.create({
-      email,
-      name,
-      phone,
-      roles: filteredRoles,
-    });
+    await this.authService.createGeolocation(user, ctx.req);
 
-    const agree = new UserTermAgreement({
-      type: roles && roles.length > 1 ? 'EARN' : 'ACCESS',
-      agreed: true,
-      userId: user.get('id'),
-    });
-
-    await agree.save();
-
-    if (marketingSource) {
-      await UserMarketingSource.create({
-        ...marketingSource,
-        userId: user.get('id'),
-      });
-    }
-
-    if (ctx.req.header('X-AppEngine-CityLatLong')) {
-      const coordinates = ctx.req.header('X-AppEngine-CityLatLong').split(',');
-
-      await UserGeolocation.create({
-        userId: user.id,
-        countryCode: ctx.req.header('X-AppEngine-Country'),
-        regionCode: ctx.req.header('X-AppEngine-Region'),
-        city: ctx.req.header('X-AppEngine-City'),
-        coordinates: {
-          type: 'Point',
-          coordinates: [
-            parseInt(coordinates[1], 10),
-            parseInt(coordinates[0], 10),
-          ],
-        },
-      } as UserGeolocation);
-    }
-
-    /* await sendEmail({
+    await this.emailService.send({
       to: user.email,
-      id: filteredRoles.includes(UserRole.CONTRIBUTOR) ? 13193333 : 13136612,
+      id: user.roles.includes(UserRole.CONTRIBUTOR) ? 13193333 : 13136612,
       data: {
         name: user.parsedName.first,
       },
-    }); */
+    });
 
     const payload = { sub: user.id };
 
     return {
       token: this.jwtService.sign(payload),
+      user,
     };
   }
 }
