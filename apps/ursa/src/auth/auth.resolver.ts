@@ -41,31 +41,15 @@ export class AuthResolver {
     } else {
       const user = await this.authService.verify(phone, passcode);
 
-      if (ctx.req.header('X-AppEngine-CityLatLong')) {
-        const coordinates = ctx.req
-          .header('X-AppEngine-CityLatLong')
-          .split(',');
+      if (user) {
+        await this.authService.createUserGeolocation(user, ctx.req);
 
-        await UserGeolocation.create({
-          userId: user.id,
-          countryCode: ctx.req.header('X-AppEngine-Country'),
-          regionCode: ctx.req.header('X-AppEngine-Region'),
-          city: ctx.req.header('X-AppEngine-City'),
-          coordinates: {
-            type: 'Point',
-            coordinates: [
-              parseInt(coordinates[1], 10),
-              parseInt(coordinates[0], 10),
-            ],
-          },
-        } as UserGeolocation);
+        const payload = { sub: user.id };
+
+        return {
+          token: this.jwtService.sign(payload),
+        };
       }
-
-      const payload = { sub: user.id };
-
-      return {
-        token: this.jwtService.sign(payload),
-      };
     }
   }
 

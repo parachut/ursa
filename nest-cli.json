@@ -26,15 +26,6 @@
         "tsConfigPath": "apps/forest/tsconfig.app.json"
       }
     },
-    "forage": {
-      "type": "application",
-      "root": "apps/forage",
-      "entryFile": "main",
-      "sourceRoot": "apps/forage/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/forage/tsconfig.app.json"
-      }
-    },
     "database": {
       "type": "library",
       "root": "libs/database",
@@ -51,6 +42,15 @@
       "sourceRoot": "libs/calculator/src",
       "compilerOptions": {
         "tsConfigPath": "libs/calculator/tsconfig.lib.json"
+      }
+    },
+    "forage": {
+      "type": "application",
+      "root": "apps/forage",
+      "entryFile": "main",
+      "sourceRoot": "apps/forage/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/forage/tsconfig.app.json"
       }
     }
   }

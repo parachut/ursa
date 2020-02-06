@@ -3,13 +3,11 @@ import { GraphQLModule } from '@nestjs/graphql';
 
 import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
-import { RecurlyModule} from '../../forage/recurly/recurly.module'
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    RecurlyModule,
     AddressModule,
     AuthModule,
     GraphQLModule.forRoot({
@@ -22,4 +20,4 @@ import { AuthModule } from './auth/auth.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

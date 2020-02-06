@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { RecurlyModule } from '../recurly/recurly.module';
+import { AppModule } from './../src/app.module';
 
 describe('AppController (e2e)', () => {
   let app;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [RecurlyModule],
+      imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
