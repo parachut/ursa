@@ -7,7 +7,7 @@ import { UserRole } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
-export class UserService {
+export class AddressService {
   private readonly userRepository: typeof User = this.sequelize.getRepository(
     'User',
   );

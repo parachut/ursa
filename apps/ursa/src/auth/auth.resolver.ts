@@ -1,22 +1,19 @@
-import { UserGeolocation } from '@app/database/entities';
-import { UserMarketingSource } from '@app/database/entities';
-import { UserTermAgreement } from '@app/database/entities';
+import { UserRole } from '@app/database/enums';
 import { User } from '@app/database/entities';
-import { UserRole } from '@app/database/enums/user-role.enum';
+import { Logger, UseGuards } from '@nestjs/common';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
-import { Op } from 'sequelize';
-import { Args, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
-import { Logger } from '@nestjs/common';
 
 import { Context as ContextInterface } from '../context.interface';
+import { EmailService } from '../email.service';
 import { Phone } from '../phone.decorator';
-import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
+import { AuthService } from './auth.service';
 import { AuthenticateInput } from './dto/authenticate.input';
 import { RegisterInput } from './dto/register.input';
 import { Token } from './dto/token.type';
-
-// import { sendEmail } from '../utils/sendEmail';
+import { GqlAuthGuard } from '../gql-auth-guard.guard';
+import { CurrentUser } from '../current-user.decorator';
 
 @Resolver(Token)
 export class AuthResolver {
@@ -24,11 +21,18 @@ export class AuthResolver {
 
   constructor(
     private readonly authService: AuthService,
+    private readonly emailService: EmailService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
-  @Mutation(() => Token)
+  @Query(type => User)
+  @UseGuards(GqlAuthGuard)
+  async me(@CurrentUser() user: User) {
+    return this.userService.findUser(user.id);
+  }
+
+  @Mutation(type => Token)
   async authenticate(
     @Args('input') { passcode, method }: AuthenticateInput,
     @Phone() phone: string,
@@ -44,7 +48,7 @@ export class AuthResolver {
       const user = await this.authService.verify(phone, passcode);
 
       if (user) {
-        await this.authService.createUserGeolocation(user, ctx.req);
+        await this.authService.createGeolocation(user, ctx.req);
 
         const payload = { sub: user.id };
 
@@ -83,15 +87,15 @@ export class AuthResolver {
       marketingSource,
     );
 
-    await this.authService.createUserGeolocation(user, ctx.req);
+    await this.authService.createGeolocation(user, ctx.req);
 
-    /* await sendEmail({
+    await this.emailService.send({
       to: user.email,
-      id: filteredRoles.includes(UserRole.CONTRIBUTOR) ? 13193333 : 13136612,
+      id: user.roles.includes(UserRole.CONTRIBUTOR) ? 13193333 : 13136612,
       data: {
         name: user.parsedName.first,
       },
-    }); */
+    });
 
     const payload = { sub: user.id };
 

@@ -1,6 +1,5 @@
-import { User, UserTermAgreement } from '@app/database/entities';
-import { UserGeolocation } from '@app/database/entities';
-import { Injectable, Inject } from '@nestjs/common';
+import { User, UserGeolocation } from '@app/database/entities';
+import { Inject, Injectable } from '@nestjs/common';
 import { Client as Authy } from 'authy-client';
 import { Request } from 'express';
 import { Op } from 'sequelize';
@@ -84,18 +83,18 @@ export class AuthService {
     }
   }
 
-  async createUserGeolocation(
+  async createGeolocation(
     user: User,
     request: Request,
   ): Promise<UserGeolocation> {
-    if (request.header('X-AppEngine-CityLatLong')) {
-      const coordinates = request.header('X-AppEngine-CityLatLong').split(',');
+    if (request.header('x-appengine-citylatlong')) {
+      const coordinates = request.header('x-appengine-citylatlong').split(',');
 
       return this.userGeolocationRepository.create({
         userId: user.id,
-        countryCode: request.header('X-AppEngine-Country'),
-        regionCode: request.header('X-AppEngine-Region'),
-        city: request.header('X-AppEngine-City'),
+        countryCode: request.header('x-appengine-country'),
+        regionCode: request.header('x-appengine-region'),
+        city: request.header('x-appengine-city'),
         coordinates: {
           type: 'Point',
           coordinates: [

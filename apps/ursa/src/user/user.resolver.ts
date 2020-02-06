@@ -1,6 +1,6 @@
+import { User } from '@app/database/entities';
 import { Logger } from '@nestjs/common';
 import { Resolver } from '@nestjs/graphql';
-import { User } from '@app/database/entities';
 
 import { UserService } from './user.service';
 
