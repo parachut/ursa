@@ -289,7 +289,6 @@ type Mutation {
   addressUpdate(where: AddressWhereUniqueInput!, input: AddressUpdateInput!): Address!
   addressDestroy(where: AddressWhereUniqueInput!): Address!
   authenticate(input: AuthenticateInput!): Token!
-  agreeToTerms(type: String!): UserTermAgreement!
   register(input: RegisterInput!): Token!
 }
 

@@ -11,6 +11,7 @@ import { Logger } from '@nestjs/common';
 import { Context as ContextInterface } from '../context.interface';
 import { Phone } from '../phone.decorator';
 import { AuthService } from './auth.service';
+import { UserService } from '../user/user.service';
 import { AuthenticateInput } from './dto/authenticate.input';
 import { RegisterInput } from './dto/register.input';
 import { Token } from './dto/token.type';
@@ -23,6 +24,7 @@ export class AuthResolver {
 
   constructor(
     private readonly authService: AuthService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -31,7 +33,7 @@ export class AuthResolver {
     @Args('input') { passcode, method }: AuthenticateInput,
     @Phone() phone: string,
     @Context() ctx: ContextInterface,
-  ) {
+  ): Promise<Token> {
     if (!passcode) {
       await this.authService.request(phone, method);
 
@@ -48,29 +50,10 @@ export class AuthResolver {
 
         return {
           token: this.jwtService.sign(payload),
+          user,
         };
       }
     }
-  }
-
-  @Mutation(() => UserTermAgreement)
-  async agreeToTerms(
-    @Args('type') type: string,
-    @Context() ctx: ContextInterface,
-  ) {
-    if (ctx.user) {
-      const agree = new UserTermAgreement({
-        type,
-        agreed: true,
-        userId: ctx.user.id,
-      });
-
-      await agree.save();
-
-      return agree;
-    }
-
-    throw new Error('Unauthorized');
   }
 
   @Mutation(() => Token)
@@ -80,11 +63,9 @@ export class AuthResolver {
     @Args('input')
     { email, name, marketingSource, roles }: RegisterInput,
     @Context() ctx: ContextInterface,
-  ) {
+  ): Promise<Token> {
     // Find if there is an existing account
-    const userExists = await User.findOne({
-      where: { [Op.or]: [{ email }, { phone }] },
-    });
+    const userExists = await this.authService.checkUserExists(phone, email);
 
     if (userExists) {
       throw new Error('Sorry, this user already exists, please try again.');
@@ -92,52 +73,17 @@ export class AuthResolver {
 
     await this.authService.checkMobile(phone);
 
-    const filteredRoles =
-      roles && roles.length
-        ? roles.filter(role =>
-            [UserRole.CONTRIBUTOR, UserRole.MEMBER].includes(role),
-          )
-        : [UserRole.MEMBER];
+    const user = await this.userService.createUser(
+      {
+        email,
+        phone,
+        name,
+      },
+      roles,
+      marketingSource,
+    );
 
-    const user = await User.create({
-      email,
-      name,
-      phone,
-      roles: filteredRoles,
-    });
-
-    const agree = new UserTermAgreement({
-      type: roles && roles.length > 1 ? 'EARN' : 'ACCESS',
-      agreed: true,
-      userId: user.get('id'),
-    });
-
-    await agree.save();
-
-    if (marketingSource) {
-      await UserMarketingSource.create({
-        ...marketingSource,
-        userId: user.get('id'),
-      });
-    }
-
-    if (ctx.req.header('X-AppEngine-CityLatLong')) {
-      const coordinates = ctx.req.header('X-AppEngine-CityLatLong').split(',');
-
-      await UserGeolocation.create({
-        userId: user.id,
-        countryCode: ctx.req.header('X-AppEngine-Country'),
-        regionCode: ctx.req.header('X-AppEngine-Region'),
-        city: ctx.req.header('X-AppEngine-City'),
-        coordinates: {
-          type: 'Point',
-          coordinates: [
-            parseInt(coordinates[1], 10),
-            parseInt(coordinates[0], 10),
-          ],
-        },
-      } as UserGeolocation);
-    }
+    await this.authService.createUserGeolocation(user, ctx.req);
 
     /* await sendEmail({
       to: user.email,
@@ -151,6 +97,7 @@ export class AuthResolver {
 
     return {
       token: this.jwtService.sign(payload),
+      user,
     };
   }
 }

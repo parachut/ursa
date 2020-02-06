@@ -1,8 +1,9 @@
-import { User } from '@app/database/entities';
+import { User, UserTermAgreement } from '@app/database/entities';
 import { UserGeolocation } from '@app/database/entities';
 import { Injectable, Inject } from '@nestjs/common';
 import { Client as Authy } from 'authy-client';
 import { Request } from 'express';
+import { Op } from 'sequelize';
 
 import { AuthenticateMethod } from './dto/authenticate-method.enum';
 
@@ -104,5 +105,13 @@ export class AuthService {
         },
       });
     }
+  }
+
+  async checkUserExists(phone: string, email: string): Promise<boolean> {
+    const exists = await this.userRepository.count({
+      where: { [Op.or]: [{ email }, { phone }] },
+    });
+
+    return !!exists;
   }
 }
