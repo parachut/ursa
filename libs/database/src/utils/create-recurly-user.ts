@@ -1,9 +1,9 @@
-import Recurly from 'recurly';
+import * as Recurly from 'recurly';
 
-import { User } from '../models/User';
-import { UserIntegration } from '../models/UserIntegration';
+import { User } from '../entities/user.entity';
+import { UserIntegration } from '../entities/user-integration.entity';
 
-const recurly = new Recurly.Client(process.env.RECURLY, `subdomain-parachut`);
+const recurly = new Recurly.Client(process.env.RECURLY);
 
 export async function createRecurlyUser(
   user: User,

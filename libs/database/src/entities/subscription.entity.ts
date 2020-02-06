@@ -9,8 +9,8 @@ import {
 } from 'sequelize-typescript';
 import { Field, ID, ObjectType } from 'type-graphql';
 
-import { Plan } from './Plan';
-import { User } from './User';
+import { Plan } from './plan.entity';
+import { User } from './user.entity';
 
 @ObjectType()
 @Table({
@@ -18,7 +18,7 @@ import { User } from './User';
   underscored: true,
 })
 export class Subscription extends Model<Subscription> {
-  @Field((type) => ID)
+  @Field(type => ID)
   @PrimaryKey
   @Column
   id!: string;
