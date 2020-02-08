@@ -1,7 +1,6 @@
 import { UserRole } from '@app/database/enums';
-import { User } from '@app/database/entities';
-import { Logger, UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Logger } from '@nestjs/common';
+import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 
 import { Context as ContextInterface } from '../context.interface';
@@ -12,10 +11,8 @@ import { AuthService } from './auth.service';
 import { AuthenticateInput } from './dto/authenticate.input';
 import { RegisterInput } from './dto/register.input';
 import { Token } from './dto/token.type';
-import { GqlAuthGuard } from '../gql-auth-guard.guard';
-import { CurrentUser } from '../current-user.decorator';
 
-@Resolver(Token)
+@Resolver(of => Token)
 export class AuthResolver {
   private readonly logger = new Logger(AuthResolver.name);
 
@@ -26,13 +23,7 @@ export class AuthResolver {
     private readonly jwtService: JwtService,
   ) {}
 
-  @Query(type => User)
-  @UseGuards(GqlAuthGuard)
-  async me(@CurrentUser() user: User) {
-    return this.userService.findUser(user.id);
-  }
-
-  @Mutation(type => Token)
+  @Mutation(returns => Token)
   async authenticate(
     @Args('input') { passcode, method }: AuthenticateInput,
     @Phone() phone: string,
@@ -60,7 +51,7 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => Token)
+  @Mutation(returns => Token)
   async register(
     @Phone()
     phone: string,

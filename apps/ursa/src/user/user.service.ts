@@ -12,7 +12,7 @@ export class UserService {
     'User',
   );
   private readonly userAgreementRepository: typeof UserTermAgreement = this.sequelize.getRepository(
-    'UserAgreement',
+    'UserTermAgreement',
   );
 
   constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
@@ -50,7 +50,7 @@ export class UserService {
     });
   }
 
-  async findUser(userId: string) {
+  async findOne(userId: string) {
     return this.userRepository.findByPk(userId);
   }
 }

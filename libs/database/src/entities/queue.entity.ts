@@ -33,9 +33,7 @@ export class Queue extends Model<Queue> {
   lastNotified?: Date;
 
   @BelongsTo(() => Product)
-  async product(@Root() queue: Queue): Promise<Product> {
-    return Product.findByPk(queue.productId);
-  }
+  product: Product;
 
   @ForeignKey(() => Product)
   @Column(DataType.UUID)

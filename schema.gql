@@ -59,6 +59,13 @@ enum AuthenticateMethod {
   EMAIL
 }
 
+input BankAccountCreateInput {
+  accountId: String!
+  token: String!
+  last4: Float
+  dob: String
+}
+
 type BillingInfo {
   id: ID!
   company: String
@@ -104,12 +111,42 @@ type Cart {
   couponCode: String
   protectionPlan: Boolean!
   service: String
+  items: [CartItem!]!
+  inventory: [CartItem!]!
+  address: Address!
+  shipments: [Shipment!]!
 }
 
 type CartItem {
   id: ID!
   points: Int!
   quantity: Int!
+  product: Product!
+}
+
+input CartItemCreateInput {
+  productId: ID!
+  quantity: Int
+}
+
+input CartItemUpdateInput {
+  quantity: Int
+}
+
+input CartItemWhereUniqueInput {
+  id: ID!
+}
+
+input CartUpdateInput {
+  planId: String
+  protectionPlan: Boolean
+  service: String
+  couponCode: String
+  addressId: String
+}
+
+input CartWhereUniqueInput {
+  id: ID!
 }
 
 type Category {
@@ -119,7 +156,7 @@ type Category {
   slug: String!
   description: String
   includedEssentials: [String!]
-  parent: Category
+  parent: Category!
 }
 
 type CategoryInspectionTask {
@@ -193,6 +230,10 @@ type Deposit {
   createdAt: DateTime!
 }
 
+input DepositCreateInput {
+  amount: Float!
+}
+
 type File {
   id: ID!
   filename: String!
@@ -221,6 +262,11 @@ type Inventory {
   status: InventoryStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
+  history: [InventoryHistory!]!
+  product: Product!
+  lastCart: Cart!
+  lastReturn: Cart!
+  lastShipment: Cart!
 }
 
 enum InventoryCondition {
@@ -229,6 +275,21 @@ enum InventoryCondition {
   EXCELLENT
   USED
   DAMAGED
+}
+
+input InventoryCreateInput {
+  productId: ID!
+  condition: InventoryCondition!
+  missingEssentials: [String!]
+}
+
+type InventoryHistory {
+  in: DateTime
+  out: DateTime!
+  amount: Float!
+  days: Float!
+  serial: String
+  name: String
 }
 
 enum InventoryStatus {
@@ -247,6 +308,21 @@ enum InventoryStatus {
   RETURNED
   STOLEN
   LOST
+}
+
+input InventoryUpdateInput {
+  productId: ID
+  condition: InventoryCondition
+  missingEssentials: [String!]
+}
+
+input InventoryWhereInput {
+  status: [InventoryStatus!]
+  id: ID
+}
+
+input InventoryWhereUniqueInput {
+  id: ID!
 }
 
 type Invoice {
@@ -290,6 +366,22 @@ type Mutation {
   addressDestroy(where: AddressWhereUniqueInput!): Address!
   authenticate(input: AuthenticateInput!): Token!
   register(input: RegisterInput!): Token!
+  bankAccountCreate(input: BankAccountCreateInput!): UserBankAccount!
+  cartCancel(where: CartWhereUniqueInput!): Cart!
+  cartUpdate(input: CartUpdateInput!): Cart!
+  cartItemCreate(input: CartItemCreateInput!): CartItem!
+  cartItemUpdate(input: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem!
+  cartItemDestroy(input: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem!
+  depositCreate(input: DepositCreateInput!): Deposit!
+  inventoryCreate(input: InventoryCreateInput!): Inventory!
+  inventoryUpdate(input: InventoryUpdateInput!, where: InventoryWhereUniqueInput!): Inventory!
+  inventoryReturn(where: InventoryWhereUniqueInput!): Inventory!
+  inventoryDestroy(where: InventoryWhereUniqueInput!): Inventory!
+  queueCreate(input: QueueCreateInput!): Queue!
+  queueDestroy(input: QueueWhereUniqueInput!): Queue!
+  shipKitUpdate(input: ShipKitUpdateInput!): ShipKit!
+  shipKitComplete: ShipKit!
+  shipmentCreate(input: ShipmentCreateInput!): Shipment!
 }
 
 type PaymentMethod {
@@ -364,6 +456,10 @@ type Product {
   stock: Int!
   demand: Int!
   brand: Brand
+  category: Category!
+  dailyCommission: Float!
+  estimatedCommission: Float!
+  breadCrumbs: [Category!]!
 }
 
 type ProductAttribute {
@@ -376,6 +472,38 @@ type ProductAttributeValue {
   value: String!
 }
 
+input ProductFilterInput {
+  id: ID
+  search: String
+  brand: String
+  inStock: Boolean = false
+  maxPoints: Int = 100000
+  minPoints: Int = 0
+}
+
+enum ProductSort {
+  ID_DESC
+  ID_ASC
+  SLUG_DESC
+  SLUG_ASC
+  POPULARITY_ASC
+  POPULARITY_DESC
+  DEMAND_ASC
+  DEMAND_DESC
+  STOCK_ASC
+  STOCK_DESC
+  LAST_INVENTORY_CREATED_ASC
+  LAST_INVENTORY_CREATED_DESC
+}
+
+type ProductsResponse {
+  items: [Product!]!
+  total: Int!
+  from: Int!
+  size: Int!
+  hasMore: Boolean!
+}
+
 type ProductValue {
   id: ID!
   value: String!
@@ -386,13 +514,41 @@ type ProductValue {
 }
 
 type Query {
-  address(id: ID!): Address!
+  address(id: String!): Address!
   addresses: [Address!]!
+  bankAccount(id: String!): UserBankAccount!
+  bankAccounts: UserBankAccount!
+  me: User!
+  cart(id: String!): Cart!
+  carts: [Cart!]!
+  category(id: String!): Category!
+  categories(id: String!): Category!
+  deposit(id: String!): Deposit!
+  deposits: [Deposit!]!
+  inventory(id: String!): Inventory!
+  inventories(input: InventoryWhereInput!): [Inventory!]!
+  product(slug: String!): Product!
+  products(sort: ProductSort = ID_DESC, filter: ProductFilterInput, size: Int = 10, from: Int = 0): ProductsResponse!
+  queue(id: String!): Queue!
+  queues: [Queue!]!
+  shipKit(id: String!): ShipKit!
+  shipKits: [ShipKit!]!
+  shipment(id: String!): Shipment!
+  shipments: [Shipment!]!
 }
 
 type Queue {
   id: ID!
   lastNotified: DateTime
+  product: Product!
+}
+
+input QueueCreateInput {
+  productId: ID!
+}
+
+input QueueWhereUniqueInput {
+  id: ID!
 }
 
 input RegisterInput {
@@ -408,6 +564,14 @@ type ShipKit {
   completedAt: DateTime
   confirmedAt: DateTime
   airbox: Boolean!
+  inventory: [Inventory!]!
+  address: Address!
+  shipments: [Shipment!]!
+}
+
+input ShipKitUpdateInput {
+  addressId: String
+  airbox: Boolean
 }
 
 type Shipment {
@@ -435,6 +599,13 @@ type Shipment {
   weight: Float!
   width: Float!
   createdAt: DateTime!
+  inventory: [Inventory!]!
+}
+
+input ShipmentCreateInput {
+  inventoryIds: [ID!]!
+  type: ShipmentType!
+  direction: ShipmentDirection!
 }
 
 enum ShipmentDirection {
@@ -580,6 +751,9 @@ type User {
   vip: Boolean!
   currentInventory: [Inventory!]!
   inventory: [Inventory!]!
+  termAgreements: [Inventory!]!
+  funds: UserFunds!
+  frontHash: UserFunds!
 }
 
 type UserBankAccount {
@@ -597,6 +771,12 @@ type UserEmployment {
   role: String!
   subRole: String!
   senority: String!
+}
+
+type UserFunds {
+  balance: Float!
+  total: Float!
+  withdrawn: Float!
 }
 
 type UserIntegration {
