@@ -16,6 +16,6 @@ export class UserResolver {
   @UseGuards(GqlAuthGuard)
   async me(@CurrentUser() user: User) {
     console.log(user);
-    return this.userService.findUser(user.id);
+    return this.userService.findOne(user.id);
   }
 }

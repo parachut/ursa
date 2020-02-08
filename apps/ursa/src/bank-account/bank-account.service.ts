@@ -1,5 +1,6 @@
-import { User, UserBankAccount, UserBankBalance } from '@app/database/entities';
-import { Inject, Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { User, UserBankAccount } from '@app/database/entities';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { DwollaService } from '../dwolla.service';
 import { PlaidService } from '../plaid.service';
 
@@ -41,7 +42,7 @@ export class BankAccountService {
     });
   }
 
-  async createBankAccount(
+  async create(
     accessToken: string,
     accountId: string,
     userId: string,

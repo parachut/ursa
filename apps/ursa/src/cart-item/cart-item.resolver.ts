@@ -1,18 +1,11 @@
 import { CartItem, User } from '@app/database/entities';
 import { Logger, UseGuards } from '@nestjs/common';
-import {
-  Args,
-  Mutation,
-  Parent,
-  Query,
-  ResolveProperty,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 
-import { CartItemService } from './cart-item.service';
+import { CartService } from '../cart/cart.service';
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
-import { CartService } from '../cart/cart.service';
+import { CartItemService } from './cart-item.service';
 import { CartItemCreateInput } from './dto/cart-item-create.input';
 import { CartItemUpdateInput } from './dto/cart-item-update.input';
 import { CartItemWhereUniqueInput } from './dto/cart-item-where-unique.input';
@@ -33,7 +26,7 @@ export class CartItemResolver {
     input: CartItemCreateInput,
     @CurrentUser() user: User,
   ) {
-    return this.cartItemService.createCartItem(input, user.id);
+    return this.cartItemService.create(input, user.id);
   }
 
   @Mutation(() => CartItem)
@@ -45,7 +38,7 @@ export class CartItemResolver {
     { quantity }: CartItemUpdateInput,
     @CurrentUser() user: User,
   ) {
-    return this.cartItemService.updateCartItem(id, quantity, user.id);
+    return this.cartItemService.update(id, quantity, user.id);
   }
 
   @Mutation(() => CartItem)
@@ -57,6 +50,6 @@ export class CartItemResolver {
     { quantity }: CartItemUpdateInput,
     @CurrentUser() user: User,
   ) {
-    return this.cartItemService.destroyCartItem(id, user.id);
+    return this.cartItemService.destroy(id, user.id);
   }
 }

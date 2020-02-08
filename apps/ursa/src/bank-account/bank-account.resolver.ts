@@ -4,9 +4,9 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
+import { IpAddress } from '../ip-address.decorator';
 import { BankAccountService } from './bank-account.service';
 import { BankAccountCreateInput } from './dto/bank-account-create.input';
-import { IpAddress } from '../ip-address.decorator';
 
 @Resolver(of => UserBankAccount)
 export class BankAccountResolver {
@@ -34,11 +34,6 @@ export class BankAccountResolver {
     @CurrentUser() user: User,
     @IpAddress() ipAddress,
   ) {
-    return this.bankAccountService.createBankAccount(
-      token,
-      accountId,
-      user.id,
-      ipAddress,
-    );
+    return this.bankAccountService.create(token, accountId, user.id, ipAddress);
   }
 }

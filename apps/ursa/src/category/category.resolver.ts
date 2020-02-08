@@ -2,10 +2,10 @@ import { Category } from '@app/database/entities';
 import { Logger } from '@nestjs/common';
 import {
   Args,
-  Query,
-  Resolver,
-  ResolveProperty,
   Parent,
+  Query,
+  ResolveProperty,
+  Resolver,
 } from '@nestjs/graphql';
 
 import { CategoryService } from './category.service';

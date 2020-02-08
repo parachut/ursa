@@ -1,6 +1,6 @@
 import { Cart, User } from '@app/database/entities';
 import { InventoryStatus } from '@app/database/enums';
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Op } from 'sequelize';
 
 @Injectable()
@@ -72,7 +72,7 @@ export class CartService {
     });
   }
 
-  async cancelCart(id: string, userId: string) {
+  async cancel(id: string, userId: string) {
     const cart = await this.cartRepository.findOne({
       where: { userId, id },
       include: ['inventory'],
@@ -90,7 +90,7 @@ export class CartService {
     return cart.save();
   }
 
-  async updateCart(input: Partial<Cart>, userId: string) {
+  async update(input: Partial<Cart>, userId: string) {
     const cart = await Cart.findOne({
       where: { userId, completedAt: null },
       order: [['createdAt', 'DESC']],

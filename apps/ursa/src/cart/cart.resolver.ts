@@ -44,7 +44,7 @@ export class CartResolver {
     { id }: CartWhereUniqueInput,
     @CurrentUser() user: User,
   ) {
-    return this.cartService.cancelCart(id, user.id);
+    return this.cartService.cancel(id, user.id);
   }
 
   @Mutation(type => Cart)
@@ -54,7 +54,7 @@ export class CartResolver {
     input: CartUpdateInput,
     @CurrentUser() user: User,
   ) {
-    return this.cartService.updateCart(input, user.id);
+    return this.cartService.update(input, user.id);
   }
 
   @ResolveProperty(type => [CartItem])

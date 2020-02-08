@@ -50,7 +50,7 @@ export class UserService {
     });
   }
 
-  async findUser(userId: string) {
+  async findOne(userId: string) {
     return this.userRepository.findByPk(userId);
   }
 }

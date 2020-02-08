@@ -1,5 +1,6 @@
 import { Deposit, User } from '@app/database/entities';
-import { Inject, Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { DwollaService } from '../dwolla.service';
 
 @Injectable()
@@ -40,7 +41,7 @@ export class DepositService {
     });
   }
 
-  async createDeposit(amount: number, userId: string): Promise<Deposit> {
+  async create(amount: number, userId: string): Promise<Deposit> {
     const user = await this.userRepository.findByPk(userId, {
       include: ['bankAccounts', 'funds'],
     });

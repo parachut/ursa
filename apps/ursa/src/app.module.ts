@@ -15,6 +15,12 @@ import { CartModule } from './cart/cart.module';
 import { CartItemModule } from './cart-item/cart-item.module';
 import { CategoryModule } from './category/category.module';
 import { DepositModule } from './deposit/deposit.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { ProductModule } from './product/product.module';
+import { ElasticService } from './elastic.service';
+import { QueueModule } from './queue/queue.module';
+import { ShipKitModule } from './ship-kit/ship-kit.module';
+import { ShipmentModule } from './shipment/shipment.module';
 
 @Module({
   imports: [
@@ -33,8 +39,19 @@ import { DepositModule } from './deposit/deposit.module';
     CartItemModule,
     CategoryModule,
     DepositModule,
+    InventoryModule,
+    ProductModule,
+    QueueModule,
+    ShipKitModule,
+    ShipmentModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService, PlaidService, DwollaService],
+  providers: [
+    AppService,
+    EmailService,
+    PlaidService,
+    DwollaService,
+    ElasticService,
+  ],
 })
 export class AppModule {}

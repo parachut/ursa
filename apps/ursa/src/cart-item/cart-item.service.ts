@@ -31,10 +31,7 @@ export class CartItemService {
     });
   }
 
-  async createCartItem(
-    input: Partial<CartItem>,
-    userId: string,
-  ): Promise<CartItem> {
+  async create(input: Partial<CartItem>, userId: string): Promise<CartItem> {
     const cart = await this.cartService.findOne(userId);
 
     if (!cart) {
@@ -48,7 +45,7 @@ export class CartItemService {
     });
   }
 
-  async updateCartItem(id: string, quantity: number, userId: string) {
+  async update(id: string, quantity: number, userId: string) {
     const cartItem = await this.cartItemRepository.findOne({
       where: {
         id,
@@ -67,7 +64,7 @@ export class CartItemService {
     return cartItem.save();
   }
 
-  async destroyCartItem(id: string, userId: string) {
+  async destroy(id: string, userId: string) {
     const cartItem = await this.cartItemRepository.findOne({
       where: {
         id,

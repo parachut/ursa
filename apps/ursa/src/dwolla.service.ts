@@ -12,19 +12,14 @@ export class DwollaService {
 
   private appToken: any;
 
-  async getAppToken() {
-    if (!this.appToken) {
-      this.appToken = await this.dwollaClient.auth.client();
-    }
-    return this.appToken;
+  async onModuleInit(): Promise<void> {
+    this.appToken = await this.dwollaClient.auth.client();
   }
 
   async createAccount(
     user: User,
     ipAddress: string,
   ): Promise<Partial<UserIntegration>> {
-    const appToken = await this.getAppToken();
-
     const dwollaCustomerRequest: any = {
       firstName: user.parsedName.first,
       lastName: user.parsedName.last,
@@ -37,7 +32,7 @@ export class DwollaService {
       dwollaCustomerRequest.businessName = user.businessName;
     }
 
-    const userUrl = await appToken
+    const userUrl = await this.appToken
       .post('customers', dwollaCustomerRequest)
       .then(res => res.headers.get('location'));
 
@@ -53,10 +48,8 @@ export class DwollaService {
     plaidToken: string,
     name: string,
   ): Promise<string> {
-    const appToken = await this.getAppToken();
-
     try {
-      const dwollaRef = await appToken
+      const dwollaRef = await this.appToken
         .post(`${dwollaAccountRef}/funding-sources`, {
           plaidToken,
           name,
@@ -81,13 +74,11 @@ export class DwollaService {
     paymentId: string,
     userId: string,
   ): Promise<string> {
-    const appToken = await this.getAppToken();
-
-    const accountUrl = await appToken
+    const accountUrl = await this.appToken
       .get('/')
       .then(res => res.body._links.account.href);
 
-    const masterFundingSource = await appToken
+    const masterFundingSource = await this.appToken
       .get(`${accountUrl}/funding-sources`)
       .then(res => res.body._embedded['funding-sources'][0]._links.self.href);
 
@@ -115,7 +106,7 @@ export class DwollaService {
       correlationId: paymentId,
     };
 
-    return appToken
+    return this.appToken
       .post('transfers', requestBody)
       .then(res => res.headers.get('location'));
   }
