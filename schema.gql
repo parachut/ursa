@@ -59,6 +59,13 @@ enum AuthenticateMethod {
   EMAIL
 }
 
+input BankAccountCreateInput {
+  accountId: String!
+  token: String!
+  last4: Float
+  dob: String
+}
+
 type BillingInfo {
   id: ID!
   company: String
@@ -104,12 +111,38 @@ type Cart {
   couponCode: String
   protectionPlan: Boolean!
   service: String
+  items: [CartItem!]!
 }
 
 type CartItem {
   id: ID!
   points: Int!
   quantity: Int!
+}
+
+input CartItemCreateInput {
+  productId: ID!
+  quantity: Int
+}
+
+input CartItemUpdateInput {
+  quantity: Int
+}
+
+input CartItemWhereUniqueInput {
+  id: ID!
+}
+
+input CartUpdateInput {
+  planId: String
+  protectionPlan: Boolean
+  service: String
+  couponCode: String
+  addressId: String
+}
+
+input CartWhereUniqueInput {
+  id: ID!
 }
 
 type Category {
@@ -119,7 +152,7 @@ type Category {
   slug: String!
   description: String
   includedEssentials: [String!]
-  parent: Category
+  parent: Category!
 }
 
 type CategoryInspectionTask {
@@ -290,6 +323,12 @@ type Mutation {
   addressDestroy(where: AddressWhereUniqueInput!): Address!
   authenticate(input: AuthenticateInput!): Token!
   register(input: RegisterInput!): Token!
+  bankAccountCreate(input: BankAccountCreateInput!): UserBankAccount!
+  cartCancel(where: CartWhereUniqueInput!): Cart!
+  cartUpdate(input: CartUpdateInput!): Cart!
+  cartItemCreate(input: CartItemCreateInput!): CartItem!
+  cartItemUpdate(input: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem!
+  cartItemDestroy(input: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem!
 }
 
 type PaymentMethod {
@@ -386,8 +425,15 @@ type ProductValue {
 }
 
 type Query {
-  address(id: ID!): Address!
+  address(id: String!): Address!
   addresses: [Address!]!
+  bankAccount(id: String!): UserBankAccount!
+  bankAccounts: UserBankAccount!
+  me: User!
+  cart(id: String!): Cart!
+  carts: [Cart!]!
+  category(id: String!): Category!
+  categories(id: String!): Category!
 }
 
 type Queue {
@@ -597,6 +643,12 @@ type UserEmployment {
   role: String!
   subRole: String!
   senority: String!
+}
+
+type UserFunds {
+  balance: Float!
+  total: Float!
+  withdrawn: Float!
 }
 
 type UserIntegration {

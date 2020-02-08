@@ -8,16 +8,23 @@ import { UserService } from '../user/user.service';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     DatabaseModule,
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  providers: [AuthResolver, AuthService, UserService, EmailService],
+  providers: [
+    AuthResolver,
+    AuthService,
+    UserService,
+    EmailService,
+    JwtStrategy,
+  ],
 })
 export class AuthModule {}

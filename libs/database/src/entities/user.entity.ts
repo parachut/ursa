@@ -15,6 +15,7 @@ import {
   Unique,
   Sequelize,
   UpdatedAt,
+  HasOne,
 } from 'sequelize-typescript';
 import { Field, ID, Int, ObjectType } from 'type-graphql';
 
@@ -29,6 +30,7 @@ import { Queue } from './queue.entity';
 import { ShipKit } from './ship-kit.entity';
 import { Shipment } from './shipment.entity';
 import { UserBankAccount } from './user-bank-account.entity';
+import { UserBankBalance } from './user-bank-balance.entity';
 import { UserGeolocation } from './user-geolocation.entity';
 import { UserIntegration } from './user-integration.entity';
 import { UserMarketingSource } from './user-marketing-source.entity';
@@ -39,6 +41,7 @@ import { createAuthyUser } from '../utils/create-authy-user';
 import { createRecurlyUser } from '../utils/create-recurly-user';
 import { createFrontContact } from '../utils/create-front-contact';
 import checkClearbit from '../utils/check-clearbit';
+import { UserFunds } from './user-funds.view';
 
 @ObjectType()
 @Table({
@@ -203,6 +206,12 @@ export class User extends Model<User> {
 
   @HasMany(() => UserBankAccount, 'userId')
   bankAccounts?: UserBankAccount[];
+
+  @HasMany(() => UserBankBalance, 'userId')
+  bankBalances?: UserBankBalance[];
+
+  @HasOne(() => UserFunds, 'userId')
+  funds?: UserFunds;
 
   @HasMany(() => UserTermAgreement, 'userId')
   termAgreements?: UserTermAgreement[];

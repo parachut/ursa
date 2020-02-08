@@ -36,6 +36,7 @@ export * from './transaction.entity';
 export * from './user-bank-account.entity';
 export * from './user-bank-balance.entity';
 export * from './user-employment.entity';
+export * from './user-funds.view';
 export * from './user-geolocation.entity';
 export * from './user-integration.entity';
 export * from './user-marketing-source.entity';
