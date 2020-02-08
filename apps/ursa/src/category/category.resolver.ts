@@ -17,17 +17,17 @@ export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Query(type => Category)
-  async category(@Args('id') id: string) {
+  async category(@Args('id') id: string): Promise<Category> {
     return this.categoryService.findOne(id);
   }
 
   @Query(type => Category)
-  async categories(@Args('id') id: string) {
+  async categories(@Args('id') id: string): Promise<Category[]> {
     return this.categoryService.find();
   }
 
   @ResolveProperty('parent', returns => Category)
-  async getPosts(@Parent() category: Category) {
-    return this.categoryService.findOne(category.parentId);
+  async getPosts(@Parent() category: Category): Promise<Category> {
+    return category.$get('parent');
   }
 }

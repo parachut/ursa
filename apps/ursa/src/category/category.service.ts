@@ -11,7 +11,7 @@ export class CategoryService {
 
   constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Category> {
     const category = await this.categoryRepository.findOne({
       where: { id },
     });
@@ -23,9 +23,37 @@ export class CategoryService {
     return category;
   }
 
-  async find() {
+  async find(): Promise<Category[]> {
     return this.categoryRepository.findAll({
       order: [['createdAt', 'DESC']],
     });
+  }
+
+  async breadCrumbs(id: string): Promise<Category[]> {
+    const categories = await Category.findAll({});
+
+    function findBreadCrumbs(id: string): Category[] {
+      const cat = categories.find(cat => cat.id === id);
+      const _categories = [cat];
+
+      const getParent = async (child: Category) => {
+        if (child.parentId) {
+          const parent = categories.find(cate => cate.id === child.parentId);
+
+          if (parent) {
+            _categories.push(parent);
+
+            if (parent.parentId) {
+              getParent(parent);
+            }
+          }
+        }
+      };
+
+      getParent(cat);
+      return _categories;
+    }
+
+    return findBreadCrumbs(id);
   }
 }

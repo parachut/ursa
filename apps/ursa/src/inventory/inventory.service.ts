@@ -1,8 +1,16 @@
 import { Inventory } from '@app/database/entities';
-import { InventoryStatus } from '@app/database/enums';
+import {
+  InventoryStatus,
+  ShipmentDirection,
+  ShipmentType,
+} from '@app/database/enums';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { differenceInCalendarDays } from 'date-fns';
+import { last, sortBy } from 'lodash';
+import * as numeral from 'numeral';
 import { Op } from 'sequelize';
 
+import { InventoryHistory } from './dto/inventory-history.type';
 import { InventoryWhereInput } from './dto/inventory-where.input';
 
 @Injectable()
@@ -100,5 +108,65 @@ export class InventoryService {
     await inventory.destroy();
 
     return inventory;
+  }
+
+  async history(id: string): Promise<InventoryHistory[]> {
+    const item = await this.inventoryRepository.findByPk(id, {
+      include: ['product'],
+    });
+
+    const groups: InventoryHistory[] = [];
+
+    let shipments = await item.$get('shipments', {
+      order: [['carrierReceivedAt', 'ASC']],
+    });
+
+    shipments = shipments
+      .filter(ship => ship.type === ShipmentType.ACCESS)
+      .filter(
+        ship =>
+          (ship.direction === ShipmentDirection.OUTBOUND &&
+            ship.carrierDeliveredAt) ||
+          (ship.direction === ShipmentDirection.INBOUND &&
+            ship.carrierReceivedAt),
+      );
+
+    shipments = sortBy(shipments, ship =>
+      ship.carrierReceivedAt
+        ? ship.carrierReceivedAt.getTime()
+        : ship.carrierDeliveredAt.getTime(),
+    );
+
+    shipments.forEach((shipment, i) => {
+      if (
+        shipment.direction === ShipmentDirection.OUTBOUND &&
+        shipment.carrierDeliveredAt
+      ) {
+        const access: InventoryHistory = {
+          out: shipment.carrierDeliveredAt,
+          in: null,
+          amount: 0,
+          days: 0,
+          serial: item.serial,
+          name: item.product.name,
+        };
+
+        groups.push(access);
+      } else {
+        last(groups).in = shipment.carrierReceivedAt;
+      }
+
+      const final = last(groups);
+
+      if (final.in || i === item.shipments.length - 1 || final.in === null) {
+        final.days = differenceInCalendarDays(
+          final.in || new Date(),
+          final.out,
+        );
+        final.amount = numeral(item.commission * final.days).format('$0,00.00');
+      }
+    });
+
+    return groups;
   }
 }

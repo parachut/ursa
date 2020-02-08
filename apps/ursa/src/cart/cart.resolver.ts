@@ -1,4 +1,11 @@
-import { Cart, CartItem, User } from '@app/database/entities';
+import {
+  Address,
+  Cart,
+  CartItem,
+  Inventory,
+  Shipment,
+  User,
+} from '@app/database/entities';
 import { Logger, UseGuards } from '@nestjs/common';
 import {
   Args,
@@ -27,13 +34,13 @@ export class CartResolver {
 
   @Query(type => Cart)
   @UseGuards(GqlAuthGuard)
-  async cart(@Args('id') id: string, @CurrentUser() user: User) {
+  async cart(@Args('id') id: string, @CurrentUser() user: User): Promise<Cart> {
     return this.cartService.findOne(user.id);
   }
 
   @Query(type => [Cart])
   @UseGuards(GqlAuthGuard)
-  async carts(@CurrentUser() user: User) {
+  async carts(@CurrentUser() user: User): Promise<Cart[]> {
     return this.cartService.find(user.id);
   }
 
@@ -43,7 +50,7 @@ export class CartResolver {
     @Args('where')
     { id }: CartWhereUniqueInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<Cart> {
     return this.cartService.cancel(id, user.id);
   }
 
@@ -53,12 +60,27 @@ export class CartResolver {
     @Args('input')
     input: CartUpdateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<Cart> {
     return this.cartService.update(input, user.id);
   }
 
   @ResolveProperty(type => [CartItem])
-  async items(@Parent() cart: Cart) {
-    return this.cartItemService.find(cart.id);
+  async items(@Parent() cart: Cart): Promise<CartItem[]> {
+    return cart.$get('items');
+  }
+
+  @ResolveProperty(type => [CartItem])
+  async inventory(@Parent() cart: Cart): Promise<Inventory[]> {
+    return cart.$get('inventory');
+  }
+
+  @ResolveProperty(type => Address)
+  async address(@Parent() cart: Cart): Promise<Address> {
+    return cart.$get('address');
+  }
+
+  @ResolveProperty(type => [Shipment])
+  async shipments(@Parent() cart: Cart): Promise<Shipment[]> {
+    return cart.$get('shipments');
   }
 }

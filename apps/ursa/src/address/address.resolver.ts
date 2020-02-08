@@ -17,24 +17,28 @@ export class AddressResolver {
 
   @Query(returns => Address)
   @UseGuards(GqlAuthGuard)
-  async address(@Args('id') id: string, @CurrentUser() user: User) {
+  async address(
+    @Args('id') id: string,
+    @CurrentUser() user: User,
+  ): Promise<Address> {
     return this.addressService.findOne(id, user.id);
   }
 
   @Query(returns => [Address])
   @UseGuards(GqlAuthGuard)
-  async addresses(@CurrentUser() user: User) {
+  async addresses(@CurrentUser() user: User): Promise<Address[]> {
     return this.addressService.find(user.id);
   }
 
-  @Mutation(types => Address)
+  @Mutation(returns => Address)
   @UseGuards(GqlAuthGuard)
   async addressSetPrimary(
     @Args('where')
     { id }: AddressWhereUniqueInput,
     @CurrentUser() user: User,
-  ) {
-    return this.addressService.setPrimary(id, user.id);
+  ): Promise<Address> {
+    await this.addressService.setPrimary(id, user.id);
+    return this.addressService.findOne(id, user.id);
   }
 
   @Mutation(returns => Address)
@@ -45,7 +49,7 @@ export class AddressResolver {
     input: AddressCreateInput,
     @CurrentUser() user: User,
     @IpAddress() ipAddress,
-  ) {
+  ): Promise<Address> {
     return this.addressService.createAddress(
       { ...input, phone, userId: user.id },
       ipAddress,
@@ -62,7 +66,7 @@ export class AddressResolver {
     { id }: AddressWhereUniqueInput,
     @CurrentUser() user: User,
     @IpAddress() ipAddress,
-  ) {
+  ): Promise<Address> {
     const address = await this.addressService.createAddress(
       { ...input, phone, userId: user.id },
       ipAddress,
@@ -78,7 +82,7 @@ export class AddressResolver {
     @Args('where')
     { id }: AddressWhereUniqueInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<Address> {
     return this.addressService.deleteAddress(id, user.id);
   }
 }

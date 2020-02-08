@@ -1,6 +1,12 @@
-import { CartItem, User } from '@app/database/entities';
+import { CartItem, Product, User } from '@app/database/entities';
 import { Logger, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Resolver,
+  ResolveProperty,
+  Parent,
+} from '@nestjs/graphql';
 
 import { CartService } from '../cart/cart.service';
 import { CurrentUser } from '../current-user.decorator';
@@ -25,7 +31,7 @@ export class CartItemResolver {
     @Args('input')
     input: CartItemCreateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<CartItem> {
     return this.cartItemService.create(input, user.id);
   }
 
@@ -37,7 +43,7 @@ export class CartItemResolver {
     @Args('input')
     { quantity }: CartItemUpdateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<CartItem> {
     return this.cartItemService.update(id, quantity, user.id);
   }
 
@@ -49,7 +55,12 @@ export class CartItemResolver {
     @Args('input')
     { quantity }: CartItemUpdateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<CartItem> {
     return this.cartItemService.destroy(id, user.id);
+  }
+
+  @ResolveProperty(type => Product)
+  async product(@Parent() cartItem: CartItem): Promise<Product> {
+    return cartItem.$get('product');
   }
 }

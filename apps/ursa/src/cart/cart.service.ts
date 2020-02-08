@@ -1,4 +1,4 @@
-import { Cart, User } from '@app/database/entities';
+import { Cart, Inventory, User } from '@app/database/entities';
 import { InventoryStatus } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
 import { Op } from 'sequelize';
@@ -99,5 +99,21 @@ export class CartService {
     Object.assign(cart, input);
 
     return cart.save();
+  }
+
+  async lastByInventory(id: string) {
+    return this.cartRepository.findOne({
+      where: {
+        completedAt: { [Op.ne]: null },
+      },
+      include: [
+        {
+          required: true,
+          model: Inventory,
+          where: { id },
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
   }
 }

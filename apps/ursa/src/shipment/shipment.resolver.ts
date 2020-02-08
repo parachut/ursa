@@ -1,6 +1,13 @@
-import { Shipment, User } from '@app/database/entities';
+import { Inventory, Shipment, User } from '@app/database/entities';
 import { Logger, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver,
+} from '@nestjs/graphql';
 
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
@@ -15,13 +22,16 @@ export class ShipmentResolver {
 
   @Query(type => Shipment)
   @UseGuards(GqlAuthGuard)
-  async shipment(@Args('id') id: string, @CurrentUser() user: User) {
+  async shipment(
+    @Args('id') id: string,
+    @CurrentUser() user: User,
+  ): Promise<Shipment> {
     return this.shipmentService.findOne(id, user.id);
   }
 
   @Query(returns => [Shipment])
   @UseGuards(GqlAuthGuard)
-  async shipments(@CurrentUser() user: User) {
+  async shipments(@CurrentUser() user: User): Promise<Shipment[]> {
     return this.shipmentService.find(user.id);
   }
 
@@ -31,7 +41,12 @@ export class ShipmentResolver {
     @Args('input')
     input: ShipmentCreateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<Shipment> {
     return this.shipmentService.create(input, user.id);
+  }
+
+  @ResolveProperty(type => [Inventory])
+  async inventory(@Parent() shipment: Shipment): Promise<Inventory[]> {
+    return shipment.$get('inventory');
   }
 }

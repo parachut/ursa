@@ -1,4 +1,5 @@
 import { Inventory, Shipment } from '@app/database/entities';
+import { ShipmentDirection } from '@app/database/enums';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Op } from 'sequelize';
 
@@ -62,5 +63,21 @@ export class ShipmentService {
     await shipment.$set('inventory', input.inventoryIds);
 
     return shipment;
+  }
+
+  async lastByInventory(id: string, direction: ShipmentDirection) {
+    return this.shipmentRepository.findOne({
+      where: {
+        direction,
+      },
+      include: [
+        {
+          required: true,
+          model: Inventory,
+          where: { id },
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
   }
 }

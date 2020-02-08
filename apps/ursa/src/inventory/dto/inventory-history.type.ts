@@ -13,4 +13,10 @@ export class InventoryHistory {
 
   @Field()
   days!: number;
+
+  @Field({ nullable: true })
+  serial?: string;
+
+  @Field({ nullable: true })
+  name?: string;
 }

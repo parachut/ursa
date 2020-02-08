@@ -1,6 +1,13 @@
-import { Queue, User } from '@app/database/entities';
+import { Product, Queue, User } from '@app/database/entities';
 import { Logger, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver,
+} from '@nestjs/graphql';
 
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
@@ -16,23 +23,26 @@ export class QueueResolver {
 
   @Query(type => Queue)
   @UseGuards(GqlAuthGuard)
-  async inventory(@Args('id') id: string, @CurrentUser() user: User) {
+  async queue(
+    @Args('id') id: string,
+    @CurrentUser() user: User,
+  ): Promise<Queue> {
     return this.queueService.findOne(id, user.id);
   }
 
   @Query(returns => [Queue])
   @UseGuards(GqlAuthGuard)
-  async inventories(@CurrentUser() user: User) {
+  async queues(@CurrentUser() user: User): Promise<Queue[]> {
     return this.queueService.find(user.id);
   }
 
   @Mutation(returns => Queue)
   @UseGuards(GqlAuthGuard)
-  async inventoryCreate(
+  async queueCreate(
     @Args('input')
     { productId }: QueueCreateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<Queue> {
     return this.queueService.create(productId, user.id);
   }
 
@@ -42,7 +52,12 @@ export class QueueResolver {
     @Args('input')
     { id }: QueueWhereUniqueInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<Queue> {
     return this.queueService.destroy(id, user.id);
+  }
+
+  @ResolveProperty(type => Product)
+  async product(@Parent() queue: Queue): Promise<Product> {
+    return queue.$get('product');
   }
 }

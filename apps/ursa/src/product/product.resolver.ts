@@ -1,8 +1,16 @@
-import { Product } from '@app/database/entities';
+import { CalculatorService } from '@app/calculator';
+import { Brand, Category, Product } from '@app/database/entities';
 import { Logger } from '@nestjs/common';
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { Int } from 'type-graphql';
+import {
+  Args,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver,
+} from '@nestjs/graphql';
+import { Float, Int } from 'type-graphql';
 
+import { CategoryService } from '../category/category.service';
 import { ProductFilterInput } from './dto/product-filter.input';
 import { ProductSort } from './dto/product-sort.enum';
 import { ProductsResponse } from './dto/products-response.type';
@@ -12,10 +20,14 @@ import { ProductService } from './product.service';
 export class ProductResolver {
   private readonly logger = new Logger(ProductResolver.name);
 
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly categoryService: CategoryService,
+    private readonly calculatorService: CalculatorService,
+  ) {}
 
   @Query(type => Product)
-  async product(@Args('slug') slug: string) {
+  async product(@Args('slug') slug: string): Promise<Product> {
     return this.productService.findOne(slug);
   }
 
@@ -34,7 +46,7 @@ export class ProductResolver {
       defaultValue: ProductSort['ID_DESC'],
     })
     sort: ProductSort,
-  ) {
+  ): Promise<ProductsResponse> {
     const res = await this.productService.find(filter, sort, from, size);
 
     return {
@@ -42,5 +54,30 @@ export class ProductResolver {
       from,
       size,
     };
+  }
+
+  @ResolveProperty(type => Brand)
+  async brand(@Parent() product: Product): Promise<Brand> {
+    return product.$get('brand');
+  }
+
+  @ResolveProperty(type => Category)
+  async category(@Parent() product: Product): Promise<Category> {
+    return product.$get('category');
+  }
+
+  @ResolveProperty(type => Float)
+  dailyCommission(@Parent() product: Product): number {
+    return this.calculatorService.dailyCommission(product.points);
+  }
+
+  @ResolveProperty(type => Float)
+  estimatedCommission(@Parent() product: Product): number {
+    return this.calculatorService.dailyCommission(product.points) * 25;
+  }
+
+  @ResolveProperty(type => [Category])
+  breadCrumbs(@Parent() product: Product): Promise<Category[]> {
+    return this.categoryService.breadCrumbs(product.categoryId);
   }
 }

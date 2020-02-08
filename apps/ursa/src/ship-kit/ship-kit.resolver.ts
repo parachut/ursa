@@ -1,6 +1,19 @@
-import { ShipKit, User } from '@app/database/entities';
+import {
+  Address,
+  Inventory,
+  ShipKit,
+  Shipment,
+  User,
+} from '@app/database/entities';
 import { Logger, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver,
+} from '@nestjs/graphql';
 
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
@@ -15,13 +28,16 @@ export class ShipKitResolver {
 
   @Query(type => ShipKit)
   @UseGuards(GqlAuthGuard)
-  async shipKit(@Args('id') id: string, @CurrentUser() user: User) {
+  async shipKit(
+    @Args('id') id: string,
+    @CurrentUser() user: User,
+  ): Promise<ShipKit> {
     return this.shipKitService.findOne(user.id);
   }
 
   @Query(returns => [ShipKit])
   @UseGuards(GqlAuthGuard)
-  async shipKits(@CurrentUser() user: User) {
+  async shipKits(@CurrentUser() user: User): Promise<ShipKit[]> {
     return this.shipKitService.find(user.id);
   }
 
@@ -31,13 +47,28 @@ export class ShipKitResolver {
     @Args('input')
     input: ShipKitUpdateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<ShipKit> {
     return this.shipKitService.update(input, user.id);
   }
 
   @Mutation(returns => ShipKit)
   @UseGuards(GqlAuthGuard)
-  async shipKitComplete(@CurrentUser() user: User) {
+  async shipKitComplete(@CurrentUser() user: User): Promise<ShipKit> {
     return this.shipKitService.complete(user.id);
+  }
+
+  @ResolveProperty(type => [Inventory])
+  async inventory(@Parent() shipKit: ShipKit): Promise<Inventory[]> {
+    return shipKit.$get('inventory');
+  }
+
+  @ResolveProperty(type => Address)
+  async address(@Parent() shipKit: ShipKit): Promise<Address> {
+    return shipKit.$get('address');
+  }
+
+  @ResolveProperty(type => [Shipment])
+  async shipments(@Parent() shipKit: ShipKit): Promise<Shipment[]> {
+    return shipKit.$get('shipments');
   }
 }

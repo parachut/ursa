@@ -16,13 +16,16 @@ export class BankAccountResolver {
 
   @Query(type => UserBankAccount)
   @UseGuards(GqlAuthGuard)
-  async bankAccount(@Args('id') id: string, @CurrentUser() user: User) {
+  async bankAccount(
+    @Args('id') id: string,
+    @CurrentUser() user: User,
+  ): Promise<UserBankAccount> {
     return this.bankAccountService.findOne(id, user.id);
   }
 
   @Query(type => UserBankAccount)
   @UseGuards(GqlAuthGuard)
-  async bankAccounts(@CurrentUser() user: User) {
+  async bankAccounts(@CurrentUser() user: User): Promise<UserBankAccount[]> {
     return this.bankAccountService.find(user.id);
   }
 
@@ -33,7 +36,7 @@ export class BankAccountResolver {
     { token, accountId }: BankAccountCreateInput,
     @CurrentUser() user: User,
     @IpAddress() ipAddress,
-  ) {
+  ): Promise<UserBankAccount> {
     return this.bankAccountService.create(token, accountId, user.id, ipAddress);
   }
 }

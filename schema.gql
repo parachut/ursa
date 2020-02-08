@@ -112,12 +112,16 @@ type Cart {
   protectionPlan: Boolean!
   service: String
   items: [CartItem!]!
+  inventory: [CartItem!]!
+  address: Address!
+  shipments: [Shipment!]!
 }
 
 type CartItem {
   id: ID!
   points: Int!
   quantity: Int!
+  product: Product!
 }
 
 input CartItemCreateInput {
@@ -258,6 +262,11 @@ type Inventory {
   status: InventoryStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
+  history: [InventoryHistory!]!
+  product: Product!
+  lastCart: Cart!
+  lastReturn: Cart!
+  lastShipment: Cart!
 }
 
 enum InventoryCondition {
@@ -272,6 +281,15 @@ input InventoryCreateInput {
   productId: ID!
   condition: InventoryCondition!
   missingEssentials: [String!]
+}
+
+type InventoryHistory {
+  in: DateTime
+  out: DateTime!
+  amount: Float!
+  days: Float!
+  serial: String
+  name: String
 }
 
 enum InventoryStatus {
@@ -355,10 +373,11 @@ type Mutation {
   cartItemUpdate(input: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem!
   cartItemDestroy(input: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem!
   depositCreate(input: DepositCreateInput!): Deposit!
-  inventoryCreate(input: QueueCreateInput!): Queue!
+  inventoryCreate(input: InventoryCreateInput!): Inventory!
   inventoryUpdate(input: InventoryUpdateInput!, where: InventoryWhereUniqueInput!): Inventory!
   inventoryReturn(where: InventoryWhereUniqueInput!): Inventory!
   inventoryDestroy(where: InventoryWhereUniqueInput!): Inventory!
+  queueCreate(input: QueueCreateInput!): Queue!
   queueDestroy(input: QueueWhereUniqueInput!): Queue!
   shipKitUpdate(input: ShipKitUpdateInput!): ShipKit!
   shipKitComplete: ShipKit!
@@ -437,6 +456,10 @@ type Product {
   stock: Int!
   demand: Int!
   brand: Brand
+  category: Category!
+  dailyCommission: Float!
+  estimatedCommission: Float!
+  breadCrumbs: [Category!]!
 }
 
 type ProductAttribute {
@@ -502,10 +525,12 @@ type Query {
   categories(id: String!): Category!
   deposit(id: String!): Deposit!
   deposits: [Deposit!]!
-  inventory(id: String!): Queue!
-  inventories: [Queue!]!
+  inventory(id: String!): Inventory!
+  inventories(input: InventoryWhereInput!): [Inventory!]!
   product(slug: String!): Product!
   products(sort: ProductSort = ID_DESC, filter: ProductFilterInput, size: Int = 10, from: Int = 0): ProductsResponse!
+  queue(id: String!): Queue!
+  queues: [Queue!]!
   shipKit(id: String!): ShipKit!
   shipKits: [ShipKit!]!
   shipment(id: String!): Shipment!
@@ -515,6 +540,7 @@ type Query {
 type Queue {
   id: ID!
   lastNotified: DateTime
+  product: Product!
 }
 
 input QueueCreateInput {
@@ -538,6 +564,9 @@ type ShipKit {
   completedAt: DateTime
   confirmedAt: DateTime
   airbox: Boolean!
+  inventory: [Inventory!]!
+  address: Address!
+  shipments: [Shipment!]!
 }
 
 input ShipKitUpdateInput {
@@ -570,6 +599,7 @@ type Shipment {
   weight: Float!
   width: Float!
   createdAt: DateTime!
+  inventory: [Inventory!]!
 }
 
 input ShipmentCreateInput {
@@ -721,6 +751,9 @@ type User {
   vip: Boolean!
   currentInventory: [Inventory!]!
   inventory: [Inventory!]!
+  termAgreements: [Inventory!]!
+  funds: UserFunds!
+  frontHash: UserFunds!
 }
 
 type UserBankAccount {

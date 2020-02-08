@@ -15,13 +15,16 @@ export class DepositResolver {
 
   @Query(type => Deposit)
   @UseGuards(GqlAuthGuard)
-  async deposit(@Args('id') id: string, @CurrentUser() user: User) {
+  async deposit(
+    @Args('id') id: string,
+    @CurrentUser() user: User,
+  ): Promise<Deposit> {
     return this.depositService.findOne(id, user.id);
   }
 
   @Query(type => [Deposit])
   @UseGuards(GqlAuthGuard)
-  async deposits(@CurrentUser() user: User) {
+  async deposits(@CurrentUser() user: User): Promise<Deposit[]> {
     return this.depositService.find(user.id);
   }
 
@@ -31,7 +34,7 @@ export class DepositResolver {
     @Args('input')
     { amount }: DepositCreateInput,
     @CurrentUser() user: User,
-  ) {
+  ): Promise<Deposit> {
     return this.depositService.create(amount, user.id);
   }
 }
