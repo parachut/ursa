@@ -28,6 +28,7 @@ import { Income } from './income.entity';
 import { Inventory } from './inventory.entity';
 import { Queue } from './queue.entity';
 import { ShipKit } from './ship-kit.entity';
+import { Subscription } from './subscription.entity';
 import { Shipment } from './shipment.entity';
 import { UserBankAccount } from './user-bank-account.entity';
 import { UserBankBalance } from './user-bank-balance.entity';
@@ -215,6 +216,9 @@ export class User extends Model<User> {
 
   @HasMany(() => UserTermAgreement, 'userId')
   termAgreements?: UserTermAgreement[];
+
+  @HasOne(() => Subscription, 'userId')
+  subscription?: Subscription[];
 
   @CreatedAt
   createdAt!: Date;
