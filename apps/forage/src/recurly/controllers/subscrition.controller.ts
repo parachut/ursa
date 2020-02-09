@@ -6,17 +6,8 @@ import { SubscriptionService } from '../services/subscrition.service';
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) { }
 
-  @Get('/subscription')
-  findSubscriptions() {
-    return this.subscriptionService.findSubscriptions();
-  }
-
-
-
   @Post('/subscription')
-  getPost(@Body() body: any): string {
-    return body;
+  findSubscriptions(@Body() body) {
+    return this.subscriptionService.findSubscriptions("uuid-" + body.new_subscription_notification.subscription[0].uuid);
   }
-
-
 }

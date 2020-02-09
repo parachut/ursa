@@ -6,17 +6,9 @@ import { PlanService } from '../services/plan.service';
 export class PlanController {
   constructor(private readonly planService: PlanService) { }
 
-  @Get('/plan')
+  @Post('/plan')
   findPlans() {
     return this.planService.findPlans();
   }
-
-
-
-  @Post('/plan')
-  getPost(@Body() body: any): string {
-    return body;
-  }
-
 
 }
