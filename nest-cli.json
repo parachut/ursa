@@ -4,7 +4,7 @@
   "monorepo": true,
   "root": "apps/ursa",
   "compilerOptions": {
-    "webpack": true,
+    "webpack": false,
     "tsConfigPath": "apps/ursa/tsconfig.app.json"
   },
   "projects": {
