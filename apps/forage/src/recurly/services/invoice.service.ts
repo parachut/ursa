@@ -100,8 +100,8 @@ export class InvoiceService {
       this.logger.error(`Failed with Recurly (getInvoice) or with ID ${invoiceID} `, e.stack)
     }
 
-    const invoices = await this.invoiceRepository.findAll({});
-    return invoices;
+    this.logger.log(`Subscription Updated`)
+    return;
   }
 
 }

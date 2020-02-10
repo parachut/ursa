@@ -25,7 +25,7 @@ export class BillingService {
 
           if (subscription.account && subscription.account.id) {
             try {
-              await this.billingRepository.update({
+               await this.billingRepository.update({
 
                 company: billingInfo.company,
                 firstName: billingInfo.firstName,
@@ -80,12 +80,8 @@ export class BillingService {
       console.log(e)
       this.logger.error(`Failed with Recurly (listSubscriptions) `, e.stack)
     }
-
-
-
-
-    const billings = await this.billingRepository.findAll({});
-    return billings;
+    this.logger.log(`Billing Info Updated `)
+    return
   }
 
 

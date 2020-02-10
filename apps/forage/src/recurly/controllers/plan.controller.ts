@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 import { PlanService } from '../services/plan.service';
 
@@ -6,6 +7,7 @@ import { PlanService } from '../services/plan.service';
 export class PlanController {
   constructor(private readonly planService: PlanService) { }
 
+  @UseGuards(AuthGuard('local'))
   @Post('/plan')
   findPlans() {
     return this.planService.findPlans();

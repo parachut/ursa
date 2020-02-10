@@ -85,6 +85,7 @@ export class PlanService {
             }
 
           });
+          //  this.logger.error(`Plans Updated`)
         } catch (e) {
           console.log(e)
           this.logger.error(`Failed with Inserting to DB (SEQUELIZE) `, e.stack)
@@ -157,6 +158,7 @@ export class PlanService {
           });
 
 
+          //this.logger.error(`Plans Add On Updated`)
         }
         catch (e) {
           console.log(e)
@@ -169,8 +171,8 @@ export class PlanService {
       this.logger.error(`Failed with Recurly (listAddOns) `, e.stack)
     }
 
-    const plans = await this.planRepository.findAll({});
-    return plans;
+    this.logger.log(`Plans Updated`)
+    return;
   }
 
 

@@ -222,17 +222,20 @@ export class SubscriptionService {
               }
             })
         }
+        this.logger.log(`Subscription Updated`)
+        return
       } catch (e) {
         console.log(e.message)
         this.logger.error(`Failed with Inserting to DB (SEQUELIZE) `, e.stack)
       }
+
+
+
     } catch (e) {
       this.logger.error(`Failed with Recurly with ID ${subId} `, e.stack)
       console.log(e)
     }
 
-    const subscriptions = await this.subscriptionRepository.findAll({});
-    return subscriptions;
   }
 
 
