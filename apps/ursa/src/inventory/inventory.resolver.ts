@@ -3,6 +3,7 @@ import {
   Inventory,
   Product,
   Shipment,
+  InventoryIncome,
   User,
 } from '@app/database/entities';
 import { ShipmentDirection } from '@app/database/enums';
@@ -39,7 +40,7 @@ export class InventoryResolver {
 
   @Query(type => Inventory)
   @UseGuards(GqlAuthGuard)
-  async inventory(
+  async inventoryItem(
     @Args('id') id: string,
     @CurrentUser() user: User,
   ): Promise<Inventory> {
@@ -48,8 +49,8 @@ export class InventoryResolver {
 
   @Query(returns => [Inventory])
   @UseGuards(GqlAuthGuard)
-  async inventories(
-    @Args('input')
+  async inventory(
+    @Args({ name: 'where', type: () => InventoryWhereInput, nullable: true })
     where: InventoryWhereInput,
     @CurrentUser() user: User,
   ): Promise<Inventory[]> {
@@ -96,6 +97,11 @@ export class InventoryResolver {
     @CurrentUser() user: User,
   ): Promise<Inventory> {
     return this.inventoryService.destroy(id, user.id);
+  }
+
+  @ResolveProperty(type => InventoryIncome, { nullable: true })
+  async income(@Parent() inventory: Inventory): Promise<InventoryIncome> {
+    return inventory.$get('income');
   }
 
   @ResolveProperty(type => [InventoryHistory])

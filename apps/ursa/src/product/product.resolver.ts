@@ -77,7 +77,7 @@ export class ProductResolver {
   }
 
   @ResolveProperty(type => [Category])
-  breadCrumbs(@Parent() product: Product): Promise<Category[]> {
+  breadcrumbs(@Parent() product: Product): Promise<Category[]> {
     return this.categoryService.breadCrumbs(product.categoryId);
   }
 }

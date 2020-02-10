@@ -209,11 +209,12 @@ export class Shipment extends Model<Shipment> {
 
   @AfterUpdate
   static async checkDelivered(instance: Shipment) {
+    const { models } = instance.sequelize;
     if (
       instance.changed('status') &&
       instance.status === ShipmentStatus.DELIVERED
     ) {
-      const user = await User.findByPk(instance.userId, {
+      const user = await instance.$get('user', {
         include: ['addresses'],
       });
 
@@ -225,14 +226,9 @@ export class Shipment extends Model<Shipment> {
         instance.direction === ShipmentDirection.OUTBOUND &&
         instance.type === ShipmentType.ACCESS
       ) {
-        const cart = await Cart.findByPk(instance.cartId);
+        const cart = await instance.$get('cart');
 
-        if (!user.billingDay) {
-          user.billingDay = new Date().getDate();
-          await user.save();
-        }
-
-        await Inventory.update(
+        await models.Inventory.update(
           {
             status: InventoryStatus.WITHMEMBER,
           },
@@ -249,12 +245,14 @@ export class Shipment extends Model<Shipment> {
 
   @BeforeCreate
   static async createEasyPostShipment(instance: Shipment) {
+    const { models } = instance.sequelize;
     const easyPost = new EasyPost(process.env.EASYPOST);
 
     let cart: Cart;
+    let shipKit: ShipKit;
 
     if (instance.cartId) {
-      cart = await Cart.findByPk(instance.cartId);
+      cart = await instance.$get('cart');
 
       if (!instance.addressId) {
         instance.addressId = cart.addressId;
@@ -265,22 +263,23 @@ export class Shipment extends Model<Shipment> {
       }
     }
 
-    if (!instance.addressId) {
-      const address = await Address.findOne({
-        where: { userId: instance.userId },
-        order: [['primary', 'DESC']],
-      });
+    if (instance.shipKitId) {
+      shipKit = await instance.$get('shipKit');
 
-      if (address) {
-        instance.addressId = address.id;
+      if (!instance.addressId) {
+        instance.addressId = shipKit.addressId;
+      }
+
+      if (!instance.userId) {
+        instance.userId = shipKit.userId;
       }
     }
 
     if (!instance.warehouseId) {
-      const warehouse = await Warehouse.findOne({
+      const warehouse = (await models.Warehouse.findOne({
         where: {},
         order: [['createdAt', 'desc']],
-      });
+      })) as Warehouse;
 
       instance.warehouseId = warehouse.id;
     }
@@ -294,11 +293,8 @@ export class Shipment extends Model<Shipment> {
       });
 
       const [address, warehouse] = await Promise.all([
-        Address.findByPk(instance.addressId),
-        Warehouse.findOne({
-          where: {},
-          order: [['createdAt', 'desc']],
-        }),
+        instance.$get('address'),
+        instance.$get('warehouse'),
       ]);
 
       if (!address || !warehouse) {

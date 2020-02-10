@@ -16,7 +16,6 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 
-import { CartItemService } from '../cart-item/cart-item.service';
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
 import { CartService } from './cart.service';
@@ -27,10 +26,7 @@ import { CartWhereUniqueInput } from './dto/cart-where-unique.input';
 export class CartResolver {
   private readonly logger = new Logger(CartResolver.name);
 
-  constructor(
-    private readonly cartService: CartService,
-    private readonly cartItemService: CartItemService,
-  ) {}
+  constructor(private readonly cartService: CartService) {}
 
   @Query(type => Cart)
   @UseGuards(GqlAuthGuard)

@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import { EmailService } from '../email.service';
+import { RecurlyService } from '../recurly.service';
 import { UserService } from '../user/user.service';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
@@ -25,6 +26,7 @@ import { JwtStrategy } from './jwt.strategy';
     UserService,
     EmailService,
     JwtStrategy,
+    RecurlyService,
   ],
 })
 export class AuthModule {}

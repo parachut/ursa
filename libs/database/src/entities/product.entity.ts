@@ -170,39 +170,41 @@ export class Product extends Model<Product> {
 
   @AfterCreate
   static async createAlgolia(instance: Product) {
-    const product = await Product.findByPk(instance.id, {
-      include: ['brand', 'category'],
-    });
+    const [brand, category] = await Promise.all([
+      instance.$get('brand'),
+      instance.$get('category'),
+    ]);
 
     await elasti.index({
       index: 'products',
       body: {
-        id: product.id,
-        name: product.name,
-        category: product.category
+        id: instance.id,
+        name: instance.name,
+        category: category
           ? {
-              name: product.category.name,
-              id: product.category.id,
-              slug: product.category.slug,
+              name: category.name,
+              id: category.id,
+              slug: category.slug,
             }
           : null,
-        brand: product.brand
+        brand: brand
           ? {
-              name: product.brand.name,
-              id: product.brand.id,
-              slug: product.brand.slug,
+              name: brand.name,
+              id: brand.id,
+              slug: brand.slug,
             }
           : null,
-        slug: product.slug,
-        aliases: product.aliases
-          ? product.aliases.split(',').map(a => a.trim())
+        slug: instance.slug,
+        aliases: instance.aliases
+          ? instance.aliases.split(',').map(a => a.trim())
           : null,
-        stock: product.inventory.filter(i => i.status === 'INWAREHOUSE').length,
-        points: product.points,
-        images: product.images,
-        popularity: product.popularity,
-        demand: product.demand,
-        lastInventoryCreated: product.lastInventoryCreated,
+        stock: instance.inventory.filter(i => i.status === 'INWAREHOUSE')
+          .length,
+        points: instance.points,
+        images: instance.images,
+        popularity: instance.popularity,
+        demand: instance.demand,
+        lastInventoryCreated: instance.lastInventoryCreated,
       },
     });
   }

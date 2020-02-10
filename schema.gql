@@ -86,6 +86,10 @@ type BillingInfoUpdatedBy {
   ip: String!
 }
 
+input BillingInfoUpdateInput {
+  token: String!
+}
+
 type Bin {
   id: ID!
   cell: Float!
@@ -262,6 +266,7 @@ type Inventory {
   status: InventoryStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
+  income: InventoryIncome
   history: [InventoryHistory!]!
   product: Product!
   lastCart: Cart!
@@ -290,6 +295,11 @@ type InventoryHistory {
   days: Float!
   serial: String
   name: String
+}
+
+type InventoryIncome {
+  days: Float!
+  total: Float!
 }
 
 enum InventoryStatus {
@@ -367,6 +377,7 @@ type Mutation {
   authenticate(input: AuthenticateInput!): Token!
   register(input: RegisterInput!): Token!
   bankAccountCreate(input: BankAccountCreateInput!): UserBankAccount!
+  updateBillingInfo(input: BillingInfoUpdateInput!): BillingInfo!
   cartCancel(where: CartWhereUniqueInput!): Cart!
   cartUpdate(input: CartUpdateInput!): Cart!
   cartItemCreate(input: CartItemCreateInput!): CartItem!
@@ -459,7 +470,7 @@ type Product {
   category: Category!
   dailyCommission: Float!
   estimatedCommission: Float!
-  breadCrumbs: [Category!]!
+  breadcrumbs: [Category!]!
 }
 
 type ProductAttribute {
@@ -525,8 +536,8 @@ type Query {
   categories(id: String!): Category!
   deposit(id: String!): Deposit!
   deposits: [Deposit!]!
-  inventory(id: String!): Inventory!
-  inventories(input: InventoryWhereInput!): [Inventory!]!
+  inventoryItem(id: String!): Inventory!
+  inventory(where: InventoryWhereInput): [Inventory!]!
   product(slug: String!): Product!
   products(sort: ProductSort = ID_DESC, filter: ProductFilterInput, size: Int = 10, from: Int = 0): ProductsResponse!
   queue(id: String!): Queue!
@@ -753,7 +764,8 @@ type User {
   inventory: [Inventory!]!
   termAgreements: [Inventory!]!
   funds: UserFunds!
-  frontHash: UserFunds!
+  billingInfo: BillingInfo!
+  frontHash: String!
 }
 
 type UserBankAccount {

@@ -22,6 +22,7 @@ import { Field, ID, Int, ObjectType } from 'type-graphql';
 import { UserRole } from '../enums/user-role.enum';
 import { UserStatus } from '../enums/user-status.enum';
 import { Address } from './address.entity';
+import { BillingInfo } from './billing-info.entity';
 import { Cart } from './cart.entity';
 import { Deposit } from './deposit.entity';
 import { Income } from './income.entity';
@@ -220,6 +221,9 @@ export class User extends Model<User> {
   @HasOne(() => Subscription, 'userId')
   subscription?: Subscription;
 
+  @HasOne(() => BillingInfo, 'userId')
+  billingInfo?: BillingInfo;
+
   @CreatedAt
   createdAt!: Date;
 
@@ -242,7 +246,7 @@ export class User extends Model<User> {
       createFrontContact(instance),
     ]);
     await Promise.all([
-      UserIntegration.bulkCreate(integrations),
+      instance.sequelize.models.UserIntegration.bulkCreate(integrations),
       checkClearbit(instance),
     ]);
   }
@@ -252,13 +256,13 @@ export class User extends Model<User> {
     if (instance.changed('phone')) {
       const newAuthy = await createAuthyUser(instance);
       await Promise.all([
-        UserIntegration.destroy({
+        instance.sequelize.models.UserIntegration.destroy({
           where: {
             userId: instance.id,
             type: 'AUTHY',
           },
         }),
-        UserIntegration.create(newAuthy),
+        instance.$create('integrations', newAuthy),
       ]);
     }
   }

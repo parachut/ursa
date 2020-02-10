@@ -124,10 +124,11 @@ export class Address extends Model<Address> {
   @BeforeCreate
   static async normalize(instance: Address) {
     const easyPost = new EasyPost(process.env.EASYPOST);
+    const { models } = instance.sequelize;
 
-    const user = await User.findByPk(instance.userId);
+    const user = await instance.$get('user');
     if (instance.primary) {
-      await Address.update(
+      await models.Address.update(
         {
           primary: false,
         },

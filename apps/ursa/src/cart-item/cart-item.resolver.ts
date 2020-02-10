@@ -8,7 +8,6 @@ import {
   Parent,
 } from '@nestjs/graphql';
 
-import { CartService } from '../cart/cart.service';
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
 import { CartItemService } from './cart-item.service';
@@ -20,10 +19,7 @@ import { CartItemWhereUniqueInput } from './dto/cart-item-where-unique.input';
 export class CartItemResolver {
   private readonly logger = new Logger(CartItemResolver.name);
 
-  constructor(
-    private readonly cartService: CartService,
-    private readonly cartItemService: CartItemService,
-  ) {}
+  constructor(private readonly cartItemService: CartItemService) {}
 
   @Mutation(() => CartItem)
   @UseGuards(GqlAuthGuard)

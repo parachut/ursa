@@ -92,20 +92,22 @@ export class ShipKit extends Model<ShipKit> {
   @AfterUpdate
   static async updateInventory(instance: ShipKit) {
     if (instance.changed('completedAt') && !instance.confirmedAt) {
-      const inventory = await Inventory.findAll({
+      const { models } = instance.sequelize;
+
+      const inventory = (await models.Inventory.findAll({
         where: {
           userId: instance.userId,
           status: InventoryStatus.NEW,
         },
         include: ['product'],
-      });
+      })) as Inventory[];
 
       const shipments: any[] = [];
 
       let airboxShipment: Shipment = null;
 
       if (instance.airbox) {
-        airboxShipment = new Shipment({
+        airboxShipment = new models.Shipment({
           addressId: instance.addressId,
           userId: instance.userId,
           airbox: true,
@@ -113,12 +115,12 @@ export class ShipKit extends Model<ShipKit> {
           direction: ShipmentDirection.OUTBOUND,
           type: ShipmentType.EARN,
           shipKitId: instance.id,
-        });
+        }) as Shipment;
 
         shipments.push(airboxShipment);
       }
 
-      const returnShipment = new Shipment({
+      const returnShipment = new models.Shipment({
         addressId: instance.addressId,
         userId: instance.userId,
         airbox: true,
@@ -126,7 +128,7 @@ export class ShipKit extends Model<ShipKit> {
         direction: ShipmentDirection.INBOUND,
         type: ShipmentType.EARN,
         shipKitId: instance.id,
-      });
+      }) as Shipment;
 
       shipments.push(returnShipment);
 

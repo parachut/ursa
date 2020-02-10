@@ -13,6 +13,22 @@ import { EmailService } from '../email.service';
 import { RecurlyService } from '../recurly.service';
 import { SlackService } from '../slack.service';
 
+const plans = {
+  '1500': 149,
+  '3500': 349,
+  '750': 99,
+  '7500': 499,
+  'level-1': 249,
+  'level-2': 399,
+  'level-3': 499,
+};
+
+const planName = {
+  'level-1': 'Level 1',
+  'level-2': 'Level 2',
+  'level-3': 'Level 3',
+};
+
 @Injectable()
 export class CartService {
   private readonly cartRepository: typeof Cart = this.sequelize.getRepository(
@@ -85,7 +101,7 @@ export class CartService {
   }
 
   async find(userId: string) {
-    return Cart.findAll({
+    return this.cartRepository.findAll({
       where: {
         userId,
         canceledAt: null,

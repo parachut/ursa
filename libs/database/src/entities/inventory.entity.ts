@@ -2,7 +2,6 @@ import {
   AfterCreate,
   AfterUpdate,
   BeforeCreate,
-  BeforeUpdate,
   BelongsTo,
   BelongsToMany,
   Column,
@@ -10,25 +9,27 @@ import {
   DataType,
   Default,
   ForeignKey,
+  HasOne,
   HasMany,
   Model,
   PrimaryKey,
+  Sequelize,
   Table,
   UpdatedAt,
-  Sequelize,
 } from 'sequelize-typescript';
 import { Field, Float, ID, ObjectType } from 'type-graphql';
 
 import { InventoryCondition } from '../enums/inventory-condition.enum';
 import { InventoryStatus } from '../enums/inventory-status.enum';
 import { Bin } from './bin.entity';
-import { Cart } from './cart.entity';
 import { CartInventory } from './cart-inventory.entity';
+import { Cart } from './cart.entity';
 import { Income } from './income.entity';
+import { InventoryIncome } from './inventory-incomes.view';
 import { Product } from './product.entity';
-import { Shipment } from './shipment.entity';
 import { ShipmentInspection } from './shipment-inspection.entity';
 import { ShipmentInventory } from './shipment-inventory.entity';
+import { Shipment } from './shipment.entity';
 import { User } from './user.entity';
 import { Warehouse } from './warehouse.entity';
 
@@ -148,6 +149,9 @@ export class Inventory extends Model<Inventory> {
   @HasMany(() => Income, 'inventoryId')
   incomes?: Income[];
 
+  @HasOne(() => InventoryIncome, 'inventoryId')
+  income?: InventoryIncome;
+
   @Field(() => Date)
   @CreatedAt
   createdAt!: Date;
@@ -158,16 +162,18 @@ export class Inventory extends Model<Inventory> {
 
   @AfterUpdate
   @AfterCreate
-  static async updateProductStock(instance: Inventory) {
+  static async updateProductStock(instance: Inventory, options: any) {
     if (instance.changed('status')) {
-      const stock = await Inventory.count({
+      const { models } = instance.sequelize;
+
+      const stock = await models.Inventory.count({
         where: {
           productId: instance.productId,
           status: InventoryStatus.INWAREHOUSE,
         },
       });
 
-      await Product.update(
+      await models.Product.update(
         {
           stock,
         },
@@ -183,7 +189,7 @@ export class Inventory extends Model<Inventory> {
 
   @BeforeCreate
   static async setCommission(instance: Inventory) {
-    const product = await Product.findByPk(instance.productId);
+    const product = await instance.$get('product');
     instance.commission = Number(
       (
         ((product.points * 0.7) / 30.1) *

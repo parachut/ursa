@@ -144,4 +144,10 @@ export class RecurlyService {
       }
     }
   }
+
+  async updateBillingInfo(tokenId: string, recurlyId: string) {
+    return this.recurlyClient.updateBillingInfo(recurlyId, {
+      tokenId,
+    });
+  }
 }

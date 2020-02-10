@@ -5,16 +5,8 @@ import { CartService } from '../cart/cart.service';
 
 @Injectable()
 export class CartItemService {
-  private readonly cartRepository: typeof Cart = this.sequelize.getRepository(
-    'Cart',
-  );
-
   private readonly cartItemRepository: typeof CartItem = this.sequelize.getRepository(
     'CartItem',
-  );
-
-  private readonly userRepository: typeof User = this.sequelize.getRepository(
-    'User',
   );
 
   constructor(
@@ -23,7 +15,7 @@ export class CartItemService {
   ) {}
 
   async find(cartId: string): Promise<CartItem[]> {
-    return CartItem.findAll({
+    return this.cartItemRepository.findAll({
       where: {
         cartId,
       },

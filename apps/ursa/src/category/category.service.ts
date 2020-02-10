@@ -30,7 +30,7 @@ export class CategoryService {
   }
 
   async breadCrumbs(id: string): Promise<Category[]> {
-    const categories = await Category.findAll({});
+    const categories = await this.categoryRepository.findAll({});
 
     function findBreadCrumbs(id: string): Category[] {
       const cat = categories.find(cat => cat.id === id);

@@ -61,7 +61,7 @@ export class CartItem extends Model<CartItem> {
 
   @BeforeCreate
   static async setPoints(instance: CartItem) {
-    const product = await Product.findByPk(instance.productId);
+    const product = await instance.$get('product');
 
     instance.points = product.points;
     instance.quantity = instance.quantity || 1;

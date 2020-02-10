@@ -16,6 +16,7 @@ export * from './deposit.entity';
 export * from './file.entity';
 export * from './income.entity';
 export * from './inventory.entity';
+export * from './inventory-incomes.view';
 export * from './invoice.entity';
 export * from './plan-add-on.entity';
 export * from './plan.entity';

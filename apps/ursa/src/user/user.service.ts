@@ -1,10 +1,12 @@
 import {
+  BillingInfo,
   User,
   UserMarketingSource,
   UserTermAgreement,
 } from '@app/database/entities';
 import { UserRole } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
+import { RecurlyService } from '../recurly.service';
 
 @Injectable()
 export class UserService {
@@ -15,7 +17,10 @@ export class UserService {
     'UserTermAgreement',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
+  constructor(
+    @Inject('SEQUELIZE') private readonly sequelize,
+    private readonly recurlyService: RecurlyService,
+  ) {}
 
   async agreeToTerms(userId: string, type: string) {
     return this.userAgreementRepository.create({
@@ -52,5 +57,23 @@ export class UserService {
 
   async findOne(userId: string) {
     return this.userRepository.findByPk(userId);
+  }
+
+  async updateBillingInfo(token: string, userId: string): Promise<BillingInfo> {
+    const user = await this.userRepository.findByPk(userId, {
+      include: ['integrations', 'billingInfo'],
+    });
+
+    const recurlyId = this.recurlyService.findRecurlyIntegration(user);
+    const billingInfo = await this.recurlyService.updateBillingInfo(
+      token,
+      recurlyId,
+    );
+
+    if (user.billingInfo) {
+      await user.$remove('billingInfo', user.billingInfo.id);
+    }
+
+    return user.$create<BillingInfo>('billingInfo', billingInfo);
   }
 }

@@ -1,4 +1,5 @@
 import {
+  BillingInfo,
   Inventory,
   User,
   UserFunds,
@@ -6,8 +7,16 @@ import {
 } from '@app/database/entities';
 import * as crypto from 'crypto';
 import { Logger, UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import {
+  Parent,
+  Query,
+  Args,
+  ResolveProperty,
+  Resolver,
+  Mutation,
+} from '@nestjs/graphql';
 
+import { BillingInfoUpdateInput } from './dto/billing-info-update.input';
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
 import { UserService } from './user.service';
@@ -21,8 +30,16 @@ export class UserResolver {
   @Query(type => User)
   @UseGuards(GqlAuthGuard)
   async me(@CurrentUser() user: User): Promise<User> {
-    console.log(user);
     return this.userService.findOne(user.id);
+  }
+
+  @Mutation(type => BillingInfo)
+  @UseGuards(GqlAuthGuard)
+  async updateBillingInfo(
+    @Args('input') { token }: BillingInfoUpdateInput,
+    @CurrentUser() user: User,
+  ): Promise<BillingInfo> {
+    return this.userService.updateBillingInfo(token, user.id);
   }
 
   @ResolveProperty(type => [Inventory])
@@ -45,7 +62,12 @@ export class UserResolver {
     return user.$get('funds');
   }
 
-  @ResolveProperty(type => UserFunds)
+  @ResolveProperty(type => BillingInfo)
+  async billingInfo(@Parent() user: User): Promise<BillingInfo> {
+    return user.$get('billingInfo');
+  }
+
+  @ResolveProperty(type => String)
   frontHash(@Parent() user: User): string {
     return crypto
       .createHmac('sha256', process.env.FRONT_CHAT_SECRET)
