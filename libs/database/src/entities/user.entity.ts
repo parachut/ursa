@@ -218,7 +218,7 @@ export class User extends Model<User> {
   termAgreements?: UserTermAgreement[];
 
   @HasOne(() => Subscription, 'userId')
-  subscription?: Subscription[];
+  subscription?: Subscription;
 
   @CreatedAt
   createdAt!: Date;

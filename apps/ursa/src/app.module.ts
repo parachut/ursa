@@ -22,6 +22,7 @@ import { QueueModule } from './queue/queue.module';
 import { ShipKitModule } from './ship-kit/ship-kit.module';
 import { ShipmentModule } from './shipment/shipment.module';
 import { RecurlyService } from './recurly.service';
+import { SlackService } from './slack.service';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { RecurlyService } from './recurly.service';
     DwollaService,
     ElasticService,
     RecurlyService,
+    SlackService,
   ],
 })
 export class AppModule {}
