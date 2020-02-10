@@ -171,19 +171,13 @@ export class CouponService {
           console.log(e.message)
           this.logger.error(`Failed with Inserting to DB (SEQUELIZE) `, e.stack)
         }
-
-
       }
     } catch (e) {
       console.log(e.message)
       this.logger.error(`Failed with Recurly (listCoupons)`, e.stack)
     }
-
-
-
-
-    const coupons = await this.CouponRepository.findAll({});
-    return coupons;
+    this.logger.log(`Subscription Updated`)
+    return;
   }
 
 

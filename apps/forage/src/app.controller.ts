@@ -3,6 +3,4 @@ import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
-export class AppController {
-  
-}
+export class AppController { }
