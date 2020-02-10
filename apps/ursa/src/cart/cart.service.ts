@@ -1,7 +1,17 @@
-import { Cart, Inventory, User } from '@app/database/entities';
-import { InventoryStatus, UserStatus } from '@app/database/enums';
+import { Cart, Inventory, Shipment, User } from '@app/database/entities';
+import {
+  InventoryStatus,
+  UserStatus,
+  ShipmentDirection,
+  ShipmentType,
+} from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
 import { Op } from 'sequelize';
+import * as numeral from 'numeral';
+
+import { EmailService } from '../email.service';
+import { RecurlyService } from '../recurly.service';
+import { SlackService } from '../slack.service';
 
 @Injectable()
 export class CartService {
@@ -13,11 +23,20 @@ export class CartService {
     'Inventory',
   );
 
+  private readonly shipmentRepository: typeof Shipment = this.sequelize.getRepository(
+    'Shipment',
+  );
+
   private readonly userRepository: typeof User = this.sequelize.getRepository(
     'User',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
+  constructor(
+    @Inject('SEQUELIZE') private readonly sequelize,
+    private readonly emailService: EmailService,
+    private readonly recurlyService: RecurlyService,
+    private readonly slackService: SlackService,
+  ) {}
 
   async findOne(userId: string) {
     const cart = await this.cartRepository.findOne({
@@ -196,157 +215,35 @@ export class CartService {
       user.additionalItems = overageItems;
     }
 
-    const recurlyId = user.integrations.find(int => int.type === 'RECURLY');
-
-    const subscriptionReq: any = {
-      planCode: cart.planId,
-      addOns: [],
-    };
-
-    if (cart.protectionPlan) {
-      subscriptionReq.addOns.push({
-        code: 'protection',
-        quantity: 1,
-      });
-    }
-
-    if (user.additionalItems) {
-      subscriptionReq.addOns.push({
-        code: 'additional',
-        quantity: user.additionalItems,
-      });
-    }
-
-    if (!subscriptionReq.addOns.length) {
-      delete subscriptionReq.addOns;
-    }
-
-    let _continue = false;
+    const recurlyId = this.recurlyService.findRecurlyIntegration(user);
 
     try {
-      if (!user.subscription?.length) {
-        const purchaseReq = {
-          currency: 'USD',
-          account: {
-            id: recurlyId.value,
-          },
-          subscriptions: [subscriptionReq],
-          couponCodes: [],
-          lineItems: [],
-        };
-
-        if (cart.couponCode) {
-          purchaseReq.couponCodes.push(cart.couponCode);
-        }
-
-        if (!purchaseReq.couponCodes.length) {
-          delete purchaseReq.couponCodes;
-        }
-
-        if (cart.service !== 'Ground') {
-          purchaseReq.lineItems = [
-            {
-              type: 'charge',
-              currency: 'USD',
-              unitAmount: 50,
-              quantity: 1,
-              description: 'Expedited Shipping',
-            },
-          ];
-        } else {
-          delete purchaseReq.lineItems;
-        }
-
-        const purchase = await recurly.createPurchase(purchaseReq);
+      if (!user.subscription) {
+        await this.recurlyService.createSubscription(
+          cart.planId,
+          cart.protectionPlan,
+          user.additionalItems,
+          cart.couponCode,
+          recurlyId,
+          cart.service !== 'Ground',
+        );
       } else {
         if (cart.service !== 'Ground') {
-          await recurly.createPurchase({
-            currency: 'USD',
-            account: {
-              id: recurlyId.value,
-            },
-            lineItems: [
-              {
-                type: 'charge',
-                currency: 'USD',
-                quantity: 1,
-                unitAmount: 50,
-                description: 'Expedited Shipping',
-              },
-            ],
-          });
+          await this.recurlyService.expeditedCharge(recurlyId);
         }
 
         if (!user.legacyPlan) {
-          try {
-            subscriptionRes = await recurly.createSubscriptionChange(
-              recurlySubscription.value,
-              subscriptionReq,
-            );
-            _continue = true;
-          } catch (e) {
-            if (
-              e.message ===
-              'The submitted values match the current subscriptions values.'
-            ) {
-              _continue = true;
-            } else {
-              throw e;
-            }
-          }
-        } else {
-          _continue = true;
+          await this.recurlyService.upgradePlan(
+            cart.planId,
+            cart.protectionPlan,
+            user.additionalItems,
+            user.subscription.id,
+          );
         }
       }
     } catch (e) {
       if (process.env.STAGE === 'production') {
-        await slack.chat.postMessage({
-          channel: 'CGX5HELCT',
-          text: '',
-          blocks: [
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text:
-                  '*Order billing failed:* ' +
-                  user.name +
-                  '\n<https://app.forestadmin.com/48314/data/2108279/index/record/2108279/' +
-                  cart.id +
-                  '/summary|' +
-                  cart.id +
-                  '>',
-              },
-            },
-            {
-              type: 'section',
-              fields: [
-                {
-                  type: 'mrkdwn',
-                  text: '*Completed:*\n' + new Date().toLocaleString(),
-                },
-                {
-                  type: 'mrkdwn',
-                  text:
-                    '*Protection Plan:*\n' +
-                    (cart.protectionPlan ? 'YES' : 'NO'),
-                },
-                {
-                  type: 'mrkdwn',
-                  text: '*Service:*\n' + cart.service,
-                },
-                {
-                  type: 'mrkdwn',
-                  text: '*Plan:*\n' + cart.planId || user.planId,
-                },
-                {
-                  type: 'mrkdwn',
-                  text: '*Reason:*\n' + e.message,
-                },
-              ],
-            },
-          ],
-        });
+        await this.slackService.cartMessage(cart, user.name, e.message);
       }
 
       throw new Error(e.message);
@@ -368,59 +265,13 @@ export class CartService {
     );
 
     if (process.env.STAGE === 'production') {
-      try {
-        await pMap(['CGX5HELCT', 'CA8M5UG1K'], c =>
-          slack.chat.postMessage({
-            channel: c,
-            text: '',
-            blocks: [
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text:
-                    '*New order for:* ' +
-                    user.name +
-                    '\n<https://app.forestadmin.com/48314/data/2108279/index/record/2108279/' +
-                    cart.id +
-                    '/summary|' +
-                    cart.id +
-                    '>',
-                },
-              },
-              {
-                type: 'section',
-                fields: [
-                  {
-                    type: 'mrkdwn',
-                    text: '*Completed:*\n' + new Date().toLocaleString(),
-                  },
-                  {
-                    type: 'mrkdwn',
-                    text:
-                      '*Protection Plan:*\n' +
-                      (cart.protectionPlan ? 'YES' : 'NO'),
-                  },
-                  {
-                    type: 'mrkdwn',
-                    text: '*Service:*\n' + cart.service,
-                  },
-                  {
-                    type: 'mrkdwn',
-                    text: '*Plan:*\n' + cart.planId || user.planId,
-                  },
-                ],
-              },
-            ],
-          }),
-        );
-      } catch (e) {}
+      await this.slackService.cartMessage(cart, user.name);
     }
 
-    if (_continue) {
+    if (user.subscription) {
       cart.confirmedAt = new Date();
 
-      const shipment = await Shipment.create({
+      const shipment = await this.shipmentRepository.create({
         direction: ShipmentDirection.OUTBOUND,
         expedited: cart.service !== 'Ground',
         type: ShipmentType.ACCESS,
@@ -431,10 +282,10 @@ export class CartService {
       await shipment.$set('inventory', inventory);
     }
 
-    await sendEmail({
+    this.emailService.send({
       to: user.email,
       from: 'support@parachut.co',
-      id: !completedCart ? 12931487 : 12932745,
+      id: !user.subscription ? 12931487 : 12932745,
       data: {
         purchase_date: new Date().toDateString(),
         name: user.parsedName.first,
