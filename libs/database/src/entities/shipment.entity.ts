@@ -1,4 +1,5 @@
 import * as EasyPost from '@easypost/api';
+import * as camelcaseKeysDeep from 'camelcase-keys-deep';
 import { groupBy, sortBy } from 'lodash';
 import { Op } from 'sequelize';
 import {
@@ -369,15 +370,18 @@ export class Shipment extends Model<Shipment> {
         throw new Error('Unable to create shipment label.');
       }
 
-      instance.easyPostId = easyPostShipment.id;
-      instance.trackingCode = easyPostShipment.tracking_code;
-      instance.parcel = easyPostShipment.parcel;
-      instance.rate = easyPostShipment.selectedRate;
-      instance.tracker = easyPostShipment.tracker;
-      instance.postage = easyPost.postageLabel;
-      instance.insurance = easyPostShipment.insurance;
-      instance.uspsZone = easyPostShipment.uspsZone;
-      instance.refundStatus = easyPostShipment.refundStatus;
+      const camalBody = camelcaseKeysDeep(easyPostShipment);
+
+      instance.easyPostId = camalBody.id;
+      instance.trackingCode = camalBody.trackingCode;
+      instance.parcel = camalBody.parcel;
+      instance.rate = camalBody.selectedRate;
+      instance.rates = easyPostShipment.rates;
+      instance.tracker = camalBody.tracker;
+      instance.postage = camalBody.postageLabel;
+      instance.insurance = camalBody.insurance;
+      instance.uspsZone = camalBody.uspsZone;
+      instance.refundStatus = camalBody.refundStatus;
     }
   }
 
