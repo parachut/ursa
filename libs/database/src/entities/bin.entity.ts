@@ -1,4 +1,5 @@
 import {
+  AfterCreate,
   Column,
   CreatedAt,
   DataType,
@@ -13,6 +14,7 @@ import {
 import { Field, ID, ObjectType } from 'type-graphql';
 
 import { Inventory } from './inventory.entity';
+import { BinFreeNode } from './bin-free-node.entity';
 
 @ObjectType()
 @Table({
@@ -58,4 +60,17 @@ export class Bin extends Model<Bin> {
 
   @UpdatedAt
   updatedAt!: Date;
+
+  @HasMany(() => BinFreeNode, 'binId')
+  freeNodes: BinFreeNode[];
+
+  @AfterCreate
+  static async normalize(instance: Bin) {
+    await instance.$create('freeNode', {
+      width: instance.width,
+      height: instance.height,
+      x: 0,
+      y: 0,
+    });
+  }
 }

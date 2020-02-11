@@ -372,13 +372,14 @@ export class Shipment extends Model<Shipment> {
 
       const camalBody = camelcaseKeysDeep(easyPostShipment);
 
+      shipment.parcel = JSON.stringify(camalBody.parcel);
+      shipment.rates = JSON.stringify(camalBody.rates);
+      shipment.rate = JSON.stringify(camalBody.selectedRate);
+      shipment.tracker = JSON.stringify(camalBody.tracker);
+      shipment.postage = JSON.stringify(camalBody.postageLabel);
+
       instance.easyPostId = camalBody.id;
       instance.trackingCode = camalBody.trackingCode;
-      instance.parcel = camalBody.parcel;
-      instance.rate = camalBody.selectedRate;
-      instance.rates = easyPostShipment.rates;
-      instance.tracker = camalBody.tracker;
-      instance.postage = camalBody.postageLabel;
       instance.insurance = camalBody.insurance;
       instance.uspsZone = camalBody.uspsZone;
       instance.refundStatus = camalBody.refundStatus;

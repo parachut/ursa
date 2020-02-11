@@ -54,6 +54,7 @@
     "forest-express-sequelize": "^5.7.0",
     "graphql": "^14.6.0",
     "lodash": "^4.17.15",
+    "node-fetch": "^2.6.0",
     "numeral": "^2.0.6",
     "p-map": "^3.0.0",
     "passport": "^0.4.1",
