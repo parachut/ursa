@@ -5,20 +5,21 @@ import {
   UserFunds,
   UserTermAgreement,
 } from '@app/database/entities';
-import * as crypto from 'crypto';
 import { Logger, UseGuards } from '@nestjs/common';
 import {
+  Args,
+  Mutation,
   Parent,
   Query,
-  Args,
   ResolveProperty,
   Resolver,
-  Mutation,
 } from '@nestjs/graphql';
+import * as crypto from 'crypto';
 
-import { BillingInfoUpdateInput } from './dto/billing-info-update.input';
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
+import { BillingInfoUpdateInput } from './dto/billing-info-update.input';
+import { SubscriptionInfo } from './dto/subscription-info.type';
 import { UserService } from './user.service';
 
 @Resolver(User)
@@ -52,7 +53,7 @@ export class UserResolver {
     return user.$get('inventory');
   }
 
-  @ResolveProperty(type => [Inventory])
+  @ResolveProperty(type => [UserTermAgreement])
   async termAgreements(@Parent() user: User): Promise<UserTermAgreement[]> {
     return user.$get('termAgreements');
   }
@@ -62,7 +63,12 @@ export class UserResolver {
     return user.$get('funds');
   }
 
-  @ResolveProperty(type => BillingInfo)
+  @ResolveProperty(type => SubscriptionInfo, { nullable: true })
+  async subscription(@Parent() user: User): Promise<SubscriptionInfo | null> {
+    return this.userService.subscription(user);
+  }
+
+  @ResolveProperty(type => BillingInfo, { nullable: true })
   async billingInfo(@Parent() user: User): Promise<BillingInfo> {
     return user.$get('billingInfo');
   }

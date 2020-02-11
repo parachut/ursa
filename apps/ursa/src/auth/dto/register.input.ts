@@ -1,7 +1,7 @@
-import { IsEmail, Length } from 'class-validator';
-import { InputType, Field, ID } from 'type-graphql';
-
 import { UserRole } from '@app/database/enums/user-role.enum';
+import { IsEmail, Length } from 'class-validator';
+import { Field, InputType } from 'type-graphql';
+
 import { MarketingSourceInput } from './marketing-source.input';
 
 @InputType()

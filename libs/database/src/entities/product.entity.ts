@@ -169,7 +169,7 @@ export class Product extends Model<Product> {
   }
 
   @AfterCreate
-  static async createAlgolia(instance: Product) {
+  static async createElastic(instance: Product) {
     const [brand, category] = await Promise.all([
       instance.$get('brand'),
       instance.$get('category'),
@@ -210,7 +210,7 @@ export class Product extends Model<Product> {
   }
 
   @AfterUpdate
-  static async updateAlgolia(instance: Product) {
+  static async updateElastic(instance: Product) {
     if (instance.id) {
       await elasti.updateByQuery({
         index: 'products',

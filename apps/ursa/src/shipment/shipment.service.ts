@@ -73,7 +73,7 @@ export class ShipmentService {
       include: [
         {
           required: true,
-          model: Inventory,
+          model: this.inventoryRepository,
           where: { id },
         },
       ],

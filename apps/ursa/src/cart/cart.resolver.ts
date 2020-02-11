@@ -30,7 +30,7 @@ export class CartResolver {
 
   @Query(type => Cart)
   @UseGuards(GqlAuthGuard)
-  async cart(@Args('id') id: string, @CurrentUser() user: User): Promise<Cart> {
+  async cart(@CurrentUser() user: User): Promise<Cart> {
     return this.cartService.findOne(user.id);
   }
 

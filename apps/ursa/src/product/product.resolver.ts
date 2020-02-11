@@ -80,4 +80,9 @@ export class ProductResolver {
   breadcrumbs(@Parent() product: Product): Promise<Category[]> {
     return this.categoryService.breadCrumbs(product.categoryId);
   }
+
+  @ResolveProperty(type => Int)
+  async total(@Parent() product: Product): Promise<number> {
+    return product.$count('inventory');
+  }
 }

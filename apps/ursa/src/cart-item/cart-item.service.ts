@@ -70,7 +70,7 @@ export class CartItemService {
       throw new NotFoundException(id);
     }
 
-    await CartItem.destroy({
+    await this.cartItemRepository.destroy({
       where: {
         id,
       },

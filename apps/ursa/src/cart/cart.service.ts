@@ -130,7 +130,7 @@ export class CartService {
   }
 
   async update(input: Partial<Cart>, userId: string) {
-    const cart = await Cart.findOne({
+    const cart = await this.cartRepository.findOne({
       where: { userId, completedAt: null },
       order: [['createdAt', 'DESC']],
     });
@@ -148,7 +148,7 @@ export class CartService {
       include: [
         {
           required: true,
-          model: Inventory,
+          model: this.inventoryRepository,
           where: { id },
         },
       ],

@@ -23,7 +23,7 @@ export class BankAccountResolver {
     return this.bankAccountService.findOne(id, user.id);
   }
 
-  @Query(type => UserBankAccount)
+  @Query(type => [UserBankAccount])
   @UseGuards(GqlAuthGuard)
   async bankAccounts(@CurrentUser() user: User): Promise<UserBankAccount[]> {
     return this.bankAccountService.find(user.id);

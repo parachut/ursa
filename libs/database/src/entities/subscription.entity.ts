@@ -1,15 +1,17 @@
 import {
   BelongsTo,
   Column,
+  DataType,
+  ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
-  ForeignKey,
-  DataType,
 } from 'sequelize-typescript';
 import { Field, ID, ObjectType } from 'type-graphql';
 
 import { Plan } from './plan.entity';
+import { SubscriptionAddOn } from './subscription-add-on.entity';
 import { User } from './user.entity';
 
 @ObjectType()
@@ -152,4 +154,7 @@ export class Subscription extends Model<Subscription> {
 
   @BelongsTo(() => Plan, 'planId')
   plan!: Plan;
+
+  @HasMany(() => SubscriptionAddOn, 'subscriptionId')
+  addOns?: SubscriptionAddOn[];
 }
