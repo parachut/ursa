@@ -1,20 +1,17 @@
-require('dotenv').config();
 import { Injectable } from '@nestjs/common';
 
-
-
+require('dotenv').config();
 @Injectable()
 export class AuthService {
-    async validateUser(username: string, password: string): Promise<any> {
-        const user = {
-
-            username: process.env.USERNAME,
-            password: process.env.PASSWORD
-        }
-        if (username === user.username && user.password === password) {
-            const { password, ...result } = user;
-            return result;
-        }
-        return null;
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = {
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD,
+    };
+    if (username === user.username && user.password === password) {
+      const { password, ...result } = user;
+      return result;
     }
+    return null;
+  }
 }
