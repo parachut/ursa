@@ -1,0 +1,9 @@
+import * as Liana from 'forest-express-sequelize';
+
+Liana.collection('Shipment', {
+  actions: [
+    {
+      name: 'Print label',
+    },
+  ],
+});

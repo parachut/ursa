@@ -1,5 +1,4 @@
 import * as EasyPost from '@easypost/api';
-import { ConfigService } from '@nestjs/config';
 import {
   AfterCreate,
   BeforeCreate,

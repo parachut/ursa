@@ -1,18 +1,15 @@
-import { Body, Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+
 import { EasyPostService } from '../easypost/easypost.service';
-
-
 
 @Controller()
 export class EasyPostController {
-  constructor(private readonly easyPostService: EasyPostService) { }
+  constructor(private readonly easyPostService: EasyPostService) {}
 
   @UseGuards(AuthGuard('local'))
   @Post('/easy_post')
   async easyPost(@Body() body) {
     return this.easyPostService.easyPost(body);
   }
-
-
 }

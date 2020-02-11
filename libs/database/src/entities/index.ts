@@ -1,4 +1,6 @@
 export * from './address.entity';
+export * from './affiliate-link.entity';
+export * from './visit.entity';
 export * from './billing-info.entity';
 export * from './bin.entity';
 export * from './brand.entity';

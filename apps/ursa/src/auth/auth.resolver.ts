@@ -1,16 +1,20 @@
+import { User, Visit } from '@app/database/entities';
 import { UserRole } from '@app/database/enums';
 import { Logger } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 
 import { Context as ContextInterface } from '../context.interface';
+import { CurrentUser } from '../current-user.decorator';
 import { EmailService } from '../email.service';
+import { IpAddress } from '../ip-address.decorator';
 import { Phone } from '../phone.decorator';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { AuthenticateInput } from './dto/authenticate.input';
 import { RegisterInput } from './dto/register.input';
 import { Token } from './dto/token.type';
+import { VisitCreateInput } from './dto/visit-create.input';
 
 @Resolver(of => Token)
 export class AuthResolver {
@@ -51,12 +55,31 @@ export class AuthResolver {
     }
   }
 
+  @Mutation(returns => Visit)
+  async visitCreate(
+    @Args('input')
+    { affiliateId, deviceId, marketingSource, visitorId }: VisitCreateInput,
+    @IpAddress() ipAddress: string,
+    @CurrentUser() user: User,
+    @Context() ctx: ContextInterface,
+  ): Promise<Visit> {
+    return this.authService.recordVisit({
+      visitorId,
+      deviceId,
+      ipAddress,
+      req: ctx.req,
+      affiliateId,
+      userId: user?.id,
+      marketingSource,
+    });
+  }
+
   @Mutation(returns => Token)
   async register(
     @Phone()
     phone: string,
     @Args('input')
-    { email, name, marketingSource, roles }: RegisterInput,
+    { email, name, marketingSource, roles, visitorId }: RegisterInput,
     @Context() ctx: ContextInterface,
   ): Promise<Token> {
     // Find if there is an existing account
@@ -77,6 +100,10 @@ export class AuthResolver {
       roles,
       marketingSource,
     );
+
+    if (visitorId) {
+      await this.authService.creditVisit(visitorId, user.id);
+    }
 
     await this.authService.createGeolocation(user, ctx.req);
 

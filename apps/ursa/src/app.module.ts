@@ -34,7 +34,7 @@ import { SlackService } from './slack.service';
     GraphQLModule.forRoot({
       debug: true,
       installSubscriptionHandlers: false,
-      autoSchemaFile: 'schema.gql',
+      autoSchemaFile: true,
       context: ({ req }) => ({ req }),
     }),
     CartModule,

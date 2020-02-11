@@ -15,6 +15,7 @@ import { Field, ID, ObjectType } from 'type-graphql';
 
 import { User } from './user.entity';
 import { Inventory } from './inventory.entity';
+import { IncomeType } from '../enums';
 
 @ObjectType()
 @Table({
@@ -27,6 +28,15 @@ export class Income extends Model<Income> {
   @Default(Sequelize.fn('uuid_generate_v4'))
   @Column(DataType.UUID)
   readonly id!: string;
+
+  @Field(type => IncomeType)
+  @Default(IncomeType.INVENTORY)
+  @Column(
+    DataType.ENUM({
+      values: Object.values(IncomeType),
+    }),
+  )
+  type?: IncomeType;
 
   @Field()
   @Default(0)
