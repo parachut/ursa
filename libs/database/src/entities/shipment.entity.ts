@@ -5,6 +5,7 @@ import {
   AfterCreate,
   AfterUpdate,
   BeforeCreate,
+  BeforeDestroy,
   BelongsTo,
   BelongsToMany,
   Column,
@@ -12,13 +13,11 @@ import {
   DataType,
   Default,
   ForeignKey,
-  HasMany,
   Model,
   PrimaryKey,
+  Sequelize,
   Table,
   UpdatedAt,
-  BeforeDestroy,
-  Sequelize,
 } from 'sequelize-typescript';
 import { Field, ID, ObjectType } from 'type-graphql';
 
@@ -26,11 +25,14 @@ import { InventoryStatus } from '../enums/inventory-status.enum';
 import { ShipmentDirection } from '../enums/shipment-direction.enum';
 import { ShipmentStatus } from '../enums/shipment-status.enum';
 import { ShipmentType } from '../enums/shipment-type.enum';
+import { ShipmentParcel } from '../types/shipment-parcel.type';
+import { ShipmentPostageLabel } from '../types/shipment-postage-label.type';
+import { ShipmentRate } from '../types/shipment-rate.type';
+import { ShipmentTracker } from '../types/shipment-tracker.type';
 import { Address } from './address.entity';
 import { Cart } from './cart.entity';
 import { Inventory } from './inventory.entity';
 import { ShipKit } from './ship-kit.entity';
-import { ShipmentInspection } from './shipment-inspection.entity';
 import { ShipmentInventory } from './shipment-inventory.entity';
 import { User } from './user.entity';
 import { Warehouse } from './warehouse.entity';
@@ -47,6 +49,15 @@ export class Shipment extends Model<Shipment> {
   @Column(DataType.UUID)
   readonly id!: string;
 
+  @Field({ nullable: true })
+  @Column
+  easyPostId?: string;
+
+  @Field()
+  @Default(false)
+  @Column
+  pickup!: boolean;
+
   @Field()
   @Default(false)
   @Column
@@ -55,12 +66,80 @@ export class Shipment extends Model<Shipment> {
   @Field()
   @Default(false)
   @Column
-  pickup!: boolean;
+  expedited?: boolean;
+
+  @Field(type => ShipmentDirection)
+  @Default(ShipmentDirection.OUTBOUND)
+  @Column(
+    DataType.ENUM({
+      values: Object.values(ShipmentDirection),
+    }),
+  )
+  direction!: ShipmentDirection;
+
+  @Field(type => ShipmentType)
+  @Default(ShipmentType.ACCESS)
+  @Column(
+    DataType.ENUM({
+      values: Object.values(ShipmentType),
+    }),
+  )
+  type!: ShipmentType;
+
+  @Field(type => ShipmentStatus)
+  @Default(ShipmentStatus.PRETRANSIT)
+  @Column(
+    DataType.ENUM({
+      values: Object.values(ShipmentStatus),
+    }),
+  )
+  status!: ShipmentStatus;
+
+  @Field(type => ShipmentParcel, { nullable: true })
+  @Column({
+    type: 'json',
+  })
+  parcel?: ShipmentParcel;
+
+  @Field(type => ShipmentRate, { nullable: true })
+  @Column({
+    type: 'json',
+  })
+  rate?: ShipmentRate;
+
+  @Field(type => [ShipmentRate], { nullable: true })
+  @Column({
+    type: 'json',
+  })
+  rates?: ShipmentRate[];
+
+  @Field(type => ShipmentTracker, { nullable: true })
+  @Column({
+    type: 'json',
+  })
+  tracker?: ShipmentTracker;
+
+  @Field(type => ShipmentPostageLabel, { nullable: true })
+  @Column({
+    type: 'json',
+  })
+  postage?: ShipmentPostageLabel;
 
   @Field({ nullable: true })
-  @Default('UPS')
   @Column
-  carrier?: string;
+  insurance?: number;
+
+  @Field({ nullable: true })
+  @Column
+  trackingCode?: string;
+
+  @Field({ nullable: true })
+  @Column
+  uspsZone?: string;
+
+  @Field({ nullable: true })
+  @Column
+  refundStatus?: string;
 
   @Field({ nullable: true })
   @Column
@@ -75,79 +154,14 @@ export class Shipment extends Model<Shipment> {
   estDeliveryDate?: Date;
 
   @Field()
-  @Default(false)
-  @Column
-  expedited?: boolean;
-
-  @Field()
-  @Column(DataType.FLOAT)
-  cost?: number;
-
-  @Field(type => ShipmentDirection)
-  @Default(ShipmentDirection.OUTBOUND)
-  @Column(
-    DataType.ENUM({
-      values: Object.values(ShipmentDirection),
-    }),
-  )
-  direction!: ShipmentDirection;
-
-  @Field({ nullable: true })
-  @Column
-  easyPostId?: string;
-
-  @Field()
   @Default(12)
   @Column(DataType.FLOAT)
   height!: number;
-
-  @Field({ nullable: true })
-  @Column
-  labelUrl?: string;
-
-  @Field({ nullable: true })
-  @Column
-  labelUrlZPL?: string;
 
   @Field()
   @Default(12)
   @Column(DataType.FLOAT)
   length!: number;
-
-  @Field({ nullable: true })
-  @Column
-  publicUrl?: string;
-
-  @Field()
-  @Default('Ground')
-  @Column
-  service!: string;
-
-  @Field(type => ShipmentStatus)
-  @Default(ShipmentStatus.PRETRANSIT)
-  @Column(
-    DataType.ENUM({
-      values: Object.values(ShipmentStatus),
-    }),
-  )
-  status!: ShipmentStatus;
-
-  @Field({ nullable: true })
-  @Column
-  signedBy?: string;
-
-  @Field({ nullable: true })
-  @Column
-  trackingCode?: string;
-
-  @Field(type => ShipmentType)
-  @Default(ShipmentType.ACCESS)
-  @Column(
-    DataType.ENUM({
-      values: Object.values(ShipmentType),
-    }),
-  )
-  type!: ShipmentType;
 
   @Field()
   @Default(12)
@@ -214,10 +228,6 @@ export class Shipment extends Model<Shipment> {
       instance.changed('status') &&
       instance.status === ShipmentStatus.DELIVERED
     ) {
-      const user = await instance.$get('user', {
-        include: ['addresses'],
-      });
-
       const inventory = await instance.$get('inventory', {
         include: ['product'],
       });
@@ -226,8 +236,6 @@ export class Shipment extends Model<Shipment> {
         instance.direction === ShipmentDirection.OUTBOUND &&
         instance.type === ShipmentType.ACCESS
       ) {
-        const cart = await instance.$get('cart');
-
         await models.Inventory.update(
           {
             status: InventoryStatus.WITHMEMBER,
@@ -324,44 +332,35 @@ export class Shipment extends Model<Shipment> {
       try {
         await easyPostShipment.save();
 
-        if (!instance.service || instance.service === 'Ground') {
-          if (easyPostShipment.rates.length > 2) {
-            const rates = groupBy(
-              easyPostShipment.rates.filter(r => r.delivery_days),
-              o => {
-                return Number(o.delivery_days);
-              },
-            );
+        console.log(easyPostShipment);
 
-            const levels = Object.keys(rates).map(Number);
-            const level = instance.expedited
-              ? rates[levels[0]]
-              : rates[levels[1]];
-
-            const uspsExpress = easyPostShipment.rates.find(
-              rate => rate.service === 'Express',
-            );
-
-            if (uspsExpress) {
-              rates[levels[0]].push(uspsExpress);
-            }
-
-            const rateSorted = sortBy(level, o => Number(o.rate));
-
-            instance.cost = Number(rateSorted[0].rate);
-            instance.service = rateSorted[0].service;
-            instance.estDeliveryDate = new Date(rateSorted[0].delivery_date);
-            await easyPostShipment.buy(rateSorted[0]);
-          } else {
-            throw new Error('No rates available');
-          }
-        } else {
-          const rate = easyPostShipment.rates.find(
-            rate => rate.service === instance.service,
+        if (easyPostShipment.rates.length > 2) {
+          const rates = groupBy(
+            easyPostShipment.rates.filter(r => r.delivery_days),
+            o => {
+              return Number(o.delivery_days);
+            },
           );
-          await easyPostShipment.buy(rate);
 
-          instance.estDeliveryDate = new Date(rate.delivery_date);
+          const levels = Object.keys(rates).map(Number);
+          const level = instance.expedited
+            ? rates[levels[0]]
+            : rates[levels[1]];
+
+          const uspsExpress = easyPostShipment.rates.find(
+            rate => rate.service === 'Express',
+          );
+
+          if (uspsExpress) {
+            rates[levels[0]].push(uspsExpress);
+          }
+
+          const rateSorted = sortBy(level, o => Number(o.rate));
+
+          instance.estDeliveryDate = new Date(rateSorted[0].delivery_date);
+          await easyPostShipment.buy(rateSorted[0]);
+        } else {
+          throw new Error('No rates available');
         }
 
         await easyPostShipment.convertLabelFormat('ZPL');
@@ -372,9 +371,13 @@ export class Shipment extends Model<Shipment> {
 
       instance.easyPostId = easyPostShipment.id;
       instance.trackingCode = easyPostShipment.tracking_code;
-      instance.publicUrl = easyPostShipment.tracker.public_url;
-      instance.labelUrlZPL = easyPostShipment.postage_label.label_zpl_url;
-      instance.labelUrl = easyPostShipment.postage_label.label_url;
+      instance.parcel = easyPostShipment.parcel;
+      instance.rate = easyPostShipment.selectedRate;
+      instance.tracker = easyPostShipment.tracker;
+      instance.postage = easyPost.postageLabel;
+      instance.insurance = easyPostShipment.insurance;
+      instance.uspsZone = easyPostShipment.uspsZone;
+      instance.refundStatus = easyPostShipment.refundStatus;
     }
   }
 

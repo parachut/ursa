@@ -754,6 +754,76 @@
       "fields": []
     }]
   }, {
+    "name": "BinFreeNode",
+    "nameOld": "BinFreeNode",
+    "icon": null,
+    "integration": null,
+    "isReadOnly": false,
+    "isSearchable": true,
+    "isVirtual": false,
+    "onlyForRelationships": false,
+    "paginationType": "page",
+    "fields": [{
+      "field": "bin",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": "Bin.binId",
+      "inverseOf": null,
+      "relationship": "BelongsTo",
+      "validations": []
+    }, {
+      "field": "createdAt",
+      "type": "Date",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
+      "field": "id",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
+      "field": "updatedAt",
+      "type": "Date",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }],
+    "segments": [],
+    "actions": []
+  }, {
     "name": "Brand",
     "nameOld": "Brand",
     "icon": null,
@@ -4332,6 +4402,20 @@
       "inverseOf": null,
       "validations": []
     }, {
+      "field": "depth",
+      "type": "Number",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
       "field": "description",
       "type": "String",
       "defaultValue": null,
@@ -4462,20 +4546,6 @@
     }, {
       "field": "lastInventoryCreated",
       "type": "Date",
-      "defaultValue": null,
-      "enums": null,
-      "integration": null,
-      "isFilterable": true,
-      "isReadOnly": false,
-      "isRequired": false,
-      "isSortable": true,
-      "isVirtual": false,
-      "reference": null,
-      "inverseOf": null,
-      "validations": []
-    }, {
-      "field": "length",
-      "type": "Number",
       "defaultValue": null,
       "enums": null,
       "integration": null,
@@ -5325,20 +5395,6 @@
       "inverseOf": null,
       "validations": []
     }, {
-      "field": "carrier",
-      "type": "String",
-      "defaultValue": "UPS",
-      "enums": null,
-      "integration": null,
-      "isFilterable": true,
-      "isReadOnly": false,
-      "isRequired": false,
-      "isSortable": true,
-      "isVirtual": false,
-      "reference": null,
-      "inverseOf": null,
-      "validations": []
-    }, {
       "field": "carrierDeliveredAt",
       "type": "Date",
       "defaultValue": null,
@@ -5380,20 +5436,6 @@
       "reference": "Cart.cartId",
       "inverseOf": null,
       "relationship": "BelongsTo",
-      "validations": []
-    }, {
-      "field": "cost",
-      "type": "Number",
-      "defaultValue": null,
-      "enums": null,
-      "integration": null,
-      "isFilterable": true,
-      "isReadOnly": false,
-      "isRequired": false,
-      "isSortable": true,
-      "isVirtual": false,
-      "reference": null,
-      "inverseOf": null,
       "validations": []
     }, {
       "field": "createdAt",
@@ -5494,6 +5536,20 @@
       "inverseOf": null,
       "validations": []
     }, {
+      "field": "insurance",
+      "type": "Number",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
       "field": "inventory",
       "type": ["String"],
       "defaultValue": null,
@@ -5507,34 +5563,6 @@
       "reference": "Inventory.shipmentId",
       "inverseOf": null,
       "relationship": "BelongsToMany",
-      "validations": []
-    }, {
-      "field": "labelUrl",
-      "type": "String",
-      "defaultValue": null,
-      "enums": null,
-      "integration": null,
-      "isFilterable": true,
-      "isReadOnly": false,
-      "isRequired": false,
-      "isSortable": true,
-      "isVirtual": false,
-      "reference": null,
-      "inverseOf": null,
-      "validations": []
-    }, {
-      "field": "labelUrlZPL",
-      "type": "String",
-      "defaultValue": null,
-      "enums": null,
-      "integration": null,
-      "isFilterable": true,
-      "isReadOnly": false,
-      "isRequired": false,
-      "isSortable": true,
-      "isVirtual": false,
-      "reference": null,
-      "inverseOf": null,
       "validations": []
     }, {
       "field": "length",
@@ -5565,23 +5593,9 @@
       "inverseOf": null,
       "validations": []
     }, {
-      "field": "publicUrl",
+      "field": "refundStatus",
       "type": "String",
       "defaultValue": null,
-      "enums": null,
-      "integration": null,
-      "isFilterable": true,
-      "isReadOnly": false,
-      "isRequired": false,
-      "isSortable": true,
-      "isVirtual": false,
-      "reference": null,
-      "inverseOf": null,
-      "validations": []
-    }, {
-      "field": "service",
-      "type": "String",
-      "defaultValue": "Ground",
       "enums": null,
       "integration": null,
       "isFilterable": true,
@@ -5606,20 +5620,6 @@
       "reference": "ShipKit.shipKitId",
       "inverseOf": null,
       "relationship": "BelongsTo",
-      "validations": []
-    }, {
-      "field": "signedBy",
-      "type": "String",
-      "defaultValue": null,
-      "enums": null,
-      "integration": null,
-      "isFilterable": true,
-      "isReadOnly": false,
-      "isRequired": false,
-      "isSortable": true,
-      "isVirtual": false,
-      "reference": null,
-      "inverseOf": null,
       "validations": []
     }, {
       "field": "status",
@@ -5702,6 +5702,20 @@
       "reference": "User.userId",
       "inverseOf": null,
       "relationship": "BelongsTo",
+      "validations": []
+    }, {
+      "field": "uspsZone",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
       "validations": []
     }, {
       "field": "warehouse",
@@ -6153,6 +6167,21 @@
       "isVirtual": false,
       "reference": null,
       "inverseOf": null,
+      "validations": []
+    }, {
+      "field": "addOns",
+      "type": ["Number"],
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": "SubscriptionAddOn.subscriptionId",
+      "inverseOf": null,
+      "relationship": "HasMany",
       "validations": []
     }, {
       "field": "autoRenew",

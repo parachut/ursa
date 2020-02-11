@@ -20,6 +20,7 @@ import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
 import { BillingInfoUpdateInput } from './dto/billing-info-update.input';
 import { SubscriptionInfo } from './dto/subscription-info.type';
+import { AgreeToTermsInput } from './dto/agree-to-terms.input';
 import { UserService } from './user.service';
 
 @Resolver(User)
@@ -41,6 +42,15 @@ export class UserResolver {
     @CurrentUser() user: User,
   ): Promise<BillingInfo> {
     return this.userService.updateBillingInfo(token, user.id);
+  }
+
+  @Mutation(type => BillingInfo)
+  @UseGuards(GqlAuthGuard)
+  async agreeToTerms(
+    @Args('input') { type }: AgreeToTermsInput,
+    @CurrentUser() user: User,
+  ): Promise<UserTermAgreement> {
+    return this.userService.agreeToTerms(user.id, type);
   }
 
   @ResolveProperty(type => [Inventory])

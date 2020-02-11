@@ -49,7 +49,7 @@ export class Product extends Model<Product> {
   active!: boolean;
 
   @Column(DataType.FLOAT)
-  length?: number;
+  depth?: number;
 
   @Field({ nullable: true })
   @Column(DataType.TEXT)
@@ -170,9 +170,10 @@ export class Product extends Model<Product> {
 
   @AfterCreate
   static async createElastic(instance: Product) {
-    const [brand, category] = await Promise.all([
+    const [brand, category, inventory] = await Promise.all([
       instance.$get('brand'),
       instance.$get('category'),
+      instance.$get('inventory'),
     ]);
 
     await elasti.index({
@@ -198,8 +199,7 @@ export class Product extends Model<Product> {
         aliases: instance.aliases
           ? instance.aliases.split(',').map(a => a.trim())
           : null,
-        stock: instance.inventory.filter(i => i.status === 'INWAREHOUSE')
-          .length,
+        stock: inventory.filter(i => i.status === 'INWAREHOUSE').length,
         points: instance.points,
         images: instance.images,
         popularity: instance.popularity,
@@ -216,15 +216,14 @@ export class Product extends Model<Product> {
         index: 'products',
         body: {
           query: {
-            match: { id: instance.get('id') },
+            match_phrase: { id: instance.get('id') },
           },
           script: {
             source:
-              'ctx._source.stock = params.stock; ctx._source.points = params.points; ctx._source.images = params.images; ctx._source.popularity = params.popularity; ctx._source.demand = params.demand; ctx._source.lastInventoryCreated = params.lastInventoryCreated;',
+              'ctx._source.stock = params.stock; ctx._source.points = params.points; ctx._source.popularity = params.popularity; ctx._source.demand = params.demand; ctx._source.lastInventoryCreated = params.lastInventoryCreated;',
             params: {
               stock: instance.stock,
               points: instance.points,
-              images: instance.images,
               popularity: instance.popularity,
               demand: instance.demand,
               lastInventoryCreated: instance.lastInventoryCreated,

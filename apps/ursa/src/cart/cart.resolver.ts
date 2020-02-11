@@ -70,7 +70,7 @@ export class CartResolver {
     return cart.$get('inventory');
   }
 
-  @ResolveProperty(type => Address)
+  @ResolveProperty(type => Address, { nullable: true })
   async address(@Parent() cart: Cart): Promise<Address> {
     return cart.$get('address');
   }

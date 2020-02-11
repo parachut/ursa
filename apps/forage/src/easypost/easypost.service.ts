@@ -9,12 +9,7 @@ const easyPost = new EasyPost(process.env.EASYPOST);
 @Injectable()
 export class EasyPostService {
   private logger = new Logger('EasyPostService');
-  private readonly inventoryRepository: typeof Inventory = this.sequelize.getRepository(
-    'Inventory',
-  );
-  private readonly userRepository: typeof User = this.sequelize.getRepository(
-    'User',
-  );
+
   private readonly shipmentRepository: typeof Shipment = this.sequelize.getRepository(
     'Shipment',
   );
@@ -54,7 +49,6 @@ export class EasyPostService {
               .replace(/_/g, '') as keyof typeof ShipmentStatus
           ];
 
-        shipment.signedBy = easyPostBody.tracker.signed_by;
         shipment.estDeliveryDate = new Date(
           easyPostBody.tracker.est_delivery_date,
         );
