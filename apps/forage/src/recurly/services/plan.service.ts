@@ -142,8 +142,6 @@ export class PlanService {
                 deletedAt: addon.updatedAt,
                 planId: addon.planId
 
-
-
               }).then(async newRecord => {
                 console.log("New Plan Add On", newRecord)
               })
@@ -156,9 +154,6 @@ export class PlanService {
 
 
           });
-
-
-          //this.logger.error(`Plans Add On Updated`)
         }
         catch (e) {
           console.log(e)
