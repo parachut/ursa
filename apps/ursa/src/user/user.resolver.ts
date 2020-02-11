@@ -44,7 +44,7 @@ export class UserResolver {
     return this.userService.updateBillingInfo(token, user.id);
   }
 
-  @Mutation(type => BillingInfo)
+  @Mutation(type => UserTermAgreement)
   @UseGuards(GqlAuthGuard)
   async agreeToTerms(
     @Args('input') { type }: AgreeToTermsInput,

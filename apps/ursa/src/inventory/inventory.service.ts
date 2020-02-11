@@ -137,6 +137,10 @@ export class InventoryService {
         : ship.carrierDeliveredAt.getTime(),
     );
 
+    if (!shipments.length) {
+      return [];
+    }
+
     shipments.forEach((shipment, i) => {
       if (
         shipment.direction === ShipmentDirection.OUTBOUND &&
@@ -158,12 +162,12 @@ export class InventoryService {
 
       const final = last(groups);
 
-      if (final.in || i === item.shipments.length - 1 || final.in === null) {
+      if (final.in || i === shipments.length - 1 || final.in === null) {
         final.days = differenceInCalendarDays(
           final.in || new Date(),
           final.out,
         );
-        final.amount = numeral(item.commission * final.days).format('$0,00.00');
+        final.amount = item.commission * final.days;
       }
     });
 

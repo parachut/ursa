@@ -42,17 +42,26 @@ export class UserService {
           )
         : [UserRole.MEMBER];
 
-    return this.userRepository.create({
+    const user = await this.userRepository.create({
       ...input,
       roles: filteredRoles,
       termAgreements: [
         {
-          type: roles && roles.length > 1 ? 'EARN' : 'ACCESS',
+          type: filteredRoles && filteredRoles.length > 1 ? 'EARN' : 'ACCESS',
           agreed: true,
         },
       ],
       marketingSources: [marketingSource],
     });
+
+    await user.$create('termAgreements', {
+      type: filteredRoles && filteredRoles.length > 1 ? 'EARN' : 'ACCESS',
+      agreed: true,
+    });
+
+    await user.$create('marketingSources', marketingSource);
+
+    return user;
   }
 
   async findOne(userId: string) {
@@ -74,7 +83,7 @@ export class UserService {
       await user.$remove('billingInfo', user.billingInfo.id);
     }
 
-    return user.$create<BillingInfo>('billingInfo', billingInfo);
+    return user.$create('billingInfo', billingInfo);
   }
 
   async subscription(user: User) {

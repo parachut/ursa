@@ -2225,6 +2225,11 @@ bindings@^1.5.0:
   dependencies:
     file-uri-to-path "1.0.0"
 
+binpackingjs@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/binpackingjs/-/binpackingjs-2.3.2.tgz#9ba2f0cf83b87499188d6db765eb2096e6f9b770"
+  integrity sha512-gAdu687EDxyunUvGf96AA5CJwMcrWuJ3L9Hbo0ZB2WOndWO/6uIETEYBEzh6YJmTgAQ2ol6TBBQ5Fm5hbtsGDw==
+
 bitwise-xor@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/bitwise-xor/-/bitwise-xor-0.0.0.tgz#040a8172b5bb8cc562b0b7119f230b2a1a780e3d"

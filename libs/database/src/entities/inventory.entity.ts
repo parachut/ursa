@@ -21,6 +21,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript';
 import { Field, Float, ID, ObjectType } from 'type-graphql';
+import { BP2D } from 'binpackingjs';
 
 import { InventoryCondition } from '../enums/inventory-condition.enum';
 import { InventoryStatus } from '../enums/inventory-status.enum';
@@ -240,7 +241,35 @@ export class Inventory extends Model<Inventory> {
           throw new Error('Unable to assign bin, create a new bin.');
         }
 
-        instance.binId = freeNodes[0].binId;
+        const { bin } = freeNodes[0];
+
+        instance.binId = bin.id;
+
+        const binn = new BP2D.Bin(bin.width, bin.height);
+        const contents = [];
+
+        const binInventory = await bin.$get('inventory', {
+          include: ['product'],
+        });
+
+        for (const bi of [...binInventory.map(i => i.product), product]) {
+          const [width, height] = await dimensions(bi, false);
+          contents.push(new BP2D.Box(width, height));
+        }
+
+        new BP2D.Packer([binn]).pack(contents);
+
+        await instance.sequelize.models.BinFreeNode.destroy({
+          where: {
+            binId: bin.id,
+          },
+        });
+
+        for (const freeNode of binn.freeRectangles) {
+          await bin.$create('freeNode', {
+            ...freeNode,
+          });
+        }
 
         const binName = `${freeNodes[0].bin.location}-${freeNodes[0].bin.row}-${freeNodes[0].bin.column}-${freeNodes[0].bin.cell}`;
 
