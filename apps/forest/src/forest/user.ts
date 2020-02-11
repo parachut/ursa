@@ -32,23 +32,22 @@ Liana.collection('User', {
       type: 'Enum',
       enums: ['low', 'medium', 'high'],
       isReadOnly: true,
-      get: async user => {
-        const verification = await UserVerification.findOne({
+      get: async (user: User) => {
+        const [verification] = await user.$get('verifications', {
           where: {
-            userId: user.id,
             type: 'CLEARBIT_FRAUD',
           },
           order: [['createdAt', 'DESC']],
         });
         if (verification) {
-          return verification.meta.risk.level;
-        } else {
-          return 'low';
+          const meta = JSON.parse(verification.meta);
+          return meta?.risk?.level;
         }
+        return null;
       },
     },
     {
-      field: 'forestPhone',
+      field: 'formattedPhone',
       type: 'String',
       get: async (user: User) => {
         const pn = new PhoneNumber(user.phone);

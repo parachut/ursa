@@ -47,6 +47,17 @@ input AddressWhereUniqueInput {
   id: ID!
 }
 
+type AffiliateLink {
+  id: ID!
+  link: String!
+  type: AffiliateLinkType!
+}
+
+enum AffiliateLinkType {
+  ACCESS
+  EARN
+}
+
 input AuthenticateInput {
   phone: String!
   passcode: String
@@ -248,12 +259,20 @@ type File {
 
 type Income {
   id: ID!
+  type: IncomeType!
   commission: Float!
   dailyRate: Float!
   membership: Boolean!
   planId: String
   notes: String
   transferId: String
+}
+
+enum IncomeType {
+  ACCESS
+  EARN
+  INVENTORY
+  ADJUSTMENT
 }
 
 type Inventory {
@@ -375,6 +394,7 @@ type Mutation {
   addressUpdate(where: AddressWhereUniqueInput!, input: AddressUpdateInput!): Address!
   addressDestroy(where: AddressWhereUniqueInput!): Address!
   authenticate(input: AuthenticateInput!): Token!
+  visitCreate(input: VisitCreateInput!): Visit!
   register(input: RegisterInput!): Token!
   bankAccountCreate(input: BankAccountCreateInput!): UserBankAccount!
   updateBillingInfo(input: BillingInfoUpdateInput!): BillingInfo!
@@ -567,6 +587,7 @@ input RegisterInput {
   name: String!
   phone: String!
   roles: [UserRole!]
+  visitorId: String
   marketingSource: MarketingSourceInput
 }
 
@@ -836,6 +857,22 @@ type UserVerification {
   id: ID!
   type: String!
   verified: Boolean!
+}
+
+type Visit {
+  id: ID!
+  deviceId: String!
+  ipAddress: String!
+  campaign: String!
+  medium: String
+  source: String!
+}
+
+input VisitCreateInput {
+  visitorId: String
+  affiliateId: String
+  deviceId: String!
+  marketingSource: MarketingSourceInput
 }
 
 type Warehouse {

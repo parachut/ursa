@@ -1,3 +1,5 @@
+export * from './affiliate-link-type.enum';
+export * from './income-type.enum';
 export * from './inventory-condition.enum';
 export * from './inventory-status.enum';
 export * from './shipment-direction.enum';

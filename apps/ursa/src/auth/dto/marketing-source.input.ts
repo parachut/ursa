@@ -3,11 +3,11 @@ import { Field, InputType } from 'type-graphql';
 @InputType()
 export class MarketingSourceInput {
   @Field()
-  campaign!: string;
+  campaign?: string;
 
   @Field()
   source?: string;
 
   @Field()
-  medium!: string;
+  medium?: string;
 }
