@@ -30,7 +30,7 @@ async function checkClearbit(user: User): Promise<UserVerification> {
       socialHandles.push({
         handle: person.facebook.handle,
         type: 'FACEBOOK',
-        userId: user.id,
+        userId: user.get('id'),
       });
     }
 
@@ -38,7 +38,7 @@ async function checkClearbit(user: User): Promise<UserVerification> {
       socialHandles.push({
         handle: person.github.handle,
         type: 'GITHUB',
-        userId: user.id,
+        userId: user.get('id'),
       });
     }
 
@@ -46,7 +46,7 @@ async function checkClearbit(user: User): Promise<UserVerification> {
       socialHandles.push({
         handle: person.twitter.handle,
         type: 'TWITTER',
-        userId: user.id,
+        userId: user.get('id'),
       });
     }
 
@@ -54,26 +54,26 @@ async function checkClearbit(user: User): Promise<UserVerification> {
       socialHandles.push({
         handle: person.linkedin.handle,
         type: 'LINKEDIN',
-        userId: user.id,
+        userId: user.get('id'),
       });
     }
 
     const promises: Promise<
       UserVerification | User | UserEmployment | UserSocialHandle[]
     >[] = [
-      UserVerification.create({
+      user.sequelize.models.UserVerification.create<any>({
         type: 'CLEARBIT_PERSON',
         verified: !person.fuzzy,
         meta: person,
-        userId: user.id,
+        userId: user.get('id'),
       }),
-      UserSocialHandle.bulkCreate(socialHandles),
+      user.sequelize.models.UserSocialHandle.bulkCreate(socialHandles),
       user.save(),
     ];
 
     if (person.employment) {
       promises.push(
-        UserEmployment.create({
+        user.sequelize.models.UserEmployment.create<any>({
           ...pick(person.employment, [
             'domain',
             'name',
@@ -90,11 +90,11 @@ async function checkClearbit(user: User): Promise<UserVerification> {
 
     return verification as UserVerification;
   } catch (e) {
-    return UserVerification.create({
+    return user.sequelize.models.UserVerification.create<any>({
       type: 'CLEARBIT_PERSON',
       verified: false,
       meta: e,
-      userId: user.id,
+      userId: user.get('id'),
     });
   }
 }

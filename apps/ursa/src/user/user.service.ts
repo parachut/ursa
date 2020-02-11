@@ -76,4 +76,28 @@ export class UserService {
 
     return user.$create<BillingInfo>('billingInfo', billingInfo);
   }
+
+  async subscription(user: User) {
+    const subscription = await user.$get('subscription', {
+      include: ['plan', { association: 'addOns', include: ['planAddOn'] }],
+    });
+
+    if (!subscription) {
+      return null;
+    }
+
+    const additionalItems = subscription.addOns.find(
+      addOn => addOn.planAddOn.code === 'overage',
+    );
+
+    return {
+      planName: subscription.plan.name,
+      subtotal: subscription.subtotal,
+      nextBillingDate: subscription.currentPeriodEndsAt,
+      protectionPlan: !!subscription.addOns.find(
+        addOn => addOn.planAddOn.code === 'protection',
+      ),
+      additionalItems: additionalItems ? additionalItems.quantity : 0,
+    };
+  }
 }

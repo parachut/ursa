@@ -30,7 +30,7 @@ export class CartResolver {
 
   @Query(type => Cart)
   @UseGuards(GqlAuthGuard)
-  async cart(@Args('id') id: string, @CurrentUser() user: User): Promise<Cart> {
+  async cart(@CurrentUser() user: User): Promise<Cart> {
     return this.cartService.findOne(user.id);
   }
 
@@ -70,7 +70,7 @@ export class CartResolver {
     return cart.$get('inventory');
   }
 
-  @ResolveProperty(type => Address)
+  @ResolveProperty(type => Address, { nullable: true })
   async address(@Parent() cart: Cart): Promise<Address> {
     return cart.$get('address');
   }

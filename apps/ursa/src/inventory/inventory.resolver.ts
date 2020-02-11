@@ -114,12 +114,12 @@ export class InventoryResolver {
     return inventory.$get('product');
   }
 
-  @ResolveProperty(type => Cart)
+  @ResolveProperty(type => Cart, { nullable: true })
   async lastCart(@Parent() inventory: Inventory): Promise<Cart> {
     return this.cartService.lastByInventory(inventory.id);
   }
 
-  @ResolveProperty(type => Cart)
+  @ResolveProperty(type => Shipment, { nullable: true })
   async lastReturn(@Parent() inventory: Inventory): Promise<Shipment> {
     return this.shipmentService.lastByInventory(
       inventory.id,
@@ -127,7 +127,7 @@ export class InventoryResolver {
     );
   }
 
-  @ResolveProperty(type => Cart)
+  @ResolveProperty(type => Shipment, { nullable: true })
   async lastShipment(@Parent() inventory: Inventory): Promise<Shipment> {
     return this.shipmentService.lastByInventory(
       inventory.id,

@@ -10,5 +10,5 @@ export class ShipmentCreateInput {
   type!: ShipmentType;
 
   @Field(type => ShipmentDirection)
-  direction?: ShipmentType;
+  direction?: ShipmentDirection;
 }

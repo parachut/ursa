@@ -32,5 +32,6 @@ export const sequelize = async () => {
     },
   );
   connection.addModels(Object.values(models));
+  await connection.sync();
   return connection;
 };

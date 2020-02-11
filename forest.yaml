@@ -1,6 +1,6 @@
 runtime: nodejs12
-
-instance_class: F2
+service: forest
+instance_class: F1
 
 env_variables:
   NODE_ENV: production
@@ -12,12 +12,14 @@ env_variables:
   FRONT_SECRET: 4dce622a31e114be739556e3edfc6d37"
   FRONT_JWT_TOKEN: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZXMiOlsic2hhcmVkOioiLCJwcml2YXRlOioiXSwiaXNzIjoiZnJvbnQiLCJzdWIiOiJwYXJhY2h1dCJ9.Z0qTzMxIxg443FX4opxiAo4ai5vOLPWHKbjG_ksMqRc
   FRONT_CHAT_SECRET: c86b4e008a84cc0710b878226db17185
+  FOREST_ENV_SECRET: 202caeb713c75e0c9f04397a53e5004f5442b04905f7d9155f899c55a218868e
+  FOREST_AUTH_SECRET: 6905e36ad4ffc24959181f3eaf207c225b6616b30369bb43
   GOOGLE_APPLICATION_CREDENTIALS: ./gcloud.json
   INSURANCE_PERCENT: 15
   CONTRIBUTOR_PERCENT: 6
   PLAID_ID: 5c4b5c567ba2dd00119960f5
   PLAID_PUBLIC_KEY: ffc78bac76ae7db8732758381376d4
-  PLAID_SECRET: f3b61fb40509dffc5a965ab3503501
+  PLAID_SECRET: 15bb09998a97409160ec5105dcf9c9
   POSTMARK: 5b1665ba-65be-47da-8bb7-59712fd9a088
   SEGMENT: Wyl6CWXedZLKsaCZdeqOjVfUpAOXorxK
   ENGINE_API_KEY: service:brahms:B9TzHYzlQZx0D7aE_izljg
@@ -34,7 +36,7 @@ env_variables:
   USERNAME: RW3VLJQf6M6iCzDCRHP32dwLnFqAGQu8
   PASSWORD: cVm86FmuBoBheq74frqBM3hkZxRJVZo4
   ELASTIC_URL: https://elastic:acNbgQRsl0OUznitAboYVss6@cb0a068fb8d64b3294ede898764e8f96.us-central1.gcp.cloud.es.io:9243
-entrypoint: node dist/apps/ursa/apps/ursa/src/main.js
+entrypoint: node dist/apps/forest/apps/forest/src/main.js
 
 vpc_access_connector:
   name: 'projects/parachut-216816/locations/us-central1/connectors/stateless-vpc'

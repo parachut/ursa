@@ -1,5 +1,5 @@
-import { Inventory, Shipment } from '@app/database/entities';
-import { ShipmentDirection } from '@app/database/enums';
+import { Inventory, Shipment, User } from '@app/database/entities';
+import { ShipmentDirection, ShipmentType } from '@app/database/enums';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Op } from 'sequelize';
 
@@ -15,6 +15,10 @@ export class ShipmentService {
 
   private readonly inventoryRepository: typeof Inventory = this.sequelize.getRepository(
     'Inventory',
+  );
+
+  private readonly userRepository: typeof User = this.sequelize.getRepository(
+    'User',
   );
 
   constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
@@ -41,8 +45,21 @@ export class ShipmentService {
   }
 
   async create(input: ShipmentCreateInput, userId: string) {
+    const user = await this.userRepository.findByPk(userId, {
+      include: ['addresses'],
+    });
+
+    const address = user.addresses.length
+      ? user.addresses.find(address => address.primary) || user.addresses[0]
+      : null;
+
+    if (!address) {
+      throw new NotFoundException(userId);
+    }
+
     const [shipment] = await Promise.all([
       this.shipmentRepository.create({
+        addressId: address.id,
         direction: input.direction,
         type: input.type,
         userId,
@@ -73,7 +90,7 @@ export class ShipmentService {
       include: [
         {
           required: true,
-          model: Inventory,
+          model: this.inventoryRepository,
           where: { id },
         },
       ],

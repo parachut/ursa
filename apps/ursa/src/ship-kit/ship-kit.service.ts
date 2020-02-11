@@ -45,7 +45,7 @@ export class ShipKitService {
     }
 
     if (!shipKit.address) {
-      const user = await User.findByPk(userId, {
+      const user = await this.userRepository.findByPk(userId, {
         include: ['addresses'],
       });
 

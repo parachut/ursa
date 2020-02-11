@@ -48,8 +48,6 @@ export class CartItemResolver {
   async cartItemDestroy(
     @Args('where')
     { id }: CartItemWhereUniqueInput,
-    @Args('input')
-    { quantity }: CartItemUpdateInput,
     @CurrentUser() user: User,
   ): Promise<CartItem> {
     return this.cartItemService.destroy(id, user.id);

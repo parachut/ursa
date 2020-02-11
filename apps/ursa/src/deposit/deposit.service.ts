@@ -52,7 +52,7 @@ export class DepositService {
 
     const bankAccount = user.bankAccounts.find(account => account.primary);
 
-    const deposit = await Deposit.create({
+    const deposit = await this.depositRepository.create({
       amount,
       userId,
       userBankAccountId: bankAccount.id,

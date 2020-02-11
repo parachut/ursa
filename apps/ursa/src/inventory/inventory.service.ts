@@ -94,7 +94,7 @@ export class InventoryService {
   }
 
   async destroy(id: string, userId: string) {
-    const inventory = await Inventory.findOne({
+    const inventory = await this.inventoryRepository.findOne({
       where: {
         id,
         userId,

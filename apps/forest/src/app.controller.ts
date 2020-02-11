@@ -17,7 +17,7 @@ export class AppController {
 
     const token = sign(
       {
-        id: user.id,
+        sub: user.id,
         roles: user.roles,
       },
       'ysGEMzVN6MPbKTWXhuPt3dtwoE8GRJiCDNkctvUqZBUouhRq-Y',

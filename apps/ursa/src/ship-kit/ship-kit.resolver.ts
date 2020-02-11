@@ -28,10 +28,7 @@ export class ShipKitResolver {
 
   @Query(type => ShipKit)
   @UseGuards(GqlAuthGuard)
-  async shipKit(
-    @Args('id') id: string,
-    @CurrentUser() user: User,
-  ): Promise<ShipKit> {
+  async shipKit(@CurrentUser() user: User): Promise<ShipKit> {
     return this.shipKitService.findOne(user.id);
   }
 
