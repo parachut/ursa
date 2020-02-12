@@ -4743,7 +4743,36 @@
       "validations": []
     }],
     "segments": [],
-    "actions": []
+    "actions": [{
+      "name": "Insert Product",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/insert-product",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": [{
+        "field": "url",
+        "type": "String",
+        "defaultValue": null,
+        "enums": null,
+        "isRequired": true,
+        "reference": null,
+        "description": "Insert product url from B&H website.",
+        "position": 0,
+        "widget": null
+      }, {
+        "field": "price",
+        "type": "String",
+        "defaultValue": null,
+        "enums": null,
+        "isRequired": true,
+        "reference": null,
+        "description": "Insert price, if the price does not appear on the B&H page",
+        "position": 1,
+        "widget": null
+      }]
+    }]
   }, {
     "name": "ProductAttribute",
     "nameOld": "ProductAttribute",
@@ -9596,7 +9625,7 @@
     "liana": "forest-express-sequelize",
     "liana_version": "5.7.0",
     "engine": "nodejs",
-    "engine_version": "13.7.0",
+    "engine_version": "12.14.1",
     "framework": "other",
     "framework_version": null,
     "orm_version": "5.21.3"
