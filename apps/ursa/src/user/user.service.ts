@@ -10,6 +10,10 @@ import { RecurlyService } from '../recurly.service';
 
 @Injectable()
 export class UserService {
+  private readonly billingInfoRepository: typeof BillingInfo = this.sequelize.getRepository(
+    'BillingInfo',
+  );
+
   private readonly userRepository: typeof User = this.sequelize.getRepository(
     'User',
   );
@@ -42,7 +46,7 @@ export class UserService {
           )
         : [UserRole.MEMBER];
 
-    const user = await this.userRepository.create({
+    return this.userRepository.create({
       ...input,
       roles: filteredRoles,
       termAgreements: [
@@ -53,15 +57,6 @@ export class UserService {
       ],
       marketingSources: [marketingSource],
     });
-
-    await user.$create('termAgreements', {
-      type: filteredRoles && filteredRoles.length > 1 ? 'EARN' : 'ACCESS',
-      agreed: true,
-    });
-
-    await user.$create('marketingSources', marketingSource);
-
-    return user;
   }
 
   async findOne(userId: string) {
@@ -80,10 +75,14 @@ export class UserService {
     );
 
     if (user.billingInfo) {
-      await user.$remove('billingInfo', user.billingInfo.id);
+      await this.billingInfoRepository.destroy({
+        where: {
+          userId,
+        },
+      });
     }
 
-    return user.$create('billingInfo', billingInfo);
+    return this.billingInfoRepository.create(billingInfo);
   }
 
   async subscription(user: User) {

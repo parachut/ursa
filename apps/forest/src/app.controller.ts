@@ -107,7 +107,7 @@ export class AppController {
         0,
       );
 
-      const shipment = await cart.$create<Shipment>('shipments', {
+      const shipment = await cart.$create<Shipment>('shipment', {
         direction: ShipmentDirection.OUTBOUND,
         expedited: cart.service !== 'Ground',
         type: ShipmentType.ACCESS,

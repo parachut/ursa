@@ -333,8 +333,6 @@ export class Shipment extends Model<Shipment> {
       try {
         await easyPostShipment.save();
 
-        console.log(easyPostShipment);
-
         if (easyPostShipment.rates.length > 2) {
           const rates = groupBy(
             easyPostShipment.rates.filter(r => r.delivery_days),
@@ -372,11 +370,11 @@ export class Shipment extends Model<Shipment> {
 
       const camalBody = camelcaseKeysDeep(easyPostShipment);
 
-      shipment.parcel = JSON.stringify(camalBody.parcel);
-      shipment.rates = JSON.stringify(camalBody.rates);
-      shipment.rate = JSON.stringify(camalBody.selectedRate);
-      shipment.tracker = JSON.stringify(camalBody.tracker);
-      shipment.postage = JSON.stringify(camalBody.postageLabel);
+      instance.parcel = JSON.stringify(camalBody.parcel) as any;
+      instance.rates = JSON.stringify(camalBody.rates) as any;
+      instance.rate = JSON.stringify(camalBody.selectedRate) as any;
+      instance.tracker = JSON.stringify(camalBody.tracker) as any;
+      instance.postage = JSON.stringify(camalBody.postageLabel) as any;
 
       instance.easyPostId = camalBody.id;
       instance.trackingCode = camalBody.trackingCode;

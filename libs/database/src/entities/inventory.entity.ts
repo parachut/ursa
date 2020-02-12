@@ -312,7 +312,10 @@ export class Inventory extends Model<Inventory> {
 
         console.log(res);
       } else {
-        if (!instance.changed('markedForReturn')) {
+        if (
+          !instance.changed('markedForReturn') &&
+          instance.status !== InventoryStatus.SHIPMENTPREP
+        ) {
           instance.binId = null;
         }
       }
