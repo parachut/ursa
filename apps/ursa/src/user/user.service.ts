@@ -10,11 +10,19 @@ import { RecurlyService } from '../recurly.service';
 
 @Injectable()
 export class UserService {
+  private readonly billingInfoRepository: typeof BillingInfo = this.sequelize.getRepository(
+    'BillingInfo',
+  );
+
   private readonly userRepository: typeof User = this.sequelize.getRepository(
     'User',
   );
   private readonly userAgreementRepository: typeof UserTermAgreement = this.sequelize.getRepository(
     'UserTermAgreement',
+  );
+
+  private readonly userMarketingSourceRepository: typeof UserMarketingSource = this.sequelize.getRepository(
+    'UserMarketingSource',
   );
 
   constructor(
@@ -33,7 +41,7 @@ export class UserService {
   async createUser(
     input: Partial<User>,
     roles: UserRole[],
-    marketingSource: Partial<UserMarketingSource>,
+    marketingSource?: Partial<UserMarketingSource>,
   ) {
     const filteredRoles =
       roles && roles.length
@@ -42,17 +50,25 @@ export class UserService {
           )
         : [UserRole.MEMBER];
 
-    return this.userRepository.create({
+    const user = await this.userRepository.create({
       ...input,
       roles: filteredRoles,
-      termAgreements: [
-        {
-          type: roles && roles.length > 1 ? 'EARN' : 'ACCESS',
-          agreed: true,
-        },
-      ],
       marketingSources: [marketingSource],
     });
+
+    await this.agreeToTerms(
+      user.get('id'),
+      filteredRoles && filteredRoles.length > 1 ? 'EARN' : 'ACCESS',
+    );
+
+    if (marketingSource) {
+      await this.userMarketingSourceRepository.create({
+        ...marketingSource,
+        userId: user.get('id'),
+      });
+    }
+
+    return user;
   }
 
   async findOne(userId: string) {
@@ -71,10 +87,14 @@ export class UserService {
     );
 
     if (user.billingInfo) {
-      await user.$remove('billingInfo', user.billingInfo.id);
+      await this.billingInfoRepository.destroy({
+        where: {
+          userId,
+        },
+      });
     }
 
-    return user.$create<BillingInfo>('billingInfo', billingInfo);
+    return this.billingInfoRepository.create(billingInfo);
   }
 
   async subscription(user: User) {

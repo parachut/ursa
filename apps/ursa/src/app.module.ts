@@ -23,6 +23,7 @@ import { ShipKitModule } from './ship-kit/ship-kit.module';
 import { ShipmentModule } from './shipment/shipment.module';
 import { RecurlyService } from './recurly.service';
 import { SlackService } from './slack.service';
+import { AffiliateLinkModule } from './affiliate-link/affiliate-link.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { SlackService } from './slack.service';
     QueueModule,
     ShipKitModule,
     ShipmentModule,
+    AffiliateLinkModule,
   ],
   controllers: [AppController],
   providers: [

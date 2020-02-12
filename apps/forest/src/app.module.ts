@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { JwtStrategy } from './jwt.strategy';
 import { BPModule } from './Insert/bp.module';
 import { LogInAssModule } from './LogInAs/loginas.module';
+import { EmailService } from './email.service';
 
 @Module({
   //exports:[],
@@ -21,6 +22,6 @@ import { LogInAssModule } from './LogInAs/loginas.module';
     LogInAssModule
   ],
   controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, EmailService],
 })
 export class AppModule { }

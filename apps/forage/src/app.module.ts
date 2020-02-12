@@ -11,10 +11,17 @@ import { InvoiceModule } from './recurly/modules/invoice.module';
 
 import { EasypostModule } from './easypost/easypost.module';
 
-
 @Module({
-  imports: [SubscriptionModule, EasypostModule, PlanModule, CouponModule, BillingModule, InvoiceModule, EasypostModule],
+  imports: [
+    SubscriptionModule,
+    EasypostModule,
+    PlanModule,
+    CouponModule,
+    BillingModule,
+    InvoiceModule,
+    EasypostModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

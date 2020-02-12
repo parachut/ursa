@@ -20,6 +20,8 @@ export class DwollaService {
     user: User,
     ipAddress: string,
   ): Promise<Partial<UserIntegration>> {
+    this.appToken = await this.dwollaClient.auth.client();
+
     const dwollaCustomerRequest: any = {
       firstName: user.parsedName.first,
       lastName: user.parsedName.last,
@@ -48,6 +50,8 @@ export class DwollaService {
     plaidToken: string,
     name: string,
   ): Promise<string> {
+    this.appToken = await this.dwollaClient.auth.client();
+
     try {
       const dwollaRef = await this.appToken
         .post(`${dwollaAccountRef}/funding-sources`, {
@@ -74,6 +78,8 @@ export class DwollaService {
     paymentId: string,
     userId: string,
   ): Promise<string> {
+    this.appToken = await this.dwollaClient.auth.client();
+
     const accountUrl = await this.appToken
       .get('/')
       .then(res => res.body._links.account.href);

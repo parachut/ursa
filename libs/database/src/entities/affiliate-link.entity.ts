@@ -33,6 +33,10 @@ export class AffiliateLink extends Model<AffiliateLink> {
   @Column
   link!: string;
 
+  @Field()
+  @Column
+  rebrandlyId!: string;
+
   @Field(type => AffiliateLinkType)
   @Default(AffiliateLinkType.ACCESS)
   @Column(
