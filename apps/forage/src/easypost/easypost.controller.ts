@@ -8,7 +8,6 @@ import { EasyPostHookDto } from './dto/easy-post-hook.dto';
 export class EasyPostController {
   constructor(private readonly easyPostService: EasyPostService) {}
 
-  @UseGuards(AuthGuard('basic'))
   @Post('/easypost')
   async easyPost(@Body() easyPostHookDto: EasyPostHookDto) {
     const easyPostId = easyPostHookDto?.result?.id;
