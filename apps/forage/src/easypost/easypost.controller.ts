@@ -10,7 +10,7 @@ export class EasyPostController {
 
   @Post('/easypost')
   async easyPost(@Body() easyPostHookDto: EasyPostHookDto) {
-    const easyPostId = easyPostHookDto?.result?.id;
+    const easyPostId = easyPostHookDto?.result?.shipment_id;
 
     if (!easyPostId) {
       return 'No shipmentId found.';

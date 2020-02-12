@@ -40,16 +40,14 @@ export class AddressService {
       type: 'CLEARBIT_FRAUD',
       verified: result.risk.level !== 'high',
       meta: JSON.stringify(result),
-      userId: userId,
+      userId,
     });
   }
 
   async createAddress(input: Partial<Address>, ip: string) {
     await this.checkClearbitFraud(input.userId, input.zip, input.country, ip);
 
-    return this.addressRepository.create({
-      input,
-    });
+    return this.addressRepository.create(input);
   }
 
   async deleteAddress(addressId: string, userId: string) {

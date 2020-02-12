@@ -1,7 +1,7 @@
 import { AffiliateLink } from '@app/database/entities';
 import { AffiliateLinkType } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
-import Rebrandly from 'rebrandly';
+import * as Rebrandly from 'rebrandly';
 import * as short from 'short-uuid';
 
 @Injectable()

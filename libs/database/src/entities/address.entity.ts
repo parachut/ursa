@@ -125,7 +125,12 @@ export class Address extends Model<Address> {
     const easyPost = new EasyPost(process.env.EASYPOST);
     const { models } = instance.sequelize;
 
-    const user = await instance.$get('user');
+    console.log(instance);
+
+    const user: User = (await instance.sequelize.models.User.findByPk(
+      instance.userId,
+    )) as User;
+
     if (instance.primary) {
       await models.Address.update(
         {
