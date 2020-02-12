@@ -82,6 +82,7 @@ async function checkClearbit(user: User): Promise<UserVerification> {
             'subRole',
             'seniority',
           ]),
+          userId: user.get('id'),
         }),
       );
     }

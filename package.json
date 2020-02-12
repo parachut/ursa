@@ -66,6 +66,7 @@
     "plaid": "^4.5.0",
     "postmark": "^2.3.5",
     "puppeteer": "^2.1.1",
+    "rebrandly": "^2.0.1",
     "recurly": "^3.3.1",
     "reflect-metadata": "^0.1.13",
     "request-ip": "^2.1.3",

@@ -34,6 +34,7 @@ env_variables:
   USERNAME: RW3VLJQf6M6iCzDCRHP32dwLnFqAGQu8
   PASSWORD: cVm86FmuBoBheq74frqBM3hkZxRJVZo4
   ELASTIC_URL: https://elastic:acNbgQRsl0OUznitAboYVss6@cb0a068fb8d64b3294ede898764e8f96.us-central1.gcp.cloud.es.io:9243
+  REBRANDLY: b8c7e0cc2de740669f4fb12b613728a7
 entrypoint: node dist/apps/ursa/apps/ursa/src/main.js
 
 vpc_access_connector:

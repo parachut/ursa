@@ -26,10 +26,6 @@ export class AuthService {
 
   constructor(@Inject('SEQUELIZE') private readonly sequelize) {
     this.authyClient = new Authy({ key: process.env.AUTHY });
-
-    console.log(
-      this.translator.fromUUID('85387f41-9c29-4602-8bd2-cf374d920ff8'),
-    );
   }
 
   private async getAuthyId(phone: string): Promise<[string, User]> {
