@@ -11,6 +11,11 @@ export class AddressService {
   private readonly userRepository: typeof User = this.sequelize.getRepository(
     'User',
   );
+
+  private readonly userVerificationRepository: typeof UserVerification = this.sequelize.getRepository(
+    'UserVerification',
+  );
+
   private readonly clearbitClient = new Client({ key: process.env.CLEARBIT });
 
   constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
@@ -31,7 +36,7 @@ export class AddressService {
       zip_code: zip,
     });
 
-    return user.$create('verifications', {
+    return this.userVerificationRepository.create({
       type: 'CLEARBIT_FRAUD',
       verified: result.risk.level !== 'high',
       meta: JSON.stringify(result),

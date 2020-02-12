@@ -1,23 +1,18 @@
-require('dotenv').config();
 import { NestFactory } from '@nestjs/core';
 import * as xmlparser from 'express-xml-bodyparser';
-import { Logger } from '@nestjs/common'
+
 import { AppModule } from './app.module';
 
-
-
+require('dotenv').config();
 async function bootstrap() {
-  const logger = new Logger("bootstrap")
   const port = process.env.PORT;
-
 
   const app = await NestFactory.create(AppModule);
 
+  app.use(xmlparser());
 
-  app.use(xmlparser()); // parse text/xml requests
- 
+  app.setGlobalPrefix('forage');
 
   await app.listen(port ? parseInt(port, 10) : 4000);
-  logger.log(`Application listening on port ${port}`)
 }
 bootstrap();

@@ -21,6 +21,10 @@ export class UserService {
     'UserTermAgreement',
   );
 
+  private readonly userMarketingSourceRepository: typeof UserMarketingSource = this.sequelize.getRepository(
+    'UserMarketingSource',
+  );
+
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
     private readonly recurlyService: RecurlyService,
@@ -37,7 +41,7 @@ export class UserService {
   async createUser(
     input: Partial<User>,
     roles: UserRole[],
-    marketingSource: Partial<UserMarketingSource>,
+    marketingSource?: Partial<UserMarketingSource>,
   ) {
     const filteredRoles =
       roles && roles.length
@@ -46,17 +50,25 @@ export class UserService {
           )
         : [UserRole.MEMBER];
 
-    return this.userRepository.create({
+    const user = await this.userRepository.create({
       ...input,
       roles: filteredRoles,
-      termAgreements: [
-        {
-          type: filteredRoles && filteredRoles.length > 1 ? 'EARN' : 'ACCESS',
-          agreed: true,
-        },
-      ],
       marketingSources: [marketingSource],
     });
+
+    await this.agreeToTerms(
+      user.get('id'),
+      filteredRoles && filteredRoles.length > 1 ? 'EARN' : 'ACCESS',
+    );
+
+    if (marketingSource) {
+      await this.userMarketingSourceRepository.create({
+        ...marketingSource,
+        userId: user.get('id'),
+      });
+    }
+
+    return user;
   }
 
   async findOne(userId: string) {

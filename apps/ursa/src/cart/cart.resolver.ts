@@ -60,6 +60,12 @@ export class CartResolver {
     return this.cartService.update(input, user.id);
   }
 
+  @Mutation(type => Cart)
+  @UseGuards(GqlAuthGuard)
+  async checkout(@CurrentUser() user: User): Promise<Cart> {
+    return this.cartService.complete(user.id);
+  }
+
   @ResolveProperty(type => [CartItem])
   async items(@Parent() cart: Cart): Promise<CartItem[]> {
     return cart.$get('items');
