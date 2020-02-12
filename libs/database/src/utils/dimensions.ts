@@ -10,9 +10,9 @@ export async function dimensions(product: Product, d3: boolean) {
 
   let height = Math.round(product.height || 0);
   let width = Math.round(product.width || 0);
-  let depth = Math.round(product.depth || 0);
+  let length = Math.round(product.length || 0);
 
-  if (!height || !width || !depth) {
+  if (!height || !width || !length) {
     let categoryIds = [product.categoryId];
 
     let [
@@ -58,15 +58,15 @@ export async function dimensions(product: Product, d3: boolean) {
 
     height = height || catAverage.height;
     width = width || catAverage.width;
-    depth = depth || catAverage.depth;
+    length = length || catAverage.length;
   }
 
   if (d3) {
-    return [width, height, depth];
+    return [width, height, length];
   }
 
-  if (width !== depth) {
-    return [width, depth];
+  if (width !== length) {
+    return [width, length];
   }
   return [width, height];
 }
