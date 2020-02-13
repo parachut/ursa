@@ -5,9 +5,9 @@ import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtStrategy } from './jwt.strategy';
-import { BPModule } from './Insert/bp.module';
-import { LogInAsModule } from './LogInAs/loginas.module';
-import { EmailService } from './email.service';
+import { BPModule } from './product/product.module';
+import { LogInAsModule } from './user/user.module';
+import { EmailService } from './user/email.service';
 
 @Module({
   //exports:[],
