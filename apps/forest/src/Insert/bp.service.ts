@@ -681,6 +681,9 @@ export class BPService {
               newItem = { ...data, ...dataSpecs };
               console.log(newItem)
 
+
+
+
               try {
                 let brandId;
                 brandId = await this.brandRepository.findOne({
