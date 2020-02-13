@@ -1,11 +1,9 @@
-import { Injectable, Inject, Logger, InternalServerErrorException, ForbiddenException } from '@nestjs/common';
+import { Injectable, Inject, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Product, Category, Brand, ProductAttribute, ProductAttributeValue } from '@app/database/entities';
 import * as puppeteer from 'puppeteer'
 import *  as uuidv1 from 'uuid'
-import { errors } from '@elastic/elasticsearch';
-import e = require('express');
-
-
+import * as request from 'request'
+import { Storage } from '@google-cloud/storage'
 
 
 @Injectable()
@@ -35,23 +33,69 @@ export class BPService {
 
   async insertItem(body): Promise<Product[]> {
 
-    let newItem = {};
+    //////////////---------------------------------------------------- INSERT PICTURE TO GCP------------------------------------
+
+    async function saveToStorage(attachmentUrl, objectName) {
+      try {
+        const storage = new Storage({
+          projectId: process.env.GCLOUD_PROJECT
+        }
+        );
+        const bucket = process.env.GCLOUD_STORAGE_BUCKET
+        const req = request(attachmentUrl);
+        req.pause();
+        req.on("response", res => {
+          if (res.statusCode !== 200) {
+            return;
+          }
+          const writeStream = storage
+            .bucket(bucket)
+            .file(objectName)
+            .createWriteStream({
+              gzip: true,
+              public: true,
+              metadata: {
+                contentType: res.headers["content-type"]
+              }
+            });
+          req
+            .pipe(writeStream)
+            .on("finish", () => this.logger.log(`Picture Saved `))
+            .on("error", err => {
+              writeStream.end();
+              console.error(err);
+            });
+          req.resume();
+        });
+        req.on("error", err => console.error(err));
+
+      }
+      catch (e) {
+        this.logger.error(`Picture Was Not Inserted`, e.stack)
+      }
+    }
+
+    //////////////---------------------------------------------------- CRAWLING PAGE------------------------------------
     try {
+      let newItem = {};
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
-      await page.goto(
+      const result = await page.goto(
         body.url,
         {
           waitUntil: "networkidle2",
           timeout: 120000
         }
       );
+      if (result.status() === 404) {
+        throw new NotFoundException("Page Does Not Exists");
+      }
+
       await page.addScriptTag({
         url: "https://code.jquery.com/jquery-3.2.1.min.js"
       });
 
-
-      //////////////------------------------------------------------ START GENERAL-----------------------------------
+      //////////////------------------------------------------------ START GENERAL---------------------------------
       const data = await page.evaluate(() => {
         //CAMERA
         const cameraString = $('h1[class^="title"]').first().text();
@@ -76,6 +120,7 @@ export class BPService {
             .replace(" Point-and-Shoot", "")
             .replace(" (Camera Body)", "")
             .replace(" Lens", "")
+            .replace("FUJIFILM", "Fujifilm")
             .trim();
         }
         const slug = name
@@ -291,13 +336,9 @@ export class BPService {
       });
 
       //////////////------------------------------------------------ START SPECS-----------------------------------
-
-
       const dataSpecs = await page.evaluate(() => {
 
-        let length = null;
-        let width = null;
-        let height = null
+
 
         //SPECS LABLES
         const lablesSearch = $('td[class^="label_"]')
@@ -568,8 +609,10 @@ export class BPService {
         }
 
         //DIMENSIONS (Most Likely Cameras)
-
-        const dimensionsOption = ['Dimensions', 'Overall Dimensions', 'Dimensions (L x W x H)']
+        let length = null;
+        let width = null;
+        let height = null;
+        const dimensionsOption = ['Dimensions', 'Overall Dimensions', 'Dimensions (L x W x H)', 'Dimensions (W x H x D)']
         for (const variation of dimensionsOption) {
 
           if (length === null && width === null && height === null) {
@@ -651,6 +694,47 @@ export class BPService {
 
         //DIMENSIONS (Most Likely Lenses)
 
+        if (length === null && width === null && height === null) {
+
+          const dimensionsOptionLens = ['Dimensions (']
+          for (const variation of dimensionsOptionLens) {
+
+            if (length === null && width === null && height === null) {
+              let dimensions = null
+              dimensions = specifications.find(o => o.name.startsWith(`${variation}`));
+
+              if (!dimensions) {
+                width
+                length
+                height
+              } else if (dimensions.value.startsWith("Not Specified by")) {
+                width
+                length
+                height
+              } else if (dimensions.value.startsWith("Not specified by")) {
+                width
+                length
+                height
+              }
+              else {
+                if (dimensions.value.endsWith('cm')) {
+                  const dim1 = dimensions.value.split("/");
+                  const dim2 = dim1[1].split("x");
+                  length = Math.ceil(parseFloat(dim2[1]) * 10);
+                  width = Math.ceil(parseFloat(dim2[0]) * 10);
+                  height = Math.ceil(parseFloat(dim2[0]) * 10);
+                }
+                else if (dimensions.value.endsWith('mm')) {
+                  const dim1 = dimensions.value.split("/");
+                  const dim2 = dim1[1].split("x");
+                  length = Math.ceil(parseFloat(dim2[1]));
+                  width = Math.ceil(parseFloat(dim2[0]));
+                  height = Math.ceil(parseFloat(dim2[0]));
+                }
+              }
+            }
+          }
+        }
 
         //DATES
         const utcDateString = new Date(new Date().toUTCString())
@@ -662,9 +746,15 @@ export class BPService {
         const updatedAt = utcDateString
 
         return { specifications, weight, length, width, createdAt, updatedAt, height }
-      }
-      )
+      });
 
+      //////////////------------------------------------------------ CHECK ----------------------------------------
+      if (data.name.includes("We're Sorry!") === true) {
+        this.logger.error(`Page Does Not Exists`)
+        throw new NotFoundException();
+      }
+
+      //////////////---------------------------------------------------- INSERT------------------------------------
       if (data.mfr != "") {
         if (data.name.includes("Kit") != true) {
           if (data.name.includes(" with") != true) {
@@ -674,15 +764,13 @@ export class BPService {
               } else {
                 const fileName = uuidv1() + ".jpg";
                 data.imageId = fileName;
+                await saveToStorage(data.images, data.imageId);
               }
               if (data.points === 0) {
                 data.points = body.price
               }
               newItem = { ...data, ...dataSpecs };
               console.log(newItem)
-
-
-
 
               try {
                 let brandId;
@@ -728,81 +816,76 @@ export class BPService {
                 console.log(brandId.id)
                 console.log(categoryId.id)
 
-                // await this.productRepository.create({
+                await this.productRepository.create({
+                  slug: data.slug,
+                  length: dataSpecs.length,
+                  features: data.features,
+                  height: dataSpecs.height,
+                  inTheBox: data.features,
+                  mfr: data.mfr,
+                  name: data.name,
+                  weight: dataSpecs.weight,
+                  width: dataSpecs.width,
+                  createdAt: dataSpecs.createdAt,
+                  updatedAt: dataSpecs.updatedAt,
+                  brandId: brandId.id,
+                  categoryId: categoryId.id,
+                  images: [data.imageId],
+                  points: data.points
+                }).then(async newRecord => {
 
-                //   slug: data.slug,
-                //   length: dataSpecs.length,
-                //   features: data.features,
-                //   height: dataSpecs.height,
-                //   inTheBox: data.features,
-                //   mfr: data.mfr,
-                //   name: data.name,
-                //   weight: dataSpecs.weight,
-                //   width: dataSpecs.width,
-                //   createdAt: dataSpecs.createdAt,
-                //   updatedAt: dataSpecs.updatedAt,
-                //   brandId: brandId.id,
-                //   categoryId: categoryId.id,
-                //   images: [data.imageId],
-                //   points: data.points
-                // }).then(async newRecord => {
+                  if (dataSpecs.specifications.length != 0) {
+                    try {
+                      for (const spec of dataSpecs.specifications) {
+                        let specNameId;
+                        specNameId = await this.productAttributeRepository.findOne({
+                          where: { name: spec.name }
+                        });
 
-                //   console.log("New Item", newRecord.id)
-                //   if (dataSpecs.specifications.length != 0) {
-                //     for (const spec of dataSpecs.specifications) {
-
-                //       console.log(spec.name)
-                //       let specNameId;
-                //       specNameId = await this.productAttributeRepository.findOne({
-                //         where: { name: spec.name }
-                //       });
-
-                //       if (specNameId === null) {
-                //         await this.productAttributeRepository.create({
-                //           name: spec.name,
-                //           createdAt: dataSpecs.createdAt,
-                //           updatedAt: dataSpecs.updatedAt
-                //         }).then(async specName => {
-                //           console.log("New Specification Name", specName)
-                //         })
-                //         specNameId = await this.productAttributeRepository.findOne({
-                //           where: { name: spec.name }
-                //         });
-
-                //       }
-                //       await this.productAttributeValueRepository.create({
-                //         value: spec.value,
-                //         productAttributeId: specNameId.id,
-                //         productId: newRecord.id,
-                //         createdAt: dataSpecs.createdAt,
-                //         updatedAt: dataSpecs.updatedAt
-                //       }).then(async specValue => {
-                //         console.log("New Specification Value", specValue)
-                //       })
-                //     }
-                //   }
-                //   this.logger.log(`Inserted to DB (SEQUELIZE) Item: ID `, newRecord.id)
-                // })
+                        if (specNameId === null) {
+                          await this.productAttributeRepository.create({
+                            name: spec.name,
+                            createdAt: dataSpecs.createdAt,
+                            updatedAt: dataSpecs.updatedAt
+                          }).then(async specName => {
+                            console.log("New Specification Name", specName.id)
+                          })
+                          specNameId = await this.productAttributeRepository.findOne({
+                            where: { name: spec.name }
+                          });
+                        }
+                        await this.productAttributeValueRepository.create({
+                          value: spec.value,
+                          productAttributeId: specNameId.id,
+                          productId: newRecord.id,
+                          createdAt: dataSpecs.createdAt,
+                          updatedAt: dataSpecs.updatedAt
+                        }).then(async specValue => {
+                          console.log("New Specification Value", specValue.id)
+                        })
+                      }
+                      this.logger.log(`Inserted to DB (SEQUELIZE) (SPECS) `)
+                    }
+                    catch (e) {
+                      this.logger.error(`Inserted to DB (SEQUELIZE) (SPECS) `, e.stack)
+                    }
+                  }
+                  this.logger.log(`Inserted to DB (SEQUELIZE) `, newRecord.id)
+                })
 
               } catch (e) {
-
                 this.logger.error(`Failed with Inserting to DB (SEQUELIZE) `, e.stack)
               }
-
             }
           }
         }
-      }
-      if (data.name.includes("We're Sorry!") === true) {
-        this.logger.error(`Page Does Not Exists`)
-        throw new Error(`Page Does Not Exists`)
       }
       await page.close();
       await browser.close();
     } catch (e) {
       console.log(e);
       this.logger.error(`Item Was Not Inserted`, e.stack)
-      throw new ForbiddenException();
+      throw new NotFoundException("Page Does Not Exists");
     }
 
     this.logger.log(`Item Inserted`)
