@@ -14,7 +14,8 @@ export class AffiliateLinkResolver {
   @Query(returns => AffiliateLink)
   @UseGuards(GqlAuthGuard)
   async affiliateLink(
-    @Args('type') type: AffiliateLinkType,
+    @Args({ name: 'type', type: () => AffiliateLinkType })
+    type: AffiliateLinkType,
     @CurrentUser() user: User,
   ): Promise<AffiliateLink> {
     return this.affiliateLinkService.findOne(type, user.id);

@@ -30,6 +30,14 @@ export class UserFunds extends Model<UserFunds> {
   @Column(DataType.REAL)
   withdrawn!: number;
 
+  @Field()
+  @Column(DataType.REAL)
+  inventory!: number;
+
+  @Field()
+  @Column(DataType.REAL)
+  affiliate!: number;
+
   @BelongsTo(() => User)
   user!: User;
 

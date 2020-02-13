@@ -49,7 +49,7 @@ export class QueueResolver {
   @Mutation(returns => Queue)
   @UseGuards(GqlAuthGuard)
   async queueDestroy(
-    @Args('input')
+    @Args('where')
     { id }: QueueWhereUniqueInput,
     @CurrentUser() user: User,
   ): Promise<Queue> {

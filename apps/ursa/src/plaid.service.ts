@@ -17,6 +17,10 @@ export class PlaidService {
     environments.production,
   );
 
+  async exchangePublicToken(publicToken: string) {
+    return this.plaidClient.exchangePublicToken(publicToken);
+  }
+
   async createProcessorToken(
     accessToken: string,
     accountId: string,

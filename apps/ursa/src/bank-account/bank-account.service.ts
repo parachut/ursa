@@ -43,11 +43,15 @@ export class BankAccountService {
   }
 
   async create(
-    accessToken: string,
+    publicToken: string,
     accountId: string,
     userId: string,
     ipAddress: string,
   ) {
+    const {
+      access_token: accessToken,
+    } = await this.plaidService.exchangePublicToken(publicToken);
+
     const user = await this.userRepository.findByPk(userId, {
       include: ['integrations'],
     });

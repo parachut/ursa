@@ -31,8 +31,10 @@ export class AffiliateLinkService {
         destination: `https://unlimited.parachut.co/${type}/?affiliate_id=${this.translator.fromUUID(
           userId,
         )}`,
-        domain: 'par.ac',
-        title: `User ${type} Affilliate Link`,
+        domain: {
+          id: '870f873352f641d1b4e1cfe1d4db3e6b',
+        },
+        title: `${userId} ${String(type)} Affilliate Link`,
       });
       return this.affiliateLinkRepository.create({
         userId,

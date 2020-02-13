@@ -174,7 +174,7 @@ export class CartService {
           association: 'currentInventory',
           include: ['product'],
         },
-        'subscriptions',
+        'subscription',
       ],
     });
 
@@ -265,7 +265,7 @@ export class CartService {
       throw new Error(e.message);
     }
 
-    await Inventory.update(
+    await this.inventoryRepository.update(
       {
         status: 'SHIPMENTPREP',
         memberId: user.id,
@@ -280,7 +280,7 @@ export class CartService {
       },
     );
 
-    if (process.env.STAGE === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       await this.slackService.cartMessage(cart, user.name);
     }
 
