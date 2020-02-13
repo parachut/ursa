@@ -7,7 +7,6 @@ import { LogInAsService } from './loginas.service';
 import { JwtStrategy } from '../jwt.strategy';
 
 @Module({
-  //exports:[],
   imports: [
     DatabaseModule,
     PassportModule,
@@ -19,4 +18,4 @@ import { JwtStrategy } from '../jwt.strategy';
   controllers: [LogInAsController],
   providers: [LogInAsService, JwtStrategy],
 })
-export class LogInAssModule { }
+export class LogInAsModule { }
