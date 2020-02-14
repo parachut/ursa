@@ -258,7 +258,7 @@ export class CartService {
         }
       }
     } catch (e) {
-      if (process.env.STAGE === 'production') {
+      if (process.env.NODE_ENV === 'production') {
         await this.slackService.cartMessage(cart, user.name, e.message);
       }
 
@@ -273,7 +273,7 @@ export class CartService {
       {
         where: {
           id: {
-            [Op.in]: inventory,
+            [Op.in]: inventory.map(i => i.id),
           },
         },
         individualHooks: true,
@@ -295,10 +295,13 @@ export class CartService {
         cartId: cart.id,
       });
 
-      await shipment.$set('inventory', inventory);
+      await shipment.$set(
+        'inventory',
+        inventory.map(i => i.id),
+      );
     }
 
-    this.emailService.send({
+    await this.emailService.send({
       to: user.email,
       from: 'support@parachut.co',
       id: !user.subscription ? 12931487 : 12932745,
@@ -330,7 +333,10 @@ export class CartService {
     await user.save();
 
     cart.completedAt = new Date();
-    await cart.$set('inventory', inventory);
+    await cart.$set(
+      'inventory',
+      inventory.map(i => i.id),
+    );
     await cart.save();
 
     return cart;

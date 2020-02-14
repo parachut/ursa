@@ -94,7 +94,7 @@ export class UserService {
       });
     }
 
-    return this.billingInfoRepository.create(billingInfo);
+    return this.billingInfoRepository.create({ ...billingInfo, userId });
   }
 
   async subscription(user: User) {

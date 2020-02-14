@@ -1,9 +1,15 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Logger,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { User, UserIntegration } from '@app/database/entities';
 import * as Dwolla from 'dwolla-v2';
 
 @Injectable()
 export class DwollaService {
+  private readonly logger = new Logger(DwollaService.name);
+
   private readonly dwollaClient = new Dwolla.Client({
     key: process.env.DWOLLA_KEY,
     secret: process.env.DWOLLA_SECRET,
@@ -62,7 +68,8 @@ export class DwollaService {
 
       return dwollaRef;
     } catch (e) {
-      const existingAccount = JSON.parse(e)?._links?.about?.href;
+      this.logger.error(e.body);
+      const existingAccount = e.body._links?.about?.href;
 
       if (existingAccount) {
         return existingAccount;

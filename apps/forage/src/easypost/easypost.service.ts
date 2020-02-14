@@ -105,7 +105,7 @@ export class EasyPostService {
           };
         }
         if (update.status) {
-          this.inventoryRepository.update(update, {
+          await this.inventoryRepository.update(update, {
             where: {
               id: { [Op.in]: shipmentInventory.map(s => s.id) },
             },
@@ -123,7 +123,7 @@ export class EasyPostService {
           };
         }
         if (update.status) {
-          this.inventoryRepository.update(update, {
+          await this.inventoryRepository.update(update, {
             where: {
               id: { [Op.in]: shipmentInventory.map(s => s.id) },
             },

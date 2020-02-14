@@ -212,25 +212,30 @@ export class Product extends Model<Product> {
   @AfterUpdate
   static async updateElastic(instance: Product) {
     if (instance.id) {
-      await elasti.updateByQuery({
-        index: 'products',
-        body: {
-          query: {
-            match_phrase: { id: instance.get('id') },
-          },
-          script: {
-            source:
-              'ctx._source.stock = params.stock; ctx._source.points = params.points; ctx._source.popularity = params.popularity; ctx._source.demand = params.demand; ctx._source.lastInventoryCreated = params.lastInventoryCreated;',
-            params: {
-              stock: instance.stock,
-              points: instance.points,
-              popularity: instance.popularity,
-              demand: instance.demand,
-              lastInventoryCreated: instance.lastInventoryCreated,
+      try {
+        await elasti.updateByQuery({
+          index: 'products',
+          body: {
+            query: {
+              match_phrase: { id: instance.get('id') },
+            },
+            script: {
+              source:
+                'ctx._source.stock = params.stock; ctx._source.points = params.points; ctx._source.popularity = params.popularity; ctx._source.demand = params.demand; ctx._source.lastInventoryCreated = params.lastInventoryCreated;',
+              params: {
+                stock: instance.stock,
+                points: instance.points,
+                popularity: instance.popularity,
+                demand: instance.demand,
+                lastInventoryCreated:
+                  instance.lastInventoryCreated || new Date(),
+              },
             },
           },
-        },
-      });
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 }
