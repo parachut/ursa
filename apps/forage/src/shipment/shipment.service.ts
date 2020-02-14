@@ -1,4 +1,4 @@
-import { Inventory, Shipment, User } from '@app/database/entities';
+import { Shipment } from '@app/database/entities';
 import {
   InventoryStatus,
   ShipmentDirection,
@@ -8,15 +8,12 @@ import {
 import * as EasyPost from '@easypost/api';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as camelcaseKeysDeep from 'camelcase-keys-deep';
-import { Op } from 'sequelize';
+
+import { InventoryService } from '../inventory/inventory.service';
 
 @Injectable()
-export class EasyPostService {
-  private logger = new Logger(EasyPostService.name);
-
-  private readonly inventoryRepository: typeof Inventory = this.sequelize.getRepository(
-    'Inventory',
-  );
+export class ShipmentService {
+  private logger = new Logger(ShipmentService.name);
 
   private readonly shipmentRepository: typeof Shipment = this.sequelize.getRepository(
     'Shipment',
@@ -24,9 +21,12 @@ export class EasyPostService {
 
   private readonly easyPostClient = new EasyPost(process.env.EASYPOST);
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
+  constructor(
+    @Inject('SEQUELIZE') private readonly sequelize,
+    private readonly inventoryService: InventoryService,
+  ) {}
 
-  async updateShipment(easyPostId: string) {
+  async trackerUpdated(easyPostId: string) {
     try {
       const easyPostShipment = camelcaseKeysDeep(
         await this.easyPostClient.Shipment.retrieve(easyPostId),
@@ -36,6 +36,7 @@ export class EasyPostService {
         where: {
           easyPostId,
         },
+        include: ['user'],
       });
 
       shipment.status =
@@ -62,7 +63,9 @@ export class EasyPostService {
       )?.datetime;
 
       const carrierDeliveredAt = easyPostShipment.tracker.trackingDetails.find(
-        detail => detail.status === 'delivered',
+        detail =>
+          detail.status === 'delivered' ||
+          detail.status === 'available_for_pickup',
       )?.datetime;
 
       shipment.carrierReceivedAt = carrierReceivedAt
@@ -76,59 +79,36 @@ export class EasyPostService {
       await shipment.save();
 
       if (shipment.type === ShipmentType.ACCESS) {
-        if (shipment.status === ShipmentStatus.DELIVERED) {
-          await User.update(
-            {
-              billingHour: new Date().getHours(),
-            },
-            {
-              where: {
-                id: shipment.userId,
-              },
-            },
-          );
+        if (
+          shipment.status === ShipmentStatus.DELIVERED ||
+          shipment.status === ShipmentStatus.AVAILABLEFORPICKUP
+        ) {
+          shipment.user.billingHour = new Date().getHours();
+          await shipment.user.save();
         }
       }
 
       const shipmentInventory = await shipment.$get('inventory');
 
-      let update: Partial<Inventory> = {};
+      let status: InventoryStatus;
 
       if (shipment.direction === ShipmentDirection.INBOUND) {
         if (!shipment.carrierDeliveredAt && shipment.carrierReceivedAt) {
-          update = {
-            status: InventoryStatus.ENROUTEWAREHOUSE,
-          };
+          status = InventoryStatus.ENROUTEWAREHOUSE;
         } else if (shipment.carrierDeliveredAt) {
-          update = {
-            status: InventoryStatus.INSPECTING,
-          };
-        }
-        if (update.status) {
-          await this.inventoryRepository.update(update, {
-            where: {
-              id: { [Op.in]: shipmentInventory.map(s => s.id) },
-            },
-            individualHooks: true,
-          });
+          status = InventoryStatus.INSPECTING;
         }
       } else {
         if (!shipment.carrierDeliveredAt && shipment.carrierReceivedAt) {
-          update = {
-            status: InventoryStatus.ENROUTEMEMBER,
-          };
+          status = InventoryStatus.ENROUTEMEMBER;
         } else if (shipment.carrierDeliveredAt) {
-          update = {
-            status: InventoryStatus.WITHMEMBER,
-          };
+          status = InventoryStatus.WITHMEMBER;
         }
-        if (update.status) {
-          await this.inventoryRepository.update(update, {
-            where: {
-              id: { [Op.in]: shipmentInventory.map(s => s.id) },
-            },
-            individualHooks: true,
-          });
+        if (status) {
+          await this.inventoryService.updateShipmentInventory(
+            shipmentInventory.map(i => i.id),
+            status,
+          );
         }
       }
     } catch (e) {

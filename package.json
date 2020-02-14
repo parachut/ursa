@@ -132,7 +132,9 @@
       "@app/calculator/(.*)": "<rootDir>/libs/calculator/src/$1",
       "@app/calculator": "<rootDir>/libs/calculator/src",
       "@app/auth/(.*)": "<rootDir>/libs/auth/src/$1",
-      "@app/auth": "<rootDir>/libs/auth/src"
+      "@app/auth": "<rootDir>/libs/auth/src",
+      "@app/recurly/(.*)": "<rootDir>/libs/recurly/src/$1",
+      "@app/recurly": "<rootDir>/libs/recurly/src"
     }
   }
 }

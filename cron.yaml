@@ -1,0 +1,4 @@
+cron:
+  - description: 'hourly commission'
+    url: /forage/hourly-commission
+    schedule: every 1 hours

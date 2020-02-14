@@ -52,6 +52,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/forage/tsconfig.app.json"
       }
+    },
+    "recurly": {
+      "type": "library",
+      "root": "libs/recurly",
+      "entryFile": "index",
+      "sourceRoot": "libs/recurly/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/recurly/tsconfig.lib.json"
+      }
     }
   }
 }

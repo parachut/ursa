@@ -23,6 +23,12 @@
       ],
       "@app/calculator/*": [
         "libs/calculator/src/*"
+      ],
+      "@app/recurly": [
+        "libs/recurly/src"
+      ],
+      "@app/recurly/*": [
+        "libs/recurly/src/*"
       ]
     }
   },

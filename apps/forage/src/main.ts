@@ -8,7 +8,14 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  app.use(xmlparser());
+  app.use(
+    xmlparser({
+      explicitArray: false,
+      normalize: false,
+      normalizeTags: false,
+      trim: true,
+    }),
+  );
 
   app.setGlobalPrefix('forage');
 
