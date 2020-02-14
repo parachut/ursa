@@ -4,7 +4,7 @@ Liana.collection('Shipment', {
   actions: [
     {
       name: 'Print label',
-
+   
     },
   ],
 });

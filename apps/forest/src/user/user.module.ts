@@ -2,9 +2,10 @@ import { DatabaseModule } from '@app/database';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { LogInAsController } from './loginas.controller';
+import { UserController } from './user.controller';
 import { LogInAsService } from './loginas.service';
 import { JwtStrategy } from '../jwt.strategy';
+import { EmailService } from './email.service'
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { JwtStrategy } from '../jwt.strategy';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  controllers: [LogInAsController],
-  providers: [LogInAsService, JwtStrategy],
+  controllers: [UserController],
+  providers: [EmailService, LogInAsService, JwtStrategy],
 })
 export class LogInAsModule { }

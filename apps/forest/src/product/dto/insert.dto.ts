@@ -3,7 +3,7 @@ export class InsertProductDto {
     attributes: {
       values: {
         url: string[],
-        price: string[]
+        price: number[]
       }
     };
     collection_name: string;

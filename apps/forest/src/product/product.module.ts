@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { BPController } from './bp.controller';
-import { BPService } from './bp.service';
+import { BPController } from './product.controller';
+import { BPService } from './insert.service';
 import { DatabaseModule } from '@app/database';
 //import { AuthModule } from '../../auth/auth.module';
 import { JwtStrategy } from '../jwt.strategy';
