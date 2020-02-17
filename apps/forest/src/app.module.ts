@@ -6,8 +6,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtStrategy } from './jwt.strategy';
 import { BPModule } from './product/product.module';
-import { LogInAsModule } from './user/user.module';
+import { UserModule } from './user/user.module';
 import { EmailService } from './user/email.service';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   //exports:[],
@@ -19,9 +20,10 @@ import { EmailService } from './user/email.service';
       signOptions: { expiresIn: '7d' },
     }),
     BPModule,
-    LogInAsModule
+    UserModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, EmailService],
 })
-export class AppModule { }
+export class AppModule {}

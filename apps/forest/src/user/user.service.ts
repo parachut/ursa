@@ -2,9 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Cart, User } from '@app/database/entities';
 import { Op } from 'sequelize';
 @Injectable()
-export class LogInAsService {
-
-
+export class UserService {
   private readonly cartRepository: typeof Cart = this.sequelize.getRepository(
     'Cart',
   );
@@ -13,7 +11,7 @@ export class LogInAsService {
     'User',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) { }
+  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
 
   findUser(id: string) {
     return this.userRepository.findByPk(id);
@@ -41,5 +39,4 @@ export class LogInAsService {
       ],
     });
   }
-
 }

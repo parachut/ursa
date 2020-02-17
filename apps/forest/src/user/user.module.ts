@@ -3,9 +3,9 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UserController } from './user.controller';
-import { LogInAsService } from './loginas.service';
+import { UserService } from './user.service';
 import { JwtStrategy } from '../jwt.strategy';
-import { EmailService } from './email.service'
+import { EmailService } from './email.service';
 
 @Module({
   imports: [
@@ -17,6 +17,6 @@ import { EmailService } from './email.service'
     }),
   ],
   controllers: [UserController],
-  providers: [EmailService, LogInAsService, JwtStrategy],
+  providers: [EmailService, UserService, JwtStrategy],
 })
-export class LogInAsModule { }
+export class UserModule {}
