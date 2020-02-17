@@ -8,7 +8,7 @@ async function bootstrap() {
   const port = process.env.PORT;
 
   const app = await NestFactory.create(AppModule);
-
+  console.log(__dirname + '/forest')
   app.use(
     require('forest-express-sequelize').init({
       authSecret: process.env.FOREST_AUTH_SECRET,
@@ -17,6 +17,7 @@ async function bootstrap() {
       sequelize: await sequelize(),
     }),
   );
+
 
   app.setGlobalPrefix('forest');
 

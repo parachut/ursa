@@ -5,7 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtStrategy } from './jwt.strategy';
-import { BPModule } from './product/product.module';
+import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 import { EmailService } from './user/email.service';
 import { CartModule } from './cart/cart.module';
@@ -19,7 +19,7 @@ import { CartModule } from './cart/cart.module';
       secret: process.env.FOREST_AUTH_SECRET,
       signOptions: { expiresIn: '7d' },
     }),
-    BPModule,
+    ProductModule,
     UserModule,
     CartModule,
   ],

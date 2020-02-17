@@ -10,21 +10,21 @@ import { CartService } from './cart.service';
   providers: [CartService],
 })
 export class CartModule {
-  constructor() {
-    Liana.collection('Cart', {
-      actions: [
-        {
-          name: 'Confirm cart',
-        },
-        {
-          name: 'Cancel cart',
-        },
-        {
-          name: 'Export history',
-          type: 'global',
-          download: true,
-        },
-      ],
-    });
-  }
+  // constructor() {
+  //   Liana.collection('Cart', {
+  //     actions: [
+  //       {
+  //         name: 'Confirm cart',
+  //       },
+  //       {
+  //         name: 'Cancel cart',
+  //       },
+  //       {
+  //         name: 'Export history',
+  //         type: 'global',
+  //         download: true,
+  //       },
+  //     ],
+  //   });
+  // }
 }
