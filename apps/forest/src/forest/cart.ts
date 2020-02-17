@@ -1,4 +1,4 @@
-import Liana from 'forest-express-sequelize';
+import * as Liana from 'forest-express-sequelize';
 
 Liana.collection('Cart', {
   actions: [
