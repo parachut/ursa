@@ -4780,7 +4780,7 @@
         "type": "String",
         "defaultValue": null,
         "enums": null,
-        "isRequired": false,
+        "isRequired": true,
         "reference": null,
         "description": "Insert price, if the price does not appear on the B&H page",
         "position": 1,
