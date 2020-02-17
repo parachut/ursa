@@ -1,4 +1,4 @@
-import { Invoice } from '@app/database/entities';
+import { Invoice, Transaction } from '@app/database/entities';
 import { RecurlyService } from '@app/recurly';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { omit, pick } from 'lodash';
@@ -12,10 +12,14 @@ export class InvoiceService {
     'Invoice',
   );
 
+  private readonly transactionRepository: typeof Transaction = this.sequelize.getRepository(
+    'Invoice',
+  );
+
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
     private readonly recurlyService: RecurlyService,
-  ) {}
+  ) { }
 
   async updateOrCreate(body: object) {
     const bodyKeys = [
@@ -55,6 +59,42 @@ export class InvoiceService {
       'closedAt',
     ];
 
+    const transactionKeys = [
+      'id',
+      'amount',
+      'avsCheck',
+      'collectionMethod',
+      'currency',
+      'customerMessage',
+      'customerMessageLocale',
+      'cvvCheck',
+      'gatewayApprovalCode',
+      'gatewayMessage',
+      'gatewayReference',
+      'gatewayResponseCode',
+      'gatewayResponseTime',
+      'ipAddressCountry',
+      'ipAddressV4',
+      'object',
+      'origin',
+      'originalTransactionId',
+      'postage',
+      'paymentMethod',
+      'refunded',
+      'status',
+      'statusCode',
+      'statusMessage',
+      'success',
+      'type',
+      'uuid',
+      'createdAt',
+      'collectedAt',
+      'voidedAt',
+      'invoiceId',
+      'userId',
+      'updatedAt'
+    ]
+
     const { invoice }: any = bodyKeys.reduce(
       (r, i) => (!r ? body[i] : r),
       null,
@@ -83,6 +123,30 @@ export class InvoiceService {
 
       if (err || !record) {
         await this.invoiceRepository.create(dbInvoice);
+      }
+
+      if (recurlyInvoice.transactions.length != 0 && recurlyInvoice.transactions != null) {
+        recurlyInvoice.transactions.map(async transaction => {
+          const dbTransaction: Partial<Transaction> = {
+            ...pick(transaction, transactionKeys),
+            invoice: transaction.invoice.id,
+            userId: transaction.account.code,
+            updatedAt: recurlyInvoice.updatedAt
+          };
+
+          const [err, record] = await to(
+            this.transactionRepository.update(omit(dbTransaction, ['id']), {
+              where: {
+                id: dbTransaction.id,
+              },
+            }),
+          );
+
+          if (err || !record) {
+            await this.transactionRepository.create(dbTransaction);
+          }
+        })
+
       }
     } catch (e) {
       this.logger.error(e);

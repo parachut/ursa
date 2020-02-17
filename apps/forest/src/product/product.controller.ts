@@ -13,13 +13,13 @@ export class BPController {
     const bhUrl = insert.data.attributes.values.url;
     const bhPrice = insert.data.attributes.values.price
 
-
-    if (bhUrl.includes("www.bhphotovideo.com") == false) {
+    console.log(bhPrice)
+    if (bhUrl.includes("www.bhphotovideo.com") === false) {
       throw new BadRequestException("Wrong URL")
     }
-    
 
-    await this.insertService.insertItem(insert.data.attributes.values)
+
+    //await this.insertService.insertItem(insert.data.attributes.values)
     return {
       success: 'Product Inserted Successfully',
     }

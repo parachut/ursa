@@ -15,8 +15,8 @@ Liana.collection('Product', {
                 },
                 {
                     field: 'price',
-                    type: 'String',
-                    isRequired: false,
+                    type: 'Number',
+                    //isRequired: false,
                     description: "Insert price, if the price does not appear on the B&H page"
                 },
             ],

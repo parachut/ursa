@@ -1,4 +1,4 @@
-import { Subscription } from '@app/database/entities';
+import { Subscription, SubscriptionAddOn, CouponRedemption } from '@app/database/entities';
 import { RecurlyService } from '@app/recurly';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { omit, pick } from 'lodash';
@@ -12,10 +12,18 @@ export class SubscriptionService {
     'Subscription',
   );
 
+  private readonly subscriptionAddOnRepository: typeof SubscriptionAddOn = this.sequelize.getRepository(
+    'SubscriptionAddOn',
+  );
+
+  private readonly subscriptionCouponRedemptionRepository: typeof CouponRedemption = this.sequelize.getRepository(
+    'CouponRedemption',
+  );
+
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
     private readonly recurlyService: RecurlyService,
-  ) {}
+  ) { }
 
   async updateOrCreate(body: object) {
     const bodyKeys = [
@@ -65,6 +73,27 @@ export class SubscriptionService {
       'pausedAt',
     ];
 
+    const addOnKeys = [
+      'id',
+      'object',
+      'quantity',
+      'unitAmount',
+      'createdAt',
+      'expiredAt',
+      'subscriptionId',
+      'planAddOnId',
+      'updatedAt',
+    ]
+    const couponKeys = [
+      'id',
+      'discounted',
+      'object',
+      'state',
+      'createdAt',
+      'couponId',
+      'subscriptionId',
+      'updatedAt',
+    ]
     const { subscription }: any = bodyKeys.reduce(
       (r, i) => (!r ? body[i] : r),
       null,
@@ -92,6 +121,51 @@ export class SubscriptionService {
       if (err || !record) {
         await this.subscriptionRepository.create(dbSubscription);
       }
+      if (recurlySubscription.addOns.length != 0 && recurlySubscription.addOns != null) {
+        recurlySubscription.addOns.map(async addon => {
+
+          const dbAddOn: any = {
+            ...pick(addon, addOnKeys),
+            planId: addon.addOn.id,
+          };
+
+          const [err, record] = await to(
+            this.subscriptionAddOnRepository.update(omit(dbAddOn, ['id']), {
+              where: {
+                id: dbAddOn.id,
+              },
+            }),
+          );
+
+          if (err || !record) {
+            await this.subscriptionAddOnRepository.create(dbAddOn);
+          }
+        })
+      }
+
+      if (recurlySubscription.couponRedemptions != null && recurlySubscription.couponRedemptions.length != 0) {
+        recurlySubscription.couponRedemptions.map(async redemption => {
+
+          const dbCouponRedemption: any = {
+            ...pick(redemption, couponKeys),
+            couponId: redemption.coupon?.id,
+            subscriptionId: recurlySubscription.id
+          };
+
+          const [err, record] = await to(
+            this.subscriptionCouponRedemptionRepository.update(omit(dbCouponRedemption, ['id']), {
+              where: {
+                id: dbCouponRedemption.id,
+              },
+            }),
+          );
+
+          if (err || !record) {
+            await this.subscriptionCouponRedemptionRepository.create(dbCouponRedemption);
+          }
+        })
+      }
+
     } catch (e) {
       this.logger.error(e);
     }
