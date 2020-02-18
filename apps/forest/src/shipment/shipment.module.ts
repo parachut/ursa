@@ -19,16 +19,4 @@ import { ShipmentController } from './shipment.controller';
   controllers: [ShipmentController],
   providers: [ShipmentService, JwtStrategy],
 })
-export class ShipmentModule {
-  // constructor() {
-  //   Liana.collection('Shipment', {
-  //     actions: [
-  //       {
-  //         name: 'Print label',
-
-  //       },
-  //     ],
-  //   });
-
-  // }
-}
+export class ShipmentModule { }

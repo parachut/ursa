@@ -6,9 +6,6 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { JwtStrategy } from '../jwt.strategy';
 import { EmailService } from './email.service';
-import * as Liana from 'forest-express-sequelize';
-import PhoneNumber from 'awesome-phonenumber';
-import { User, UserVerification } from '@app/database/entities';
 
 @Module({
   imports: [

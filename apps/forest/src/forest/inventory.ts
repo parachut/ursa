@@ -19,5 +19,21 @@ Liana.collection('Inventory', {
         },
       ],
     },
+    {
+      name: 'Export commissions',
+      download: true,
+      fields: [
+        {
+          field: 'Start date',
+          type: 'Dateonly',
+          isRequired: true,
+        },
+        {
+          field: 'End date',
+          type: 'Dateonly',
+          isRequired: true,
+        },
+      ],
+    },
   ],
 });

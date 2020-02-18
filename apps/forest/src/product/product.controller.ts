@@ -11,9 +11,8 @@ export class BPController {
   @Post('/actions/insert-product')
   async insertProduct(@Body() insert: InsertProductDto) {
     const bhUrl = insert.data.attributes.values.url;
-    const bhPrice = insert.data.attributes.values.price
 
-    console.log(bhPrice)
+
     if (bhUrl.includes("www.bhphotovideo.com") === false) {
       throw new BadRequestException("Wrong URL")
     }

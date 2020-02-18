@@ -10,6 +10,10 @@ Liana.collection('Cart', {
     },
     {
       name: 'Export history',
+      download: true,
+    },
+    {
+      name: 'Export history',
       type: 'global',
       download: true,
     },

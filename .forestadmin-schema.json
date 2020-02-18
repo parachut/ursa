@@ -1253,6 +1253,15 @@
       "fields": []
     }, {
       "name": "Export history",
+      "type": "bulk",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/export-history",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": true,
+      "fields": []
+    }, {
+      "name": "Export history",
       "type": "global",
       "baseUrl": null,
       "endpoint": "/forest/actions/export-history",
@@ -3477,6 +3486,35 @@
         "position": 1,
         "widget": null
       }]
+    }, {
+      "name": "Export commissions",
+      "type": "bulk",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/export-commissions",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": true,
+      "fields": [{
+        "field": "Start date",
+        "type": "Dateonly",
+        "defaultValue": null,
+        "enums": null,
+        "isRequired": true,
+        "reference": null,
+        "description": null,
+        "position": 0,
+        "widget": null
+      }, {
+        "field": "End date",
+        "type": "Dateonly",
+        "defaultValue": null,
+        "enums": null,
+        "isRequired": true,
+        "reference": null,
+        "description": null,
+        "position": 1,
+        "widget": null
+      }]
     }]
   }, {
     "name": "InventoryIncome",
@@ -4777,10 +4815,10 @@
         "widget": null
       }, {
         "field": "price",
-        "type": "String",
+        "type": "Number",
         "defaultValue": null,
         "enums": null,
-        "isRequired": true,
+        "isRequired": false,
         "reference": null,
         "description": "Insert price, if the price does not appear on the B&H page",
         "position": 1,
@@ -9639,7 +9677,7 @@
     "liana": "forest-express-sequelize",
     "liana_version": "5.7.0",
     "engine": "nodejs",
-    "engine_version": "13.7.0",
+    "engine_version": "12.14.1",
     "framework": "other",
     "framework_version": null,
     "orm_version": "5.21.3"

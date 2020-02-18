@@ -4,8 +4,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '../jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { InventoryController } from './inventory.controller';
-import * as Liana from 'forest-express-sequelize';
-
+import { InventoryService } from './invetory.service';
+import { CalculatorService } from '@app/calculator';
 @Module({
   imports: [
     DatabaseModule,
@@ -15,7 +15,8 @@ import * as Liana from 'forest-express-sequelize';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  controllers: [JwtStrategy, InventoryController],
-  providers: [],
+  controllers: [InventoryController],
+  providers: [InventoryService, CalculatorService, JwtStrategy]
+  ,
 })
-export class InventoryModule {}
+export class InventoryModule { }
