@@ -54,8 +54,50 @@ export class CartController {
 
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('/actions/export-history')
-  async exportHistory(@Body() cancelCartDto: CancelCartDto, @Res() res): Promise<any> {
+  @Post('/actions/export-all-history')
+  async exportAllHistory(@Body() cancelCartDto: CancelCartDto, @Res() res): Promise<any> {
+
+    const { ids } = cancelCartDto.data.attributes;
+
+    const report = await this.cartService.exportHistory(ids)
+
+    stringify(
+      report,
+      {
+        header: true,
+        columns,
+      },
+      function (err, data) {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        tmp.file(function _tempFileCreated(err, path, fd) {
+          if (err) throw err;
+
+          fs.writeFileSync(path, data);
+          const options = {
+            dotfiles: 'deny',
+            headers: {
+              'Access-Control-Expose-Headers': 'Content-Disposition',
+              'Content-Disposition':
+                'attachment; filename="order-history.csv"',
+            },
+          };
+          res.status(200).sendFile(path, options, (error) => {
+            if (error) {
+              throw error;
+            }
+          });
+        });
+      },
+    );
+    return {
+      success: 'History Exported!',
+    };
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/actions/export-selected-history')
+  async exportSelectedHistory(@Body() cancelCartDto: CancelCartDto, @Res() res): Promise<any> {
 
     const { ids } = cancelCartDto.data.attributes;
 

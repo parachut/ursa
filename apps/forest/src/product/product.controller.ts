@@ -11,14 +11,14 @@ export class BPController {
   @Post('/actions/insert-product')
   async insertProduct(@Body() insert: InsertProductDto) {
     const bhUrl = insert.data.attributes.values.url;
-
+    const bhPrice =insert.data.attributes.values.price
 
     if (bhUrl.includes("www.bhphotovideo.com") === false) {
       throw new BadRequestException("Wrong URL")
     }
 
+    await this.insertService.insertItem(bhUrl,bhPrice)
 
-    //await this.insertService.insertItem(insert.data.attributes.values)
     return {
       success: 'Product Inserted Successfully',
     }

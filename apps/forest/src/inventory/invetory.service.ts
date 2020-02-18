@@ -1,6 +1,6 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Inventory, Shipment } from '@app/database/entities';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { ShipmentType, ShipmentDirection } from '@app/database/enums'
 import * as numeral from 'numeral';
 import { CalculatorService } from '@app/calculator';
@@ -133,5 +133,24 @@ export class InventoryService {
             };
         });
         return report
+    }
+
+    async findInventoryStatusPoint() {
+        const inventory = await this.inventoryRepository.findAll({
+            group: ['status'],
+            attributes: [
+                [('status'), 'key'],
+                [Sequelize.fn('SUM', Sequelize.col('product.points')), 'value'],
+            ],
+            raw: true,
+            include: [
+                {
+                    association: 'product',
+                    attributes: [],
+                },
+            ],
+        });
+
+        return inventory
     }
 }

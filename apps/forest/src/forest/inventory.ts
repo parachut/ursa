@@ -3,7 +3,7 @@ import * as Liana from 'forest-express-sequelize';
 Liana.collection('Inventory', {
   actions: [
     {
-      name: 'Export commissions',
+      name: 'Export All Commissions',
       type: 'global',
       download: true,
       fields: [
@@ -20,7 +20,7 @@ Liana.collection('Inventory', {
       ],
     },
     {
-      name: 'Export commissions',
+      name: 'Export Selected Commissions',
       download: true,
       fields: [
         {
@@ -36,4 +36,5 @@ Liana.collection('Inventory', {
       ],
     },
   ],
+
 });

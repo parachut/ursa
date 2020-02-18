@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { BPController } from './product.controller';
 import { BPService } from './insert.service';
 import { DatabaseModule } from '@app/database';
-import * as Liana from 'forest-express-sequelize';
 import { JwtStrategy } from '../jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';

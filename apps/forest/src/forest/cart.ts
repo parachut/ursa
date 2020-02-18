@@ -9,12 +9,12 @@ Liana.collection('Cart', {
       name: 'Cancel cart',
     },
     {
-      name: 'Export history',
+      name: 'Export All History',
+      type: 'global',
       download: true,
     },
     {
-      name: 'Export history',
-      type: 'global',
+      name: 'Export Selected history',
       download: true,
     },
   ],

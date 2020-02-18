@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { Cart, Shipment, User } from '@app/database/entities';
+import { Shipment } from '@app/database/entities';
 import { Op } from 'sequelize';
 @Injectable()
 export class ShipmentService {

@@ -27,30 +27,6 @@ export class UserService {
     return this.userRepository.findByPk(id);
   }
 
-  findCarts(ids: string[]) {
-    return this.cartRepository.findAll({
-      where: { id: { [Op.in]: ids } },
-      include: [
-        {
-          association: 'user',
-          include: [
-            {
-              association: 'currentInventory',
-              include: ['product'],
-            },
-            'integrations',
-          ],
-        },
-        {
-          association: 'items',
-          include: ['product'],
-        },
-        'inventory',
-      ],
-    });
-  }
-
-
   async exportProximity() {
     const users = await this.userRepository.findAll({
       include: [
@@ -110,10 +86,6 @@ export class UserService {
       airbox: airbox,
       createdAt: new Date(),
       updatedAt: new Date()
-      //addressId: ______
-    }
-    ).then(async newRecord => {
-      console.log("New ShipKit", newRecord)
     })
   }
 }

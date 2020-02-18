@@ -1252,19 +1252,19 @@
       "download": false,
       "fields": []
     }, {
-      "name": "Export history",
-      "type": "bulk",
+      "name": "Export All History",
+      "type": "global",
       "baseUrl": null,
-      "endpoint": "/forest/actions/export-history",
+      "endpoint": "/forest/actions/export-all-history",
       "httpMethod": "POST",
       "redirect": null,
       "download": true,
       "fields": []
     }, {
-      "name": "Export history",
-      "type": "global",
+      "name": "Export Selected history",
+      "type": "bulk",
       "baseUrl": null,
-      "endpoint": "/forest/actions/export-history",
+      "endpoint": "/forest/actions/export-selected-history",
       "httpMethod": "POST",
       "redirect": null,
       "download": true,
@@ -3458,10 +3458,10 @@
     }],
     "segments": [],
     "actions": [{
-      "name": "Export commissions",
+      "name": "Export All Commissions",
       "type": "global",
       "baseUrl": null,
-      "endpoint": "/forest/actions/export-commissions",
+      "endpoint": "/forest/actions/export-all-commissions",
       "httpMethod": "POST",
       "redirect": null,
       "download": true,
@@ -3487,10 +3487,10 @@
         "widget": null
       }]
     }, {
-      "name": "Export commissions",
+      "name": "Export Selected Commissions",
       "type": "bulk",
       "baseUrl": null,
-      "endpoint": "/forest/actions/export-commissions",
+      "endpoint": "/forest/actions/export-selected-commissions",
       "httpMethod": "POST",
       "redirect": null,
       "download": true,
