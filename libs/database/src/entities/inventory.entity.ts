@@ -218,6 +218,8 @@ export class Inventory extends Model<Inventory> {
 
         const direction = product.demand > 30 ? 'DESC' : 'ASC';
 
+        console.log(width, height);
+
         const freeNodes: BinFreeNode[] = (await instance.sequelize.models.BinFreeNode.findAll(
           {
             where: {
