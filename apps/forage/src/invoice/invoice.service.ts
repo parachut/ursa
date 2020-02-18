@@ -19,7 +19,7 @@ export class InvoiceService {
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
     private readonly recurlyService: RecurlyService,
-  ) { }
+  ) {}
 
   async updateOrCreate(body: object) {
     const bodyKeys = [
@@ -90,10 +90,8 @@ export class InvoiceService {
       'createdAt',
       'collectedAt',
       'voidedAt',
-      'invoiceId',
-      'userId',
-      'updatedAt'
-    ]
+      'updatedAt',
+    ];
 
     const { invoice }: any = bodyKeys.reduce(
       (r, i) => (!r ? body[i] : r),
@@ -125,13 +123,16 @@ export class InvoiceService {
         await this.invoiceRepository.create(dbInvoice);
       }
 
-      if (recurlyInvoice.transactions.length != 0 && recurlyInvoice.transactions != null) {
+      if (
+        recurlyInvoice.transactions.length != 0 &&
+        recurlyInvoice.transactions != null
+      ) {
         recurlyInvoice.transactions.map(async transaction => {
-          const dbTransaction: Partial<Transaction> = {
+          const dbTransaction: any = {
             ...pick(transaction, transactionKeys),
-            invoice: transaction.invoice.id,
+            invoiceId: transaction.invoice.id,
             userId: transaction.account.code,
-            updatedAt: recurlyInvoice.updatedAt
+            updatedAt: recurlyInvoice.updatedAt,
           };
 
           const [err, record] = await to(
@@ -145,8 +146,7 @@ export class InvoiceService {
           if (err || !record) {
             await this.transactionRepository.create(dbTransaction);
           }
-        })
-
+        });
       }
     } catch (e) {
       this.logger.error(e);

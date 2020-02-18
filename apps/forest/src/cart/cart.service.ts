@@ -40,6 +40,7 @@ export class CartService {
               .filter(i => i.status === InventoryStatus.SHIPMENTPREP)
               .map(i => i.id),
           },
+          memberId: cart.userId,
         },
         individualHooks: true,
       },
@@ -50,7 +51,7 @@ export class CartService {
   }
 
   async confirm(id: string) {
-    const cart = await Cart.findByPk(id, {
+    const cart = await this.cartRepository.findByPk(id, {
       include: [
         {
           association: 'user',
@@ -73,7 +74,7 @@ export class CartService {
     cart.confirmedAt = new Date();
     await cart.save();
 
-    const shipment = await Shipment.create({
+    const shipment = await this.shipmentRepository.create({
       direction: ShipmentDirection.OUTBOUND,
       expedited: cart.service !== 'Ground',
       type: ShipmentType.ACCESS,

@@ -8,6 +8,7 @@ import {
 import { Inject, Injectable } from '@nestjs/common';
 import { Op } from 'sequelize';
 import * as numeral from 'numeral';
+import { last, sortBy } from 'lodash';
 
 import { EmailService } from '../email.service';
 import { RecurlyService } from '../recurly.service';
@@ -161,7 +162,6 @@ export class CartService {
       include: [
         {
           association: 'carts',
-          order: [['createdAt', 'DESC']],
           include: [
             {
               association: 'items',
@@ -176,6 +176,7 @@ export class CartService {
         },
         'subscription',
       ],
+      order: [['carts', 'createdAt', 'DESC']],
     });
 
     const [cart] = user.carts;

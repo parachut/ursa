@@ -93,15 +93,26 @@ export class ShipmentService {
       let status: InventoryStatus;
 
       if (shipment.direction === ShipmentDirection.INBOUND) {
-        if (!shipment.carrierDeliveredAt && shipment.carrierReceivedAt) {
+        if (
+          !shipment.carrierDeliveredAt &&
+          shipment.carrierReceivedAt &&
+          shipment.type === ShipmentType.ACCESS
+        ) {
           status = InventoryStatus.ENROUTEWAREHOUSE;
         } else if (shipment.carrierDeliveredAt) {
           status = InventoryStatus.INSPECTING;
         }
       } else {
-        if (!shipment.carrierDeliveredAt && shipment.carrierReceivedAt) {
+        if (
+          !shipment.carrierDeliveredAt &&
+          shipment.carrierReceivedAt &&
+          shipment.type === ShipmentType.ACCESS
+        ) {
           status = InventoryStatus.ENROUTEMEMBER;
-        } else if (shipment.carrierDeliveredAt) {
+        } else if (
+          shipment.carrierDeliveredAt &&
+          shipment.type === ShipmentType.ACCESS
+        ) {
           status = InventoryStatus.WITHMEMBER;
         }
         if (status) {

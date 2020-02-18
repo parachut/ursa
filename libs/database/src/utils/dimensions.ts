@@ -16,7 +16,7 @@ export async function dimensions(product: Product, d3: boolean) {
     let categoryIds = [product.categoryId];
 
     let [catAverage] = await product.sequelize.query(
-      'SELECT avg(products.height) as height, avg(products.width) as width, avg(products.length) as depth FROM products where category_id in (:categories)',
+      'SELECT avg(products.height) as height, avg(products.width) as width, avg(products.length) as length FROM products where category_id in (:categories)',
       {
         replacements: {
           categories: categoryIds,
@@ -56,7 +56,7 @@ export async function dimensions(product: Product, d3: boolean) {
       categoryIds = categoryIds.filter((v, i, a) => a.indexOf(v) === i);
 
       catAverage = await product.sequelize.query(
-        'SELECT avg(products.height) as height, avg(products.width) as width, avg(products.length) as depth FROM products where category_id in (:categories)',
+        'SELECT avg(products.height) as height, avg(products.width) as width, avg(products.length) as length FROM products where category_id in (:categories)',
         {
           replacements: {
             categories: categoryIds,

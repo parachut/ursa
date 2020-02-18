@@ -31,8 +31,8 @@ export class ShipmentTracker {
   @Field({ nullable: true })
   estDeliveryDate?: Date;
 
-  @Field({ nullable: true })
-  publicUrl?: Date;
+  @Field()
+  publicUrl!: string;
 
   @Field(type => [ShipmentTrackerDetail], { nullable: true })
   trackingDetails?: ShipmentTrackerDetail[];
