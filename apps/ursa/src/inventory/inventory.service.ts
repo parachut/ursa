@@ -74,7 +74,7 @@ export class InventoryService {
     return inventory.save();
   }
 
-  async markForReturn(id: string, userId: string) {
+  async markForReturn(id: string, reason: string, userId: string) {
     const inventory = await this.inventoryRepository.findOne({
       where: {
         id,
@@ -85,6 +85,7 @@ export class InventoryService {
     if (inventory.status === InventoryStatus.INWAREHOUSE) {
       inventory.status = InventoryStatus.RETURNING;
       inventory.markedForReturn = true;
+      inventory.returnReason = reason;
     } else if (inventory.status === InventoryStatus.RETURNING) {
       inventory.status = InventoryStatus.INWAREHOUSE;
       inventory.markedForReturn = false;
@@ -157,12 +158,17 @@ export class InventoryService {
 
         groups.push(access);
       } else {
-        last(groups).in = shipment.carrierReceivedAt;
+        if (groups.length) {
+          last(groups).in = shipment.carrierReceivedAt;
+        }
       }
 
       const final = last(groups);
 
-      if (final.in || i === shipments.length - 1 || final.in === null) {
+      if (
+        (final && (final.in || final.in === null)) ||
+        i === shipments.length - 1
+      ) {
         final.days = differenceInCalendarDays(
           final.in || new Date(),
           final.out,

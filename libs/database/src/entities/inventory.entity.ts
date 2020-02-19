@@ -93,6 +93,9 @@ export class Inventory extends Model<Inventory> {
   @Column
   sku?: string;
 
+  @Column
+  returnReason?: string;
+
   @Field(type => InventoryStatus)
   @Default(InventoryStatus.NEW)
   @Column(
@@ -217,8 +220,6 @@ export class Inventory extends Model<Inventory> {
         const [width, height] = await dimensions(product, false);
 
         const direction = product.demand > 30 ? 'DESC' : 'ASC';
-
-        console.log(width, height);
 
         const freeNodes: BinFreeNode[] = (await instance.sequelize.models.BinFreeNode.findAll(
           {

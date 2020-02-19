@@ -27,6 +27,7 @@ import { InventoryHistory } from './dto/inventory-history.type';
 import { InventoryWhereUniqueInput } from './dto/inventory-where-unique.input';
 import { InventoryWhereInput } from './dto/inventory-where.input';
 import { InventoryService } from './inventory.service';
+import { InventoryReturnInput } from './dto/inventory-return.input';
 
 @Resolver(of => Inventory)
 export class InventoryResolver {
@@ -84,9 +85,11 @@ export class InventoryResolver {
   async inventoryReturn(
     @Args('where')
     { id }: InventoryWhereUniqueInput,
+    @Args('input')
+    { reason }: InventoryReturnInput,
     @CurrentUser() user: User,
   ): Promise<Inventory> {
-    return this.inventoryService.markForReturn(id, user.id);
+    return this.inventoryService.markForReturn(id, reason, user.id);
   }
 
   @Mutation(returns => Inventory)

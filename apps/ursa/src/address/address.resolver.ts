@@ -24,6 +24,12 @@ export class AddressResolver {
     return this.addressService.findOne(id, user.id);
   }
 
+  @Query(returns => Address, { nullable: true })
+  @UseGuards(GqlAuthGuard)
+  async addressPrimary(@CurrentUser() user: User): Promise<Address> {
+    return this.addressService.findPrimary(user.id);
+  }
+
   @Query(returns => [Address])
   @UseGuards(GqlAuthGuard)
   async addresses(@CurrentUser() user: User): Promise<Address[]> {

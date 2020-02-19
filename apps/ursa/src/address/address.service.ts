@@ -76,6 +76,15 @@ export class AddressService {
     return address;
   }
 
+  async findPrimary(userId: string) {
+    const address = await this.addressRepository.findOne({
+      where: { primary: true, userId },
+      order: [['createdAt', 'DESC']],
+    });
+
+    return address;
+  }
+
   async find(userId: string) {
     return this.addressRepository.findAll({
       where: {
