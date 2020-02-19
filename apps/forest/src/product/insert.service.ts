@@ -16,11 +16,9 @@ export class BPService {
   private readonly brandRepository: typeof Brand = this.sequelize.getRepository(
     'Brand',
   );
-
   private readonly categoryRepository: typeof Category = this.sequelize.getRepository(
     'Category',
   );
-
   private readonly productAttributeRepository: typeof ProductAttribute = this.sequelize.getRepository(
     'ProductAttribute',
   );
@@ -35,7 +33,7 @@ export class BPService {
 
     //////////////---------------------------------------------------- INSERT PICTURE TO GCP------------------------------------
 
-    async function saveToStorage(attachmentUrl, objectName) {
+    async function saveToStorage(attachmentUrl: string, objectName: string) {
       try {
         const storage = new Storage({
           projectId: process.env.GCLOUD_PROJECT
@@ -78,6 +76,8 @@ export class BPService {
     //////////////---------------------------------------------------- CRAWLING PAGE------------------------------------
     try {
       let newItem = {};
+      let data: any
+      let dataSpecs: any
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
       const result = await page.goto(
@@ -96,186 +96,114 @@ export class BPService {
       });
 
       //////////////------------------------------------------------ START GENERAL---------------------------------
-      let data
-      let dataSpecs
       try {
         data = await page.evaluate(() => {
           //CAMERA
           const cameraString = $('h1[class^="title"]').first().text();
-          let name = "";
-          if (!cameraString) {
-            name
-          } else {
-            name = cameraString
-              .replace(" Body", "")
-              .replace(" (Body Only, ", " (")
-              .replace(", Body Only), ", ")")
-              .replace(" (Body Only)", "")
-              .replace(" DSLR", "")
-              .replace(" SLR", "")
-              .replace(" Camera", "")
-              .replace(" Digital", "")
-              .replace(" Mirrorless", "")
-              .replace(" Rangefinder", "")
-              .replace(" Micro Four Thirds", "")
-              .replace(" Format", "")
-              .replace(" Medium", "")
-              .replace(" Point-and-Shoot", "")
-              .replace(" (Camera Body)", "")
-              .replace(" Lens", "")
-              .replace("FUJIFILM", "Fujifilm")
-              .trim();
-          }
-          const slug = name
+          const name = cameraString ? cameraString
+            .replace(" Body", "")
+            .replace(" (Body Only, ", " (")
+            .replace(", Body Only), ", ")")
+            .replace(" (Body Only)", "")
+            .replace(" DSLR", "")
+            .replace(" SLR", "")
+            .replace(" Camera", "")
+            .replace(" Digital", "")
+            .replace(" Mirrorless", "")
+            .replace(" Rangefinder", "")
+            .replace(" Micro Four Thirds", "")
+            .replace(" Format", "")
+            .replace(" Medium", "")
+            .replace(" Point-and-Shoot", "")
+            .replace(" (Camera Body)", "")
+            .replace(" Lens", "")
+            .replace("FUJIFILM", "Fujifilm")
+            .trim() : ''
+
+          const slug = cameraString ? name
             .toLocaleLowerCase()
-            .replace(/\+ /g, "")
-            .replace(/\"/g, "")
-            .replace(/\//g, "-")
-            .replace(/\,/g, "")
-            .replace(/\./g, "-")
+            .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, "")
             .replace(/\ -/g, "")
-            .replace(/\:/g, "-")
-            .replace(/\(/g, "")
-            .replace(/\)/g, "")
-            .replace(/\& /g, "")
             .replace(/\ /g, "-")
             .replace(/\---/g, "-")
-            .replace(/\--/g, "-");
+            .replace(/\--/g, "-") : ''
 
           //CAMERA PRICE/POINTS
           const cameraPriceSearch = $('*[data-selenium^="pricingPrice"]').first().text();
           const points = cameraPriceSearch ? Math.ceil(parseInt(cameraPriceSearch.replace("$", "").replace(",", ""))) : 0;
 
-
           //IMG SRC
           const imgSrcString = $('img[class^="image"]').attr("src");
-          let images = ''
-          if (!imgSrcString) {
-            images;
-          } else {
-            images = imgSrcString;
-            if (images === "https://static.bhphoto.com/images/en/na500x500.jpg") {
-              images = "";
-            }
+          let imagesHtml = imgSrcString ? imgSrcString : ''
+          if (imagesHtml === "https://static.bhphoto.com/images/en/na500x500.jpg") {
+            imagesHtml = "";
           }
+          //IMG ID
+          const images = imgSrcString ? "" : ""
 
           //IMG SRC LOGO
-          const logoSrcString = $(
-            '*[data-selenium^="authorizedDealerLink"] img'
-          )
+          const logoSrcString = $('*[data-selenium^="authorizedDealerLink"] img')
           const logo = logoSrcString ? logoSrcString.attr("src") : ""
-     
 
-          //IMG ID
-          let imageId = '';
-          if (imgSrcString === '') {
-            imageId = "";
-          }
 
           //BRAND NAME
           const brandSrcString = $('*[class^="dealer_"] img').attr("alt");
-          let brand = '';
-          let brandSlug = ''
-          if (!brandSrcString) {
-            const brandSrcString1 = $('*[class^="dealer_"] span').html();
+          const brandSrcString1 = $('*[class^="dealer_"] span').html();
 
-            if (!brandSrcString1) {
-              brand
-            } else {
-              brand = brandSrcString1.replace(" <!-- -->", "").replace("<!-- --> ", "");
-              brandSlug = brand
-                .toLowerCase()
-                .replace(/\ &"/g, "")
-                .replace("(", "")
-                .replace(")", "")
-                .replace(/\ /g, "-");
-            }
-          } else {
-            brand = brandSrcString;
-            brandSlug = brand
-              .toLowerCase()
-              .replace(/\ &"/g, "")
-              .replace("(", "")
-              .replace(")", "")
+          const brand = brandSrcString ? brandSrcString.replace("FUJIFILM", "Fujifilm")
+            : brandSrcString1 ? brandSrcString1.replace(" <!-- -->", "").replace("<!-- --> ", "").replace("FUJIFILM", "Fujifilm") : ''
+          const brandSlug = brandSrcString ? brand.toLocaleLowerCase()
+            .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, "")
+            .replace(/\ -/g, "")
+            .replace(/\ /g, "-")
+            .replace(/\---/g, "-")
+            .replace(/\--/g, "-")
+            : brandSrcString1 ? brand.toLocaleLowerCase()
+              .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, "")
+              .replace(/\ -/g, "")
               .replace(/\ /g, "-")
-              .replace(/\--/g, "-")
-          }
+              .replace(/\---/g, "-")
+              .replace(/\--/g, "-") : ''
+
 
           //CATEGORY
           const categoryString = $('a[class^="linkCrumb_"]').last().text();
-          let category = ''
-          let categorySlug = ''
-          if (!categoryString) {
-            category
-          } else {
-            category = categoryString;
-            categorySlug = category
-              .toLowerCase()
-              .replace(/\&/g, "")
-              .replace("(", "")
-              .replace(")", "")
-              .replace(/\ -/g, "")
-              .replace(/\,/g, "")
-              .replace(/\ /g, "-")
-              .replace(/\--/g, "-")
-          }
+          const category = categoryString ? categoryString : ''
+          const categorySlug = categoryString ? category.toLowerCase()
+            .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, "")
+            .replace(/\ -/g, "")
+            .replace(/\ /g, "-")
+            .replace(/\--/g, "-")
+            .replace(/\---/g, "-") : ''
 
-          //CATEGORY Parent
+          //CATEGORY PARENT
           const categoryParentString = $('a[class^="linkCrumb_"]')
             .eq(-2)
             .text();
-          let categoryParent = ''
-          let categoryParentSlug = ''
-          if (!categoryParentString) {
-            categoryParent
-          } else {
-            categoryParent = categoryParentString
-            categoryParentSlug = categoryParent
-              .toLowerCase()
-              .replace(/\ &"/g, "")
-              .replace("(", "")
-              .replace(")", "")
-              .replace(/\ -/g, "")
-              .replace(/\,/g, "")
-              .replace(/\ /g, "-");
-          }
+          const categoryParent = categoryParentString ? categoryParentString : ''
+          const categoryParentSlug = categoryParent ? categoryParent.toLowerCase()
+            .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, "")
+            .replace(/\ -/g, "")
+            .replace(/\ /g, "-")
+            .replace(/\--/g, "-")
+            .replace(/\---/g, "-") : ''
 
-          //CATEGORY GrandParent
+          //CATEGORY GRANDPARENT
           const categoryGrandParentString = $('a[class^="linkCrumb_"]')
             .eq(-3)
-            // .prev()
             .text();
-          let categoryGrandParent = ''
-          let categoryGrandParentSlug = ''
-          if (!categoryGrandParentString) {
-            categoryGrandParent = "";
-          } else {
-            categoryGrandParent = categoryGrandParentString;
-            categoryGrandParentSlug = categoryGrandParent
-              .toLowerCase()
-              .replace(/\ &"/g, "")
-              .replace("(", "")
-              .replace(")", "")
-              .replace(/\ -/g, "")
-              .replace(/\,/g, "")
-              .replace(/\ /g, "-");
-          }
+          const categoryGrandParent = categoryGrandParentString ? categoryGrandParentString : ''
+          const categoryGrandParentSlug = categoryGrandParentString ? categoryGrandParent.toLowerCase()
+            .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, "")
+            .replace(/\ -/g, "")
+            .replace(/\ /g, "-")
+            .replace(/\--/g, "-")
+            .replace(/\---/g, "-") : ''
 
           //MFR
           const mfrString = $('*[class^="code"]').first().text();
-
-          let mfr = ''
-          if (!mfrString) {
-            mfr
-          } else {
-            const name1 = mfrString.split("•");
-            if (name1[1].startsWith(" MFR")) {
-              const mfr1 = name1[1];
-              mfr = mfr1.replace(" MFR #", "");
-            } else {
-              mfr = "";
-            }
-          }
+          const mfrSplit = mfrString ? mfrString.split("•") : ''
+          const mfr = mfrSplit[1].startsWith(" MFR") ? mfrSplit[1].replace(" MFR #", "") : ''
 
           //KEY FEATURES
           const featureSearch = $('li[class^="listItem"]')
@@ -283,47 +211,58 @@ export class BPService {
               return $(this).text();
             })
             .get();
-          let features = []
-          if (!featureSearch) {
-            features;
-          } else {
-            features = featureSearch;
-          }
+          const features = featureSearch ? featureSearch : []
 
-          //inTheBox
+          //IN THE BOX
           const inTheBoxSearch = $('*[class^="list_2Pr"] li')
             .map(function () {
               return $(this).text();
             })
             .get();
-          let inTheBox = []
-          if (!inTheBoxSearch) {
-            inTheBox
-          } else {
-            inTheBox = inTheBoxSearch;
-          }
+          const inTheBox = inTheBoxSearch ? inTheBoxSearch : []
 
-          //url
+          //URL
           const url = window.location.href;
 
+          //DATES
+          const utcDateString = new Date(new Date().toUTCString())
+            .toISOString()
+            .replace("T", " ")
+            .replace("Z", "+00");
+
+          const createdAt = utcDateString
+          const updatedAt = utcDateString
+
           return {
-            name,
-            points,
-            slug,
-            mfr,
-            brand,
-            brandSlug,
-            logo,
-            category,
-            categorySlug,
-            categoryParent,
-            categoryParentSlug,
-            categoryGrandParent,
-            categoryGrandParentSlug,
-            inTheBox,
-            features,
-            imageId,
-            images,
+            general: {
+              name,
+              points,
+              slug,
+              mfr,
+              inTheBox,
+              features,
+              images,
+              createdAt,
+              updatedAt,
+            },
+            brand_info: {
+              createdAt,
+              updatedAt,
+              brand,
+              brandSlug,
+              logo,
+            },
+            category_info: {
+              createdAt,
+              updatedAt,
+              category,
+              categorySlug,
+              categoryParent,
+              categoryParentSlug,
+              categoryGrandParent,
+              categoryGrandParentSlug,
+            },
+            imagesHtml,
             url: url
           };
         });
@@ -741,33 +680,39 @@ export class BPService {
           const createdAt = utcDateString
           const updatedAt = utcDateString
 
-          return { specifications, weight, length, width, createdAt, updatedAt, height }
+          return {
+            specs: {
+              specifications, createdAt,
+              updatedAt
+            },
+            general: { weight, length, width, createdAt, updatedAt, height }
+          }
         });
       } catch (e) {
         console.log(e)
       }
       //////////////------------------------------------------------ CHECK ----------------------------------------
-      if (data.name.includes("We're Sorry!") === true) {
+      if (data.general.name.includes("We're Sorry!") === true) {
         this.logger.error(`Page Does Not Exists`)
         throw new NotFoundException();
       }
 
       //////////////---------------------------------------------------- INSERT------------------------------------
-      if (data.mfr != "") {
-        if (data.name.includes("Kit") != true) {
-          if (data.name.includes(" with") != true) {
-            if (data.name.includes("Bundle") != true) {
-              if (data.images === "") {
-                data.imageId = "none";
+      if (data.general.mfr != "") {
+        if (data.general.name.includes("Kit") != true) {
+          if (data.general.name.includes(" with") != true) {
+            if (data.general.name.includes("Bundle") != true) {
+              if (data.imagesHtml === "") {
+                data.general.images = "none";
               } else {
                 const fileName = uuidv1() + ".jpg";
-                data.imageId = fileName;
-                //  await saveToStorage(data.images, data.imageId);
+                data.general.images = fileName;
+                //  await saveToStorage(data.general.images, data.imageId);
               }
-              if (data.points === 0) {
-                data.points = bhPrice
+              if (data.general.points === 0) {
+                data.general.points = bhPrice
               }
-              newItem = { ...data, ...dataSpecs };
+              newItem = { general: { ...data.general, ...dataSpecs.general }, brand_info: { ...data.brand_info }, category_info: { ...data.category_info }, specs: { ...dataSpecs.specs } };
               console.log(newItem)
 
               // try {
