@@ -3339,6 +3339,20 @@
       "relationship": "BelongsTo",
       "validations": []
     }, {
+      "field": "returnReason",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
       "field": "serial",
       "type": "String",
       "defaultValue": null,
@@ -9677,7 +9691,7 @@
     "liana": "forest-express-sequelize",
     "liana_version": "5.7.0",
     "engine": "nodejs",
-    "engine_version": "12.14.1",
+    "engine_version": "13.7.0",
     "framework": "other",
     "framework_version": null,
     "orm_version": "5.21.3"
