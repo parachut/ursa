@@ -3339,6 +3339,20 @@
       "relationship": "BelongsTo",
       "validations": []
     }, {
+      "field": "returnReason",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
       "field": "serial",
       "type": "String",
       "defaultValue": null,
