@@ -2,8 +2,8 @@ export class InsertProductDto {
   readonly data: {
     attributes: {
       values: {
-        readonly url: string[],
-        readonly price: number
+        url: string[],
+        price: number
       }
     };
     collection_name: string;

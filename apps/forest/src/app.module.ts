@@ -9,6 +9,8 @@ import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 import { EmailService } from './user/email.service';
 import { CartModule } from './cart/cart.module';
+import { InventoryModule } from './inventory/inventory.module'
+import { BinModule } from './bin/bin.module'
 
 @Module({
   //exports:[],
@@ -21,9 +23,11 @@ import { CartModule } from './cart/cart.module';
     }),
     ProductModule,
     UserModule,
+    BinModule,
     CartModule,
+    InventoryModule
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, EmailService],
 })
-export class AppModule {}
+export class AppModule { }
