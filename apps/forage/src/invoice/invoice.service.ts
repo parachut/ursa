@@ -28,7 +28,9 @@ export class InvoiceService {
       'closedCreditInvoiceNotification',
       'voidedCreditInvoiceNotification',
       'reopenedCreditInvoiceNotification',
+      'paidChargeInvoiceNotification',
       'openCreditInvoiceNotification',
+      'newChargeInvoiceNotification',
     ];
 
     const filterKeys = [
@@ -93,10 +95,16 @@ export class InvoiceService {
       'updatedAt',
     ];
 
-    const { invoice }: any = bodyKeys.reduce(
+    const invoiceBody: any = bodyKeys.reduce(
       (r, i) => (!r ? body[i] : r),
       null,
     );
+
+    if (!invoiceBody) {
+      return null;
+    }
+
+    const { invoice } = invoiceBody;
 
     try {
       const recurlyInvoice = await this.recurlyService.getInvoice(
@@ -119,7 +127,7 @@ export class InvoiceService {
         }),
       );
 
-      if (err || !record) {
+      if (err || !record[0]) {
         await this.invoiceRepository.create(dbInvoice);
       }
 
