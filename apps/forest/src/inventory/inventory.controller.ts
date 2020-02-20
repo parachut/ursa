@@ -162,12 +162,5 @@ export class InventoryController {
     return {
       success: 'Shipment created!',
     };
-
-    const inventory: any = await this.inventoryService.findInventoryStatusPoint();
-    const json = new Liana.StatSerializer({
-      value: inventory,
-    }).perform();
-
-    res.status(200).send(json);
   }
 }
