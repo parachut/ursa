@@ -75,7 +75,7 @@ export class BPService {
 
     //////////////---------------------------------------------------- CRAWLING PAGE------------------------------------
     try {
-      let newItem = {};
+      let newItem: any
       let data: any
       let dataSpecs: any
       const browser = await puppeteer.launch();
@@ -516,10 +516,12 @@ export class BPService {
           } else if (weightSearch1.value.startsWith("Not specified by")) {
             weight
           } else {
-            if (weightSearch1.value.includes("oz /") === true) {
+
+
+            if (weightSearch1.value.includes("oz /") === true || weightSearch1.value.includes("oz ") === true) {
               weight = Math.ceil(parseFloat(weightSearch1.value) * 28.35);
             }
-            else if (weightSearch1.value.includes("lb /") === true) {
+            else if (weightSearch1.value.includes("lb /") === true || weightSearch1.value.includes("lb ") === true) {
               weight = Math.ceil(parseFloat(weightSearch1.value) / 0.0022046);
             }
 
@@ -547,7 +549,7 @@ export class BPService {
           let length = null;
           let width = null;
           let height = null;
-          const dimensionsOption = ['Dimensions', 'Overall Dimensions', 'Dimensions (L x W x H)', 'Dimensions (W x H x D)']
+          const dimensionsOption = ['Dimensions', 'Overall Dimensions', 'Dimensions (L x W x H)', 'Dimensions (W x H x D)', 'Dimensions (WxHxD)']
           for (const variation of dimensionsOption) {
 
             if (length === null && width === null && height === null) {
@@ -573,49 +575,50 @@ export class BPService {
                   height = Math.ceil(parseFloat(dim2[2]) * 10);
                 }
                 else if (dimensions.value.endsWith('mm')) {
-                  const dim1 = dimensions.value.split("/");
+                  const dim1 = dimensions.value.includes("/") ? dimensions.value.split("/") : dimensions.value.split("(")
                   const dim2 = dim1[1].split("x");
                   length = Math.ceil(parseFloat(dim2[0]));
                   width = Math.ceil(parseFloat(dim2[1]));
                   height = Math.ceil(parseFloat(dim2[2]));
                 }
                 else if (dimensions.value.endsWith('cm (Folded)')) {
-                  const dim1 = dimensions.value.split("/");
+                  const dim1 = dimensions.value.includes("/") ? dimensions.value.split("/") : dimensions.value.split("(")
                   const dim2 = dim1[1].split("x");
                   length = Math.ceil(parseFloat(dim2[0]) * 10);
                   width = Math.ceil(parseFloat(dim2[1]) * 10);
                   height = Math.ceil(parseFloat(dim2[2]) * 10);
                 }
                 else if (dimensions.value.endsWith('mm (Folded)')) {
-                  const dim1 = dimensions.value.split("/");
+                  const dim1 = dimensions.value.includes("/") ? dimensions.value.split("/") : dimensions.value.split("(")
                   const dim2 = dim1[1].split("x");
                   length = Math.ceil(parseFloat(dim2[0]));
                   width = Math.ceil(parseFloat(dim2[1]));
                   height = Math.ceil(parseFloat(dim2[2]));
                 }
                 else if (dimensions.value.endsWith('cm)')) {
-                  const dim1 = dimensions.value.split("/");
+                  const dim1 = dimensions.value.includes("/") ? dimensions.value.split("/") : dimensions.value.split("(")
+                  //const dim1 = dimensions.value.split("/");
                   const dim2 = dim1[1].split("x");
                   length = Math.ceil(parseFloat(dim2[0]) * 10);
                   width = Math.ceil(parseFloat(dim2[1]) * 10);
                   height = Math.ceil(parseFloat(dim2[2]) * 10);
                 }
                 else if (dimensions.value.endsWith('mm)')) {
-                  const dim1 = dimensions.value.split("/");
+                  const dim1 = dimensions.value.includes("/") ? dimensions.value.split("/") : dimensions.value.split("(")
                   const dim2 = dim1[1].split("x");
                   length = Math.ceil(parseFloat(dim2[0]));
                   width = Math.ceil(parseFloat(dim2[1]));
                   height = Math.ceil(parseFloat(dim2[2]));
                 }
                 else if (dimensions.value.endsWith('cm (Unfolded)')) {
-                  const dim1 = dimensions.value.split("/");
+                  const dim1 = dimensions.value.includes("/") ? dimensions.value.split("/") : dimensions.value.split("(")
                   const dim2 = dim1[1].split("x");
                   length = Math.ceil(parseFloat(dim2[0]) * 10);
                   width = Math.ceil(parseFloat(dim2[1]) * 10);
                   height = Math.ceil(parseFloat(dim2[2]) * 10);
                 }
                 else if (dimensions.value.endsWith('mm (Unfolded)')) {
-                  const dim1 = dimensions.value.split("/");
+                  const dim1 = dimensions.value.includes("/") ? dimensions.value.split("/") : dimensions.value.split("(")
                   const dim2 = dim1[1].split("x");
                   length = Math.ceil(parseFloat(dim2[0]));
                   width = Math.ceil(parseFloat(dim2[1]));
@@ -706,7 +709,7 @@ export class BPService {
                 data.general.images = "none";
               } else {
                 const fileName = uuidv1() + ".jpg";
-                data.general.images = fileName;
+                data.general.images = [fileName]
                 //  await saveToStorage(data.general.images, data.imageId);
               }
               if (data.general.points === 0) {
@@ -715,110 +718,118 @@ export class BPService {
               newItem = { general: { ...data.general, ...dataSpecs.general }, brand_info: { ...data.brand_info }, category_info: { ...data.category_info }, specs: { ...dataSpecs.specs } };
               console.log(newItem)
 
-              // try {
-              //   let brandId;
-              //   brandId = await this.brandRepository.findOne({
-              //     where: { slug: data.brandSlug }
-              //   });
-              //   if (brandId.id === undefined) {
-              //     await this.brandRepository.create({
-              //       name: data.brand,
-              //       slug: data.brandSlug,
-              //       createdAt: dataSpecs.createdAt,
-              //       updatedAt: dataSpecs.updatedAt
-              //     }).then(async brand => {
-              //       console.log("New Brand", brand)
-              //     })
-              //     brandId = await this.brandRepository.findOne({
-              //       where: { slug: data.brandSlug }
-              //     });
-              //   }
+              try {
 
-              //   let categoryId;
-              //   categoryId = await this.categoryRepository.findOne({
-              //     where: { slug: data.categorySlug }
-              //   });
-              //   if (categoryId.id === undefined) {
-              //     const parentCategoryId = await this.categoryRepository.findOne({
-              //       where: { slug: data.categoryParentSlug }
-              //     });
-              //     await this.categoryRepository.create({
-              //       name: data.category,
-              //       slug: data.categorySlug,
-              //       parentId: parentCategoryId.id,
-              //       createdAt: dataSpecs.createdAt,
-              //       updatedAt: dataSpecs.updatedAt
-              //     }).then(async brand => {
-              //       console.log("New Category", brand)
-              //     })
-              //     categoryId = await this.categoryRepository.findOne({
-              //       where: { slug: data.categorySlug }
-              //     });
-              //   }
+                const brand = newItem.brand_info
+                let brandId;
+                console.log(brand)
+                brandId = await this.brandRepository.findOne({
+                  where: { slug: brand.brandSlug }
+                });
+                if (brandId.id === undefined) {
+                  await this.brandRepository.create({
+                    name: brand.brand,
+                    slug: brand.brandSlug,
+                    createdAt: brand.createdAt,
+                    updatedAt: brand.updatedAt
+                  }).then(async brand => {
+                    console.log("New Brand", brand)
+                  })
+                  brandId = await this.brandRepository.findOne({
+                    where: { slug: brand.brandSlug }
+                  });
+                }
 
-              //   console.log(brandId.id)
-              //   console.log(categoryId.id)
+                const category = newItem.category_info
+                let categoryId;
+                categoryId = await this.categoryRepository.findOne({
+                  where: { slug: category.categorySlug }
+                });
+                if (categoryId.id === undefined) {
+                  const parentCategoryId = await this.categoryRepository.findOne({
+                    where: { slug: category.categoryParentSlug }
+                  });
+                  await this.categoryRepository.create({
+                    name: category.category,
+                    slug: category.categorySlug,
+                    parentId: category.id,
+                    createdAt: category.createdAt,
+                    updatedAt: category.updatedAt
+                  }).then(async brand => {
+                    console.log("New Category", brand)
+                  })
+                  categoryId = await this.categoryRepository.findOne({
+                    where: { slug: category.categorySlug }
+                  });
 
-              //   await this.productRepository.create({
-              //     slug: data.slug,
-              //     length: dataSpecs.length,
-              //     features: data.features,
-              //     height: dataSpecs.height,
-              //     inTheBox: data.features,
-              //     mfr: data.mfr,
-              //     name: data.name,
-              //     weight: dataSpecs.weight,
-              //     width: dataSpecs.width,
-              //     createdAt: dataSpecs.createdAt,
-              //     updatedAt: dataSpecs.updatedAt,
-              //     brandId: brandId.id,
-              //     categoryId: categoryId.id,
-              //     images: [data.imageId],
-              //     points: data.points
-              //   }).then(async newRecord => {
+                }
 
-              //     if (dataSpecs.specifications.length != 0) {
-              //       try {
-              //         for (const spec of dataSpecs.specifications) {
-              //           let specNameId;
-              //           specNameId = await this.productAttributeRepository.findOne({
-              //             where: { name: spec.name }
-              //           });
+                console.log(brandId.id)
+                console.log(categoryId.id)
 
-              //           if (specNameId === null) {
-              //             await this.productAttributeRepository.create({
-              //               name: spec.name,
-              //               createdAt: dataSpecs.createdAt,
-              //               updatedAt: dataSpecs.updatedAt
-              //             }).then(async specName => {
-              //               console.log("New Specification Name", specName.id)
-              //             })
-              //             specNameId = await this.productAttributeRepository.findOne({
-              //               where: { name: spec.name }
-              //             });
-              //           }
-              //           await this.productAttributeValueRepository.create({
-              //             value: spec.value,
-              //             productAttributeId: specNameId.id,
-              //             productId: newRecord.id,
-              //             createdAt: dataSpecs.createdAt,
-              //             updatedAt: dataSpecs.updatedAt
-              //           }).then(async specValue => {
-              //             console.log("New Specification Value", specValue.id)
-              //           })
-              //         }
-              //         this.logger.log(`Inserted to DB (SEQUELIZE) (SPECS) `)
-              //       }
-              //       catch (e) {
-              //         this.logger.error(`Inserted to DB (SEQUELIZE) (SPECS) `, e.stack)
-              //       }
-              //     }
-              //     this.logger.log(`Inserted to DB (SEQUELIZE) `, newRecord.id)
-              //   })
+                const product = newItem.general
+                const specifications = newItem.specs
+                await this.productRepository.create({
+                  slug: product.slug,
+                  length: product.length,
+                  features: product.features,
+                  height: product.height,
+                  inTheBox: product.features,
+                  mfr: product.mfr,
+                  name: product.name,
+                  weight: product.weight,
+                  width: product.width,
+                  createdAt: product.createdAt,
+                  updatedAt: product.updatedAt,
+                  brandId: brandId.id,
+                  categoryId: categoryId.id,
+                  images: product.imageId,
+                  points: product.points
+                }).then(async newRecord => {
 
-              // } catch (e) {
-              //   this.logger.error(`Failed with Inserting to DB (SEQUELIZE) `, e.stack)
-              // }
+
+                  if (specifications.length != 0) {
+                    try {
+                      for (const specification of specifications) {
+                        let specNameId;
+                        specNameId = await this.productAttributeRepository.findOne({
+                          where: { name: specification.name }
+                        });
+
+                        if (specNameId === null) {
+                          await this.productAttributeRepository.create({
+                            name: specification.name,
+                            createdAt: specification.createdAt,
+                            updatedAt: specification.updatedAt
+                          }).then(async specName => {
+                            console.log("New Specification Name", specName.id)
+                          })
+                          specNameId = await this.productAttributeRepository.findOne({
+                            where: { name: specification.name }
+                          });
+                        }
+                        await this.productAttributeValueRepository.create({
+                          value: specification.value,
+                          productAttributeId: specNameId.id,
+                          productId: newRecord.id,
+                          createdAt: specification.createdAt,
+                          updatedAt: specification.updatedAt
+                        }).then(async specValue => {
+                          console.log("New Specification Value", specValue.id)
+                        })
+                      }
+                      this.logger.log(`Inserted to DB (SEQUELIZE) (SPECS) `)
+                    }
+                    catch (e) {
+                      this.logger.error(`Inserted to DB (SEQUELIZE) (SPECS) `, e.stack)
+                    }
+                  }
+                  this.logger.log(`Inserted to DB (SEQUELIZE) `, newRecord.id)
+                })
+
+              } catch (e) {
+                this.logger.error(`Failed with Inserting to DB (SEQUELIZE) `, e.stack)
+              }
             }
           }
         }
@@ -830,11 +841,7 @@ export class BPService {
       this.logger.error(`Item Was Not Inserted`, e.stack)
       throw new NotFoundException("Page Does Not Exists");
     }
-
     this.logger.log(`Item Inserted`)
     return
-
   }
-
-
 }

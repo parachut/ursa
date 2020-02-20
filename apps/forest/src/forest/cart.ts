@@ -14,7 +14,7 @@ Liana.collection('Cart', {
       download: true,
     },
     {
-      name: 'Export Selected history',
+      name: 'Export Selected History',
       download: true,
     },
   ],

@@ -6,7 +6,7 @@ import { User } from '@app/database/entities';
 Liana.collection('User', {
   actions: [
     {
-      name: 'Export proximity',
+      name: 'Export Proximity',
       type: 'global',
       download: true,
     },
