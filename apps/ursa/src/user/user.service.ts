@@ -7,6 +7,7 @@ import {
 import { UserRole } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
 import { RecurlyService } from '../recurly.service';
+import * as short from 'short-uuid';
 
 @Injectable()
 export class UserService {
@@ -24,6 +25,8 @@ export class UserService {
   private readonly userMarketingSourceRepository: typeof UserMarketingSource = this.sequelize.getRepository(
     'UserMarketingSource',
   );
+
+  private readonly translator = short();
 
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
@@ -119,5 +122,9 @@ export class UserService {
       ),
       additionalItems: additionalItems ? additionalItems.quantity : 0,
     };
+  }
+
+  shortId(userId: string) {
+    return this.translator.fromUUID(userId);
   }
 }

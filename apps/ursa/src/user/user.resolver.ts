@@ -90,4 +90,9 @@ export class UserResolver {
       .update(user.email)
       .digest('hex');
   }
+
+  @ResolveProperty(type => String)
+  shortId(@Parent() user: User): string {
+    return this.userService.shortId(user.id);
+  }
 }

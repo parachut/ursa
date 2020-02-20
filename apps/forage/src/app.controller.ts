@@ -2,20 +2,24 @@ import { RecurlyService } from '@app/recurly';
 import {
   Body,
   Controller,
-  Post,
-  Res,
-  HttpStatus,
-  Headers,
   Get,
+  Headers,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import * as camelcaseKeysDeep from 'camelcase-keys-deep';
+import { Request, Response } from 'express';
 
 import { EasyPostHookDto } from './dto/easy-post-hook.dto';
-import { ShipmentService } from './shipment/shipment.service';
-import { InvoiceService } from './invoice/invoice.service';
+import { TrackerDto } from './dto/tracker.dto';
 import { InventoryService } from './inventory/inventory.service';
+import { InvoiceService } from './invoice/invoice.service';
+import { ShipmentService } from './shipment/shipment.service';
 import { SubscriptionService } from './subscription/subscription.service';
-import * as camelcaseKeysDeep from 'camelcase-keys-deep';
+import { VisitService } from './visit/visit.service';
+import { IpAddress } from './ip-address.decorator';
 
 @Controller()
 export class AppController {
@@ -25,6 +29,7 @@ export class AppController {
     private readonly invoiceService: InvoiceService,
     private readonly inventoryService: InventoryService,
     private readonly subscriptionService: SubscriptionService,
+    private readonly visitService: VisitService,
   ) {}
 
   @Post('/easypost')
@@ -74,5 +79,27 @@ export class AppController {
     await this.inventoryService.payCommission(hour);
 
     return res.status(HttpStatus.OK).send();
+  }
+
+  @Post('/tracker')
+  async tracker(
+    @Body() { visitorId, deviceId, affiliateId, marketingSource }: TrackerDto,
+    @IpAddress() ipAddress: string,
+    @Res()
+    res: Response,
+    @Req() req: Request,
+  ) {
+    const visit = await this.visitService.recordVisit({
+      visitorId,
+      deviceId,
+      ipAddress,
+      req,
+      affiliateId,
+      marketingSource,
+    });
+
+    return res.status(HttpStatus.OK).send({
+      id: visit.id,
+    });
   }
 }

@@ -55,25 +55,6 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(returns => Visit)
-  async visitCreate(
-    @Args('input')
-    { affiliateId, deviceId, marketingSource, visitorId }: VisitCreateInput,
-    @IpAddress() ipAddress: string,
-    @CurrentUser() user: User,
-    @Context() ctx: ContextInterface,
-  ): Promise<Visit> {
-    return this.authService.recordVisit({
-      visitorId,
-      deviceId,
-      ipAddress,
-      req: ctx.req,
-      affiliateId,
-      userId: user?.id,
-      marketingSource,
-    });
-  }
-
   @Mutation(returns => Token)
   async register(
     @Phone()

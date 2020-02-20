@@ -8,6 +8,7 @@ import { InvoiceModule } from './invoice/invoice.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { UserModule } from './user/user.module';
 import { InventoryModule } from './inventory/inventory.module';
+import { VisitModule } from './visit/visit.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { InventoryModule } from './inventory/inventory.module';
     ShipmentModule,
     InventoryModule,
     UserModule,
+    VisitModule,
   ],
   controllers: [AppController],
   providers: [RecurlyService],
