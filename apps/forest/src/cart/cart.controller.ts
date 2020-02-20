@@ -4,6 +4,7 @@ import {
   Res,
   Post,
   UseGuards,
+  Logger
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CancelCartDto } from './dto/cancel-cart.dto';
@@ -22,6 +23,7 @@ const columns = {
 };
 @Controller()
 export class CartController {
+  private logger = new Logger('CartController')
   constructor(private readonly cartService: CartService) { }
 
   @UseGuards(AuthGuard('jwt'))
@@ -52,7 +54,6 @@ export class CartController {
     };
   }
 
-
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/export-all-history')
   async exportAllHistory(@Body() cancelCartDto: CancelCartDto, @Res() res): Promise<any> {
@@ -61,39 +62,44 @@ export class CartController {
 
     const report = await this.cartService.exportHistory(ids)
 
-    stringify(
-      report,
-      {
-        header: true,
-        columns,
-      },
-      function (err, data) {
-        if (err) {
-          return res.status(500).send(err);
-        }
-        tmp.file(function _tempFileCreated(err, path, fd) {
-          if (err) throw err;
+    try {
+      stringify(
+        report,
+        {
+          header: true,
+          columns,
+        },
+        function (err, data) {
+          if (err) {
+            return res.status(500).send(err);
+          }
+          tmp.file(function _tempFileCreated(err, path, fd) {
+            if (err) throw err;
 
-          fs.writeFileSync(path, data);
-          const options = {
-            dotfiles: 'deny',
-            headers: {
-              'Access-Control-Expose-Headers': 'Content-Disposition',
-              'Content-Disposition':
-                'attachment; filename="order-history.csv"',
-            },
-          };
-          res.status(200).sendFile(path, options, (error) => {
-            if (error) {
-              throw error;
-            }
+            fs.writeFileSync(path, data);
+            const options = {
+              dotfiles: 'deny',
+              headers: {
+                'Access-Control-Expose-Headers': 'Content-Disposition',
+                'Content-Disposition':
+                  'attachment; filename="order-history.csv"',
+              },
+            };
+            res.status(200).sendFile(path, options, (error) => {
+              if (error) {
+                throw error;
+              }
+            });
           });
-        });
-      },
-    );
-    return {
-      success: 'History Exported!',
-    };
+        },
+      );
+      return {
+        success: 'History Exported!',
+      };
+    } catch (e) {
+      this.logger.error(`Did not export the report (History Carts) `, e.stack)
+    }
+
   }
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/export-selected-history')
@@ -103,38 +109,42 @@ export class CartController {
 
     const report = await this.cartService.exportHistory(ids)
 
-    stringify(
-      report,
-      {
-        header: true,
-        columns,
-      },
-      function (err, data) {
-        if (err) {
-          return res.status(500).send(err);
-        }
-        tmp.file(function _tempFileCreated(err, path, fd) {
-          if (err) throw err;
+    try {
+      stringify(
+        report,
+        {
+          header: true,
+          columns,
+        },
+        function (err, data) {
+          if (err) {
+            return res.status(500).send(err);
+          }
+          tmp.file(function _tempFileCreated(err, path, fd) {
+            if (err) throw err;
 
-          fs.writeFileSync(path, data);
-          const options = {
-            dotfiles: 'deny',
-            headers: {
-              'Access-Control-Expose-Headers': 'Content-Disposition',
-              'Content-Disposition':
-                'attachment; filename="order-history.csv"',
-            },
-          };
-          res.status(200).sendFile(path, options, (error) => {
-            if (error) {
-              throw error;
-            }
+            fs.writeFileSync(path, data);
+            const options = {
+              dotfiles: 'deny',
+              headers: {
+                'Access-Control-Expose-Headers': 'Content-Disposition',
+                'Content-Disposition':
+                  'attachment; filename="order-history.csv"',
+              },
+            };
+            res.status(200).sendFile(path, options, (error) => {
+              if (error) {
+                throw error;
+              }
+            });
           });
-        });
-      },
-    );
-    return {
-      success: 'History Exported!',
-    };
+        },
+      );
+      return {
+        success: 'History Exported!',
+      };
+    } catch (e) {
+      this.logger.error(`Did not export the report (History Carts) `, e.stack)
+    }
   }
 }

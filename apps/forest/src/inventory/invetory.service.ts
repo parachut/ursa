@@ -18,139 +18,147 @@ export class InventoryService {
 
   async exportCommissions(startDate: Date, endDate: Date, ids: Array<string>) {
 
-    const items = await this.inventoryRepository.findAll({
-      where: ids && ids.length ? { id: { [Op.in]: ids } } : {},
-      include: [
-        'user',
-        'product',
-        {
-          association: 'shipments',
-          order: [['carrierReceivedAt', 'ASC']],
-        },
-      ],
-    });
-
-    const report = items.map((item) => {
-      let lastOutbound = 0;
-
-      const monthShipments = sortBy(
-        item.shipments
-          .filter((shipment) => shipment.type === ShipmentType.ACCESS)
-          .filter((shipment) => {
-            return (
-              (shipment.carrierDeliveredAt &&
-                (shipment.carrierDeliveredAt.getTime() > startDate.getTime() &&
-                  shipment.carrierDeliveredAt.getTime() < endDate.getTime() &&
-                  shipment.direction === ShipmentDirection.OUTBOUND)) ||
-              (shipment.carrierReceivedAt &&
-                (shipment.carrierReceivedAt.getTime() > startDate.getTime() &&
-                  shipment.carrierReceivedAt.getTime() < endDate.getTime() &&
-                  shipment.direction === ShipmentDirection.INBOUND))
-            );
-          }),
-        [
-          function (o) {
-            return o.carrierReceivedAt.getTime();
+    try {
+      const items = await this.inventoryRepository.findAll({
+        where: ids && ids.length ? { id: { [Op.in]: ids } } : {},
+        include: [
+          'user',
+          'product',
+          {
+            association: 'shipments',
+            order: [['carrierReceivedAt', 'ASC']],
           },
         ],
-      );
+      });
 
-      let secondsInCirculation = monthShipments.reduce((r: number, i: any) => {
-        if (lastOutbound > 0 && i.direction === 'INBOUND') {
-          return r + (i.carrierReceivedAt.getTime() - lastOutbound);
-        } else if (i.direction === 'OUTBOUND') {
-          lastOutbound = i.carrierDeliveredAt.getTime();
-          return r;
-        } else if (r === 0 && lastOutbound === 0 && i.direction === 'INBOUND') {
-          return r + (i.carrierReceivedAt.getTime() - startDate.getTime());
-        }
-      }, 0);
+      const report = items.map((item) => {
+        let lastOutbound = 0;
 
-      if (
-        secondsInCirculation > 0 ||
-        (secondsInCirculation === 0 && lastOutbound > 0)
-      ) {
-        const lastShipment = monthShipments[monthShipments.length - 1];
-        if (
-          lastShipment &&
-          lastShipment.direction === ShipmentDirection.OUTBOUND
-        ) {
-          secondsInCirculation =
-            secondsInCirculation + (endDate.getTime() - lastOutbound);
-        }
-      }
-
-      if (secondsInCirculation === 0) {
-        const prevousToShipment: Shipment = findLast(
-          item.shipments.filter(
-            (shipment) => shipment.type === ShipmentType.ACCESS,
-          ),
-          (shipment) =>
-            shipment.carrierDeliveredAt &&
-            shipment.carrierDeliveredAt.getTime() < startDate.getTime() &&
-            shipment.direction === ShipmentDirection.OUTBOUND,
+        const monthShipments = sortBy(
+          item.shipments
+            .filter((shipment) => shipment.type === ShipmentType.ACCESS)
+            .filter((shipment) => {
+              return (
+                (shipment.carrierDeliveredAt &&
+                  (shipment.carrierDeliveredAt.getTime() > startDate.getTime() &&
+                    shipment.carrierDeliveredAt.getTime() < endDate.getTime() &&
+                    shipment.direction === ShipmentDirection.OUTBOUND)) ||
+                (shipment.carrierReceivedAt &&
+                  (shipment.carrierReceivedAt.getTime() > startDate.getTime() &&
+                    shipment.carrierReceivedAt.getTime() < endDate.getTime() &&
+                    shipment.direction === ShipmentDirection.INBOUND))
+              );
+            }),
+          [
+            function (o) {
+              return o.carrierReceivedAt.getTime();
+            },
+          ],
         );
 
-        if (prevousToShipment) {
-          const nextToShipment: Shipment = item.shipments
-            .filter((shipment) => shipment.type === ShipmentType.ACCESS)
-            .find(
-              (shipment) =>
-                shipment.userId === prevousToShipment.userId &&
-                shipment.direction === ShipmentDirection.INBOUND &&
-                (shipment.carrierReceivedAt &&
-                  shipment.carrierReceivedAt.getTime() >
-                  prevousToShipment.carrierDeliveredAt.getTime()),
-            );
+        let secondsInCirculation = monthShipments.reduce((r: number, i: any) => {
+          if (lastOutbound > 0 && i.direction === 'INBOUND') {
+            return r + (i.carrierReceivedAt.getTime() - lastOutbound);
+          } else if (i.direction === 'OUTBOUND') {
+            lastOutbound = i.carrierDeliveredAt.getTime();
+            return r;
+          } else if (r === 0 && lastOutbound === 0 && i.direction === 'INBOUND') {
+            return r + (i.carrierReceivedAt.getTime() - startDate.getTime());
+          }
+        }, 0);
 
+        if (
+          secondsInCirculation > 0 ||
+          (secondsInCirculation === 0 && lastOutbound > 0)
+        ) {
+          const lastShipment = monthShipments[monthShipments.length - 1];
           if (
-            (nextToShipment &&
-              nextToShipment.carrierReceivedAt.getTime() > endDate.getTime()) ||
-            !nextToShipment
+            lastShipment &&
+            lastShipment.direction === ShipmentDirection.OUTBOUND
           ) {
-            secondsInCirculation = endDate.getTime() - startDate.getTime();
+            secondsInCirculation =
+              secondsInCirculation + (endDate.getTime() - lastOutbound);
           }
         }
-      }
 
-      const daysInCirculation =
-        secondsInCirculation > 0
-          ? Math.ceil(secondsInCirculation / (1000 * 60 * 60 * 24))
-          : 0;
-      const dailyCommission = this.calcService.dailyCommission(item.product.points);
+        if (secondsInCirculation === 0) {
+          const prevousToShipment: Shipment = findLast(
+            item.shipments.filter(
+              (shipment) => shipment.type === ShipmentType.ACCESS,
+            ),
+            (shipment) =>
+              shipment.carrierDeliveredAt &&
+              shipment.carrierDeliveredAt.getTime() < startDate.getTime() &&
+              shipment.direction === ShipmentDirection.OUTBOUND,
+          );
 
-      return {
-        name: item.product.name,
-        value: item.product.points,
-        serial: item.serial,
-        total: numeral(Number(daysInCirculation) * dailyCommission).format(
-          '$0,0.00',
-        ),
-        contributorName: item.user ? item.user.name : 'no name',
-        contributorEmail: item.user ? item.user.email : 'no email',
-        contributorPhone: item.user ? item.user.phone : 'no phone',
-        daysInCirculation,
-      };
-    });
-    return report
+          if (prevousToShipment) {
+            const nextToShipment: Shipment = item.shipments
+              .filter((shipment) => shipment.type === ShipmentType.ACCESS)
+              .find(
+                (shipment) =>
+                  shipment.userId === prevousToShipment.userId &&
+                  shipment.direction === ShipmentDirection.INBOUND &&
+                  (shipment.carrierReceivedAt &&
+                    shipment.carrierReceivedAt.getTime() >
+                    prevousToShipment.carrierDeliveredAt.getTime()),
+              );
+
+            if (
+              (nextToShipment &&
+                nextToShipment.carrierReceivedAt.getTime() > endDate.getTime()) ||
+              !nextToShipment
+            ) {
+              secondsInCirculation = endDate.getTime() - startDate.getTime();
+            }
+          }
+        }
+
+        const daysInCirculation =
+          secondsInCirculation > 0
+            ? Math.ceil(secondsInCirculation / (1000 * 60 * 60 * 24))
+            : 0;
+        const dailyCommission = this.calcService.dailyCommission(item.product.points);
+
+        return {
+          name: item.product.name,
+          value: item.product.points,
+          serial: item.serial,
+          total: numeral(Number(daysInCirculation) * dailyCommission).format(
+            '$0,0.00',
+          ),
+          contributorName: item.user ? item.user.name : 'no name',
+          contributorEmail: item.user ? item.user.email : 'no email',
+          contributorPhone: item.user ? item.user.phone : 'no phone',
+          daysInCirculation,
+        };
+      });
+
+      return report
+    } catch (e) {
+      this.logger.error(`Did not find inventories/create report `, e.stack)
+    }
   }
 
   async findInventoryStatusPoint() {
-    const inventory = await this.inventoryRepository.findAll({
-      group: ['status'],
-      attributes: [
-        [('status'), 'key'],
-        [Sequelize.fn('SUM', Sequelize.col('product.points')), 'value'],
-      ],
-      raw: true,
-      include: [
-        {
-          association: 'product',
-          attributes: [],
-        },
-      ],
-    });
-
-    return inventory
+    try {
+      const inventory = await this.inventoryRepository.findAll({
+        group: ['status'],
+        attributes: [
+          [('status'), 'key'],
+          [Sequelize.fn('SUM', Sequelize.col('product.points')), 'value'],
+        ],
+        raw: true,
+        include: [
+          {
+            association: 'product',
+            attributes: [],
+          },
+        ],
+      });
+      return inventory
+    } catch (e) {
+      this.logger.error(`Did not find inventories for the stats/chart `, e.stack)
+    }
   }
 }

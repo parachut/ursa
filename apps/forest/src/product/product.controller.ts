@@ -10,6 +10,7 @@ export class BPController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/insert-product')
   async insertProduct(@Body() insert: InsertProductDto) {
+    
     const bhUrl = insert.data.attributes.values.url;
     const bhPrice =insert.data.attributes.values.price
 

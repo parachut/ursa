@@ -1261,7 +1261,7 @@
       "download": true,
       "fields": []
     }, {
-      "name": "Export Selected history",
+      "name": "Export Selected History",
       "type": "bulk",
       "baseUrl": null,
       "endpoint": "/forest/actions/export-selected-history",
@@ -8013,7 +8013,7 @@
         "widget": null
       }]
     }, {
-      "name": "Export proximity",
+      "name": "Export Proximity",
       "type": "global",
       "baseUrl": null,
       "endpoint": "/forest/actions/export-proximity",
@@ -9691,7 +9691,7 @@
     "liana": "forest-express-sequelize",
     "liana_version": "5.7.0",
     "engine": "nodejs",
-    "engine_version": "13.7.0",
+    "engine_version": "12.14.1",
     "framework": "other",
     "framework_version": null,
     "orm_version": "5.21.3"

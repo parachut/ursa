@@ -767,65 +767,65 @@ export class BPService {
                 console.log(brandId.id)
                 console.log(categoryId.id)
 
-                // const product = newItem.general
-                // const specifications = newItem.specs
-                // await this.productRepository.create({
-                //   slug: product.slug,
-                //   length: product.length,
-                //   features: product.features,
-                //   height: product.height,
-                //   inTheBox: product.features,
-                //   mfr: product.mfr,
-                //   name: product.name,
-                //   weight: product.weight,
-                //   width: product.width,
-                //   createdAt: product.createdAt,
-                //   updatedAt: product.updatedAt,
-                //   brandId: brandId.id,
-                //   categoryId: categoryId.id,
-                //   images: product.imageId,
-                //   points: product.points
-                // }).then(async newRecord => {
+                const product = newItem.general
+                const specifications = newItem.specs
+                await this.productRepository.create({
+                  slug: product.slug,
+                  length: product.length,
+                  features: product.features,
+                  height: product.height,
+                  inTheBox: product.features,
+                  mfr: product.mfr,
+                  name: product.name,
+                  weight: product.weight,
+                  width: product.width,
+                  createdAt: product.createdAt,
+                  updatedAt: product.updatedAt,
+                  brandId: brandId.id,
+                  categoryId: categoryId.id,
+                  images: product.imageId,
+                  points: product.points
+                }).then(async newRecord => {
 
 
-                //   if (specifications.length != 0) {
-                //     try {
-                //       for (const specification of specifications) {
-                //         let specNameId;
-                //         specNameId = await this.productAttributeRepository.findOne({
-                //           where: { name: specification.name }
-                //         });
+                  if (specifications.length != 0) {
+                    try {
+                      for (const specification of specifications) {
+                        let specNameId;
+                        specNameId = await this.productAttributeRepository.findOne({
+                          where: { name: specification.name }
+                        });
 
-                //         if (specNameId === null) {
-                //           await this.productAttributeRepository.create({
-                //             name: specification.name,
-                //             createdAt: specification.createdAt,
-                //             updatedAt: specification.updatedAt
-                //           }).then(async specName => {
-                //             console.log("New Specification Name", specName.id)
-                //           })
-                //           specNameId = await this.productAttributeRepository.findOne({
-                //             where: { name: specification.name }
-                //           });
-                //         }
-                //         await this.productAttributeValueRepository.create({
-                //           value: specification.value,
-                //           productAttributeId: specNameId.id,
-                //           productId: newRecord.id,
-                //           createdAt: specification.createdAt,
-                //           updatedAt: specification.updatedAt
-                //         }).then(async specValue => {
-                //           console.log("New Specification Value", specValue.id)
-                //         })
-                //       }
-                //       this.logger.log(`Inserted to DB (SEQUELIZE) (SPECS) `)
-                //     }
-                //     catch (e) {
-                //       this.logger.error(`Inserted to DB (SEQUELIZE) (SPECS) `, e.stack)
-                //     }
-                //   }
-                //   this.logger.log(`Inserted to DB (SEQUELIZE) `, newRecord.id)
-                // })
+                        if (specNameId === null) {
+                          await this.productAttributeRepository.create({
+                            name: specification.name,
+                            createdAt: specification.createdAt,
+                            updatedAt: specification.updatedAt
+                          }).then(async specName => {
+                            console.log("New Specification Name", specName.id)
+                          })
+                          specNameId = await this.productAttributeRepository.findOne({
+                            where: { name: specification.name }
+                          });
+                        }
+                        await this.productAttributeValueRepository.create({
+                          value: specification.value,
+                          productAttributeId: specNameId.id,
+                          productId: newRecord.id,
+                          createdAt: specification.createdAt,
+                          updatedAt: specification.updatedAt
+                        }).then(async specValue => {
+                          console.log("New Specification Value", specValue.id)
+                        })
+                      }
+                      this.logger.log(`Inserted to DB (SEQUELIZE) (SPECS) `)
+                    }
+                    catch (e) {
+                      this.logger.error(`Inserted to DB (SEQUELIZE) (SPECS) `, e.stack)
+                    }
+                  }
+                  this.logger.log(`Inserted to DB (SEQUELIZE) `, newRecord.id)
+                })
 
               } catch (e) {
                 this.logger.error(`Failed with Inserting to DB (SEQUELIZE) `, e.stack)
@@ -841,11 +841,7 @@ export class BPService {
       this.logger.error(`Item Was Not Inserted`, e.stack)
       throw new NotFoundException("Page Does Not Exists");
     }
-
     this.logger.log(`Item Inserted`)
     return
-
   }
-
-
 }
