@@ -3,10 +3,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { LoginAsDto } from './dto/login-as.dto';
 import { sign } from 'jsonwebtoken';
-import { ShipKitDto } from './dto/ship-kit.dto'
-import * as fs from 'fs'
-import * as stringify from 'csv-stringify';
-import * as tmp from 'tmp';
+import { ShipKitDto } from './dto/ship-kit.dto';
+import fs from 'fs';
+import stringify from 'csv-stringify';
+import tmp from 'tmp';
 
 const columns = {
   name: 'Name',
@@ -19,8 +19,8 @@ const columns = {
 };
 @Controller()
 export class UserController {
-  private logger = new Logger('UserController')
-  constructor(private readonly userService: UserService) { }
+  private logger = new Logger('UserController');
+  constructor(private readonly userService: UserService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/login-as')
@@ -42,16 +42,14 @@ export class UserController {
           'https://www.parachut.co/?temp_token=' + encodeURIComponent(token),
       };
     } catch (e) {
-      this.logger.error(`Could not find user /generate token `, e.stack)
+      this.logger.error(`Could not find user /generate token `, e.stack);
     }
   }
-
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/export-proximity')
   async exportProximity(@Res() res: any): Promise<any> {
-
-    const reports = await this.userService.exportProximity()
+    const reports = await this.userService.exportProximity();
 
     try {
       stringify(
@@ -60,7 +58,7 @@ export class UserController {
           header: true,
           columns,
         },
-        function (err, data) {
+        function(err, data) {
           if (err) {
             return res.status(500).send(err);
           }
@@ -76,42 +74,38 @@ export class UserController {
                   'attachment; filename="user-proximity.csv"',
               },
             };
-            res.status(200).sendFile(path, options, (error) => {
+            res.status(200).sendFile(path, options, error => {
               if (error) {
                 throw error;
               }
             });
           });
-        }
+        },
       );
       return {
         success: 'Proximity Exported!',
       };
     } catch (e) {
-      this.logger.error(`Did not export the proximity report (users proximity) `, e.stack)
+      this.logger.error(
+        `Did not export the proximity report (users proximity) `,
+        e.stack,
+      );
     }
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/create-shipkit')
   async createShipKit(@Body() shipKit: ShipKitDto) {
-
     const { ids } = shipKit.data.attributes;
     const attrs = shipKit.data.attributes.values;
 
     const airbox = Boolean(attrs['Airbox']);
 
-    await this.userService.createShipKit(airbox, ids)
+    await this.userService.createShipKit(airbox, ids);
 
     return {
       success: 'Shipkit generated successfully.',
       refresh: { relationships: ['shipKits'] },
     };
-
   }
-
-
-
-
-
 }

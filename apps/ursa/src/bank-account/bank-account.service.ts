@@ -76,62 +76,70 @@ export class BankAccountService {
       userId,
     });
 
-    const { accounts } = await this.plaidService.getAccounts(accessToken);
+    const plaidToken = await this.plaidService.createProcessorToken(
+      accessToken,
+      accountId,
+    );
+    const fundingSourceRef = await this.dwollaService.createOrFindFundingSource(
+      dwollaIntegration.value,
+      plaidToken,
+      userId,
+    );
 
-    if (accounts && accounts.length) {
-      let userBankAccount;
+    let userBankAccount;
 
-      await this.bankAccountRepository.update(
-        {
-          primary: false,
-        },
-        {
-          where: {
-            userId,
+    try {
+      const { accounts } = await this.plaidService.getAccounts(accessToken);
+
+      if (accounts && accounts.length) {
+        await this.bankAccountRepository.update(
+          {
+            primary: false,
           },
-        },
-      );
-
-      for (const account of accounts) {
-        const plaidToken = await this.plaidService.createProcessorToken(
-          accessToken,
-          accountId,
-        );
-        const fundingSourceRef = await this.dwollaService.createOrFindFundingSource(
-          dwollaIntegration.value,
-          plaidToken,
-          userId,
+          {
+            where: {
+              userId,
+            },
+          },
         );
 
-        const newBankAccount = await this.bankAccountRepository.create({
-          accountId: account.account_id,
-          primary: account.account_id === accountId,
-          name: account.name,
-          mask: account.mask,
-          subtype: account.subtype,
+        const mainAccount = accounts.find(i => i.account_id === accountId);
+
+        userBankAccount = await this.bankAccountRepository.create({
+          accountId: mainAccount.account_id,
+          primary: true,
+          name: mainAccount.name,
+          mask: mainAccount.mask,
+          subtype: mainAccount.subtype,
           userId,
           plaidUrl: fundingSourceRef,
         });
-
-        if (account.account_id === accountId) {
-          userBankAccount = newBankAccount;
-        }
+      } else {
+        throw new NotFoundException();
       }
-
-      try {
-        const balances = await this.plaidService.getBalance(accessToken);
-
-        if (balances && balances.length) {
-          await this.userRepository.bulkCreate(balances);
-        }
-      } catch (e) {
-        this.logger.error(e);
-        // fail gracefully
-      }
-
-      return userBankAccount;
-    } else {
-      throw new NotFoundException();
+    } catch (e) {
+      userBankAccount = await this.bankAccountRepository.create({
+        accountId,
+        primary: true,
+        name: 'Primary Account',
+        mask: '****',
+        subtype: 'Bank',
+        userId,
+        plaidUrl: fundingSourceRef,
+      });
     }
+
+    try {
+      const balances = await this.plaidService.getBalance(accessToken);
+
+      if (balances && balances.length) {
+        await this.userRepository.bulkCreate(balances);
+      }
+    } catch (e) {
+      this.logger.error(e);
+      // fail gracefully
+    }
+
+    return userBankAccount;
   }
 }

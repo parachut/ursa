@@ -3472,6 +3472,15 @@
     }],
     "segments": [],
     "actions": [{
+      "name": "Create Earn Return",
+      "type": "bulk",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/create-earn-return",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
       "name": "Export All Commissions",
       "type": "global",
       "baseUrl": null,

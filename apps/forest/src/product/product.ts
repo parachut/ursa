@@ -1,4 +1,4 @@
-import * as Liana from 'forest-express-sequelize';
+import Liana from 'forest-express-sequelize';
 
 Liana.collection('Product', {
   actions: [
@@ -11,12 +11,13 @@ Liana.collection('Product', {
           field: 'url',
           type: 'String',
           isRequired: true,
-          description: "Insert product url from B&H website."
+          description: 'Insert product url from B&H website.',
         },
         {
           field: 'price',
           type: 'Number',
-          description: "Insert price, if the price does not appear on the B&H page"
+          description:
+            'Insert price, if the price does not appear on the B&H page',
         },
       ],
     },

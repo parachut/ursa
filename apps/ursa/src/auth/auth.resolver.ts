@@ -55,25 +55,6 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(returns => Visit)
-  async visitCreate(
-    @Args('input')
-    { affiliateId, deviceId, marketingSource, visitorId }: VisitCreateInput,
-    @IpAddress() ipAddress: string,
-    @CurrentUser() user: User,
-    @Context() ctx: ContextInterface,
-  ): Promise<Visit> {
-    return this.authService.recordVisit({
-      visitorId,
-      deviceId,
-      ipAddress,
-      req: ctx.req,
-      affiliateId,
-      userId: user?.id,
-      marketingSource,
-    });
-  }
-
   @Mutation(returns => Token)
   async register(
     @Phone()
@@ -88,8 +69,6 @@ export class AuthResolver {
     if (userExists) {
       throw new Error('Sorry, this user already exists, please try again.');
     }
-
-    await this.authService.checkMobile(phone);
 
     const user = await this.userService.createUser(
       {

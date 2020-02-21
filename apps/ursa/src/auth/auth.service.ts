@@ -3,10 +3,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Client as Authy } from 'authy-client';
 import { Request } from 'express';
 import { Op } from 'sequelize';
-import * as short from 'short-uuid';
 
 import { AuthenticateMethod } from './dto/authenticate-method.enum';
-import { MarketingSourceInput } from './dto/marketing-source.input';
 
 @Injectable()
 export class AuthService {
@@ -21,8 +19,6 @@ export class AuthService {
   private readonly visitRepository: typeof Visit = this.sequelize.getRepository(
     'Visit',
   );
-
-  private readonly translator = short();
 
   constructor(@Inject('SEQUELIZE') private readonly sequelize) {
     this.authyClient = new Authy({ key: process.env.AUTHY });
@@ -118,87 +114,6 @@ export class AuthService {
     });
 
     return !!exists;
-  }
-
-  async recordVisit({
-    visitorId,
-    deviceId,
-    ipAddress,
-    req,
-    affiliateId,
-    userId,
-    marketingSource,
-  }: {
-    visitorId?: string;
-    deviceId: string;
-    ipAddress: string;
-    req: Request;
-    affiliateId?: string;
-    userId?: string;
-    marketingSource?: MarketingSourceInput;
-  }): Promise<Visit> {
-    let visit = visitorId
-      ? await this.visitRepository.findByPk(visitorId)
-      : await this.visitRepository.findOne({
-          where: {
-            deviceId,
-            ipAddress,
-          },
-        });
-
-    const _affiliateId = affiliateId
-      ? this.translator.toUUID(affiliateId)
-      : null;
-
-    if (!visit) {
-      visit = this.visitRepository.build({
-        affiliateId: _affiliateId,
-        userId,
-        ipAddress,
-        deviceId,
-      });
-
-      if (req.header('x-appengine-citylatlong')) {
-        const coordinates = req.header('x-appengine-citylatlong').split(',');
-
-        visit.countryCode = req.header('x-appengine-country');
-        visit.regionCode = req.header('x-appengine-region');
-        visit.city = req.header('x-appengine-city');
-        visit.coordinates = {
-          type: 'Point',
-          coordinates: [
-            parseInt(coordinates[1], 10),
-            parseInt(coordinates[0], 10),
-          ],
-        };
-      }
-
-      return visit.save();
-    }
-
-    if (!visit.affiliateId && _affiliateId) {
-      visit.affiliateId = _affiliateId;
-    }
-
-    if (
-      (!visit.campaign || !visit.source || !visit.medium) &&
-      marketingSource
-    ) {
-      visit.campaign = marketingSource.campaign;
-      visit.source = marketingSource.source;
-      visit.medium = marketingSource.medium;
-    }
-    if (visit.changed()) {
-      try {
-        await visit.save();
-        return visit;
-      } catch (e) {
-        console.log(e);
-        return visit;
-      }
-    } else {
-      return visit;
-    }
   }
 
   async creditVisit(visitorId: string, userId: string) {

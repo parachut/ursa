@@ -7,7 +7,7 @@ import {
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { differenceInCalendarDays } from 'date-fns';
 import { last, sortBy } from 'lodash';
-import * as numeral from 'numeral';
+import numeral from 'numeral';
 import { Op } from 'sequelize';
 
 import { InventoryHistory } from './dto/inventory-history.type';

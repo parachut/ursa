@@ -14,7 +14,7 @@ import {
   ResolveProperty,
   Resolver,
 } from '@nestjs/graphql';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
@@ -89,5 +89,10 @@ export class UserResolver {
       .createHmac('sha256', process.env.FRONT_CHAT_SECRET)
       .update(user.email)
       .digest('hex');
+  }
+
+  @ResolveProperty(type => String)
+  shortId(@Parent() user: User): string {
+    return this.userService.shortId(user.id);
   }
 }

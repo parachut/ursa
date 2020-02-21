@@ -7,7 +7,7 @@ import {
 } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
 import { Op } from 'sequelize';
-import * as numeral from 'numeral';
+import numeral from 'numeral';
 import { last, sortBy } from 'lodash';
 
 import { EmailService } from '../email.service';

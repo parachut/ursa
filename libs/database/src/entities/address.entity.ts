@@ -1,4 +1,4 @@
-import * as EasyPost from '@easypost/api';
+import EasyPost from '@easypost/api';
 import {
   AfterCreate,
   BeforeCreate,
@@ -124,8 +124,6 @@ export class Address extends Model<Address> {
   static async normalize(instance: Address) {
     const easyPost = new EasyPost(process.env.EASYPOST);
     const { models } = instance.sequelize;
-
-    console.log(instance);
 
     const user: User = (await instance.sequelize.models.User.findByPk(
       instance.userId,

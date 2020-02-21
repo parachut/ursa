@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import * as xmlparser from 'express-xml-bodyparser';
+import xmlparser from 'express-xml-bodyparser';
 import { AppModule } from './app.module';
 
 require('dotenv').config();
@@ -7,6 +7,8 @@ async function bootstrap() {
   const port = process.env.PORT;
 
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors();
 
   app.use(
     xmlparser({

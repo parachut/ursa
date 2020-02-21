@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 import { NestFactory } from '@nestjs/core';
-import * as requestIp from 'request-ip';
+import requestIp from 'request-ip';
 
 import { AppModule } from './app.module';
 

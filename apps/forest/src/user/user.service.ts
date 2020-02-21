@@ -1,12 +1,12 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Cart, User, ShipKit, ShipKitInventory } from '@app/database/entities';
 import { Op } from 'sequelize';
-import * as numeral from 'numeral';
+import numeral from 'numeral';
 import { sortBy } from 'lodash';
 
 @Injectable()
 export class UserService {
-  private logger = new Logger('UserService')
+  private logger = new Logger('UserService');
   private readonly cartRepository: typeof Cart = this.sequelize.getRepository(
     'Cart',
   );
@@ -22,7 +22,7 @@ export class UserService {
     'ShipKitInventory',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) { }
+  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
 
   findUser(id: string) {
     return this.userRepository.findByPk(id);
@@ -45,14 +45,14 @@ export class UserService {
         ],
       });
       const report = users
-        .filter((user) => {
-          const cart = user.carts.find((cart) => !cart.completedAt);
+        .filter(user => {
+          const cart = user.carts.find(cart => !cart.completedAt);
           return cart && cart.items.length;
         })
-        .map((user) => {
-          const cart = user.carts.find((cart) => !cart.completedAt);
+        .map(user => {
+          const cart = user.carts.find(cart => !cart.completedAt);
 
-          const cartItemsSorted = sortBy(cart.items, function (item) {
+          const cartItemsSorted = sortBy(cart.items, function(item) {
             return item.updatedAt;
           });
 
@@ -69,14 +69,17 @@ export class UserService {
             cartValue: numeral(
               cart.items.reduce((r, i) => r + i.product.points, 0),
             ).format('$0,0.00'),
-            cartItems: cart.items.map((i) => i.product.name).join(', '),
+            cartItems: cart.items.map(i => i.product.name).join(', '),
             proximity,
           };
         });
 
-      return report
+      return report;
     } catch (e) {
-      this.logger.error(`Could not find all user/ generate report (exportProximity) `, e.stack)
+      this.logger.error(
+        `Could not find all user/ generate report (exportProximity) `,
+        e.stack,
+      );
     }
   }
 
@@ -88,10 +91,10 @@ export class UserService {
         userId: ids[0],
         airbox: airbox,
         createdAt: new Date(),
-        updatedAt: new Date()
-      })
+        updatedAt: new Date(),
+      });
     } catch (e) {
-      this.logger.error(`Could not create shipKit`, e.stack)
+      this.logger.error(`Could not create shipKit`, e.stack);
     }
   }
 }

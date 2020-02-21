@@ -1,5 +1,5 @@
-import * as EasyPost from '@easypost/api';
-import * as camelcaseKeysDeep from 'camelcase-keys-deep';
+import EasyPost from '@easypost/api';
+import camelcaseKeysDeep from 'camelcase-keys-deep';
 import { groupBy, sortBy } from 'lodash';
 import { Op } from 'sequelize';
 import {

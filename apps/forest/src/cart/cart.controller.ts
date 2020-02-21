@@ -1,17 +1,10 @@
-import {
-  Body,
-  Controller,
-  Res,
-  Post,
-  UseGuards,
-  Logger
-} from '@nestjs/common';
+import { Body, Controller, Res, Post, UseGuards, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CancelCartDto } from './dto/cancel-cart.dto';
 import { CartService } from './cart.service';
-import * as fs from 'fs'
-import * as stringify from 'csv-stringify';
-import * as tmp from 'tmp';
+import fs from 'fs';
+import stringify from 'csv-stringify';
+import tmp from 'tmp';
 
 const columns = {
   completedAt: 'Completed',
@@ -23,8 +16,8 @@ const columns = {
 };
 @Controller()
 export class CartController {
-  private logger = new Logger('CartController')
-  constructor(private readonly cartService: CartService) { }
+  private logger = new Logger('CartController');
+  constructor(private readonly cartService: CartService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/cancel-cart')
@@ -56,11 +49,13 @@ export class CartController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/export-all-history')
-  async exportAllHistory(@Body() cancelCartDto: CancelCartDto, @Res() res): Promise<any> {
-
+  async exportAllHistory(
+    @Body() cancelCartDto: CancelCartDto,
+    @Res() res,
+  ): Promise<any> {
     const { ids } = cancelCartDto.data.attributes;
 
-    const report = await this.cartService.exportHistory(ids)
+    const report = await this.cartService.exportHistory(ids);
 
     try {
       stringify(
@@ -69,7 +64,7 @@ export class CartController {
           header: true,
           columns,
         },
-        function (err, data) {
+        function(err, data) {
           if (err) {
             return res.status(500).send(err);
           }
@@ -85,7 +80,7 @@ export class CartController {
                   'attachment; filename="order-history.csv"',
               },
             };
-            res.status(200).sendFile(path, options, (error) => {
+            res.status(200).sendFile(path, options, error => {
               if (error) {
                 throw error;
               }
@@ -97,17 +92,18 @@ export class CartController {
         success: 'History Exported!',
       };
     } catch (e) {
-      this.logger.error(`Did not export the report (History Carts) `, e.stack)
+      this.logger.error(`Did not export the report (History Carts) `, e.stack);
     }
-
   }
   @UseGuards(AuthGuard('jwt'))
   @Post('/actions/export-selected-history')
-  async exportSelectedHistory(@Body() cancelCartDto: CancelCartDto, @Res() res): Promise<any> {
-
+  async exportSelectedHistory(
+    @Body() cancelCartDto: CancelCartDto,
+    @Res() res,
+  ): Promise<any> {
     const { ids } = cancelCartDto.data.attributes;
 
-    const report = await this.cartService.exportHistory(ids)
+    const report = await this.cartService.exportHistory(ids);
 
     try {
       stringify(
@@ -116,7 +112,7 @@ export class CartController {
           header: true,
           columns,
         },
-        function (err, data) {
+        function(err, data) {
           if (err) {
             return res.status(500).send(err);
           }
@@ -132,7 +128,7 @@ export class CartController {
                   'attachment; filename="order-history.csv"',
               },
             };
-            res.status(200).sendFile(path, options, (error) => {
+            res.status(200).sendFile(path, options, error => {
               if (error) {
                 throw error;
               }
@@ -144,7 +140,7 @@ export class CartController {
         success: 'History Exported!',
       };
     } catch (e) {
-      this.logger.error(`Did not export the report (History Carts) `, e.stack)
+      this.logger.error(`Did not export the report (History Carts) `, e.stack);
     }
   }
 }

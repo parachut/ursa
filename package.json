@@ -141,7 +141,9 @@
       "@app/auth/(.*)": "<rootDir>/libs/auth/src/$1",
       "@app/auth": "<rootDir>/libs/auth/src",
       "@app/recurly/(.*)": "<rootDir>/libs/recurly/src/$1",
-      "@app/recurly": "<rootDir>/libs/recurly/src"
+      "@app/recurly": "<rootDir>/libs/recurly/src",
+      "@app/easypost/(.*)": "<rootDir>/libs/easypost/src/$1",
+      "@app/easypost": "<rootDir>/libs/easypost/src"
     }
   }
 }
