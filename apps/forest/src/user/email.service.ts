@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import Postmark from 'postmark';
+import * as Postmark from 'postmark';
 
 interface SendArgs {
   data: any;

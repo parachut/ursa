@@ -17,12 +17,33 @@ export class RegisterAffiliateInput {
   @Length(10)
   phone!: string;
 
-  @Field(type => [UserRole], { nullable: true })
-  roles?: UserRole[];
+  @Field({ nullable: true })
+  instagram?: string;
 
-  @Field(type => String, { nullable: true })
-  visitorId?: string;
+  @Field({ nullable: true })
+  followers?: string;
 
-  @Field(type => MarketingSourceInput, { nullable: true })
-  marketingSource?: MarketingSourceInput;
+  @Field({ nullable: true })
+  businessName?: string;
+
+  @Field({ nullable: true })
+  website?: string;
+
+  @Field({ nullable: true })
+  location?: string;
+
+  @Field({ nullable: true })
+  traffic?: string;
+
+  @Field({ nullable: true })
+  affiliateType?: string;
+
+  @Field({ nullable: true })
+  purpose?: string;
+
+  @Field({ nullable: true })
+  promote?: string;
+
+  @Field({ nullable: true })
+  brands?: string;
 }

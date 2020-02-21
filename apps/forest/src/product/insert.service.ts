@@ -7,7 +7,7 @@ import {
   ProductAttributeValue,
 } from '@app/database/entities';
 import puppeteer from 'puppeteer';
-import * as uuidv1 from 'uuid';
+import uuidv1 from 'uuid';
 import request from 'request';
 import { Storage } from '@google-cloud/storage';
 
