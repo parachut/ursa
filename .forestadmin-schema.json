@@ -4838,6 +4838,24 @@
         "position": 1,
         "widget": null
       }]
+    }, {
+      "name": "Insert Values",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/insert-values",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
+      "name": "mpb",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/mpb",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
     }]
   }, {
     "name": "ProductAttribute",
