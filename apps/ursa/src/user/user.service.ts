@@ -7,7 +7,7 @@ import {
 import { UserRole } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
 import { RecurlyService } from '../recurly.service';
-import * as short from 'short-uuid';
+import short from 'short-uuid';
 
 @Injectable()
 export class UserService {
@@ -49,7 +49,11 @@ export class UserService {
     const filteredRoles =
       roles && roles.length
         ? roles.filter(role =>
-            [UserRole.CONTRIBUTOR, UserRole.MEMBER].includes(role),
+            [
+              UserRole.CONTRIBUTOR,
+              UserRole.MEMBER,
+              UserRole.AFFILIATE,
+            ].includes(role),
           )
         : [UserRole.MEMBER];
 
@@ -58,11 +62,6 @@ export class UserService {
       roles: filteredRoles,
       marketingSources: [marketingSource],
     });
-
-    await this.agreeToTerms(
-      user.get('id'),
-      filteredRoles && filteredRoles.length > 1 ? 'EARN' : 'ACCESS',
-    );
 
     if (marketingSource) {
       await this.userMarketingSourceRepository.create({

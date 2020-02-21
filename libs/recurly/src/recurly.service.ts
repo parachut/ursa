@@ -4,7 +4,7 @@ import {
   Logger,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import * as Recurly from 'recurly';
+import Recurly from 'recurly';
 
 @Injectable()
 export class RecurlyService {

@@ -5,9 +5,9 @@ import {
   ShipmentStatus,
   ShipmentType,
 } from '@app/database/enums';
-import * as EasyPost from '@easypost/api';
+import EasyPost from '@easypost/api';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import * as camelcaseKeysDeep from 'camelcase-keys-deep';
+import camelcaseKeysDeep from 'camelcase-keys-deep';
 
 import { InventoryService } from '../inventory/inventory.service';
 

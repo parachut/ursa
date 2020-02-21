@@ -1,4 +1,4 @@
-import * as Recurly from 'recurly';
+import Recurly from 'recurly';
 
 import { User } from '../entities/user.entity';
 import { UserIntegration } from '../entities/user-integration.entity';

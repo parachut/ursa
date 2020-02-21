@@ -9,7 +9,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import * as camelcaseKeysDeep from 'camelcase-keys-deep';
+import camelcaseKeysDeep from 'camelcase-keys-deep';
 import { Request, Response } from 'express';
 
 import { EasyPostHookDto } from './dto/easy-post-hook.dto';

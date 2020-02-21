@@ -1,4 +1,4 @@
-import * as EasyPost from '@easypost/api';
+import EasyPost from '@easypost/api';
 import {
   BeforeCreate,
   BelongsTo,

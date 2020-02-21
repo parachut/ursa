@@ -1,5 +1,5 @@
 import PhoneNumber from 'awesome-phonenumber';
-import * as Liana from 'forest-express-sequelize';
+import Liana from 'forest-express-sequelize';
 
 import { User } from '@app/database/entities';
 

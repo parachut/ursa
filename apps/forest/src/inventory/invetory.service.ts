@@ -2,7 +2,7 @@ import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Inventory, Shipment } from '@app/database/entities';
 import { Op, Sequelize } from 'sequelize';
 import { ShipmentType, ShipmentDirection } from '@app/database/enums';
-import * as numeral from 'numeral';
+import numeral from 'numeral';
 import { CalculatorService } from '@app/calculator';
 import { sortBy, findLast } from 'lodash';
 

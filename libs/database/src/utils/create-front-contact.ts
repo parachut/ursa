@@ -1,5 +1,5 @@
 import to from 'await-to-js';
-import * as request from 'superagent';
+import request from 'superagent';
 
 import { User } from '../entities/user.entity';
 import { UserIntegration } from '../entities/user-integration.entity';

@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import * as xmlparser from 'express-xml-bodyparser';
+import xmlparser from 'express-xml-bodyparser';
 import { AppModule } from './app.module';
 
 require('dotenv').config();

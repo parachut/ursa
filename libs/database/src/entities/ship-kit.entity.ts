@@ -1,4 +1,4 @@
-import * as pMap from 'p-map';
+import pMap from 'p-map';
 import {
   AfterUpdate,
   BelongsTo,

@@ -3,10 +3,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './invetory.service';
 import { InventoryDto } from './dto/inventory.dto';
 import { startOfDay, endOfDay } from 'date-fns';
-import * as Liana from 'forest-express-sequelize';
-import * as fs from 'fs';
-import * as stringify from 'csv-stringify';
-import * as tmp from 'tmp';
+import Liana from 'forest-express-sequelize';
+import fs from 'fs';
+import stringify from 'csv-stringify';
+import tmp from 'tmp';
 
 const columns = {
   value: 'Product Value',

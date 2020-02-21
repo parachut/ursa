@@ -14,7 +14,7 @@ import {
   ResolveProperty,
   Resolver,
 } from '@nestjs/graphql';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 
 import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';

@@ -4,7 +4,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { User, UserIntegration } from '@app/database/entities';
-import * as Dwolla from 'dwolla-v2';
+import Dwolla from 'dwolla-v2';
 
 @Injectable()
 export class DwollaService {

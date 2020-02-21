@@ -4,9 +4,9 @@ import { UserService } from './user.service';
 import { LoginAsDto } from './dto/login-as.dto';
 import { sign } from 'jsonwebtoken';
 import { ShipKitDto } from './dto/ship-kit.dto';
-import * as fs from 'fs';
-import * as stringify from 'csv-stringify';
-import * as tmp from 'tmp';
+import fs from 'fs';
+import stringify from 'csv-stringify';
+import tmp from 'tmp';
 
 const columns = {
   name: 'Name',

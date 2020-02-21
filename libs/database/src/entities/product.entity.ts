@@ -1,5 +1,5 @@
 import { Client } from '@elastic/elasticsearch';
-import * as slugify from '@sindresorhus/slugify';
+import slugify from '@sindresorhus/slugify';
 import {
   AfterCreate,
   AfterUpdate,

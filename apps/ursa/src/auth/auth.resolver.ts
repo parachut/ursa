@@ -70,8 +70,6 @@ export class AuthResolver {
       throw new Error('Sorry, this user already exists, please try again.');
     }
 
-    await this.authService.checkMobile(phone);
-
     const user = await this.userService.createUser(
       {
         email,

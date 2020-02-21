@@ -1,6 +1,6 @@
 import { Visit } from '@app/database/entities';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import * as short from 'short-uuid';
+import short from 'short-uuid';
 import { Request } from 'express';
 
 @Injectable()

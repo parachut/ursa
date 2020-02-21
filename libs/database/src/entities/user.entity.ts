@@ -1,4 +1,4 @@
-import * as nameParser from 'another-name-parser';
+import nameParser from 'another-name-parser';
 import {
   AfterCreate,
   AfterUpdate,

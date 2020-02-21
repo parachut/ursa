@@ -72,6 +72,7 @@
     "plaid": "^4.5.0",
     "postmark": "^2.3.5",
     "puppeteer": "^2.1.1",
+    "puppeteer-extra-plugin-stealth": "^2.4.9",
     "rebrandly": "^2.0.1",
     "recurly": "^3.3.1",
     "reflect-metadata": "^0.1.13",
@@ -137,7 +138,9 @@
       "@app/auth/(.*)": "<rootDir>/libs/auth/src/$1",
       "@app/auth": "<rootDir>/libs/auth/src",
       "@app/recurly/(.*)": "<rootDir>/libs/recurly/src/$1",
-      "@app/recurly": "<rootDir>/libs/recurly/src"
+      "@app/recurly": "<rootDir>/libs/recurly/src",
+      "@app/easypost/(.*)": "<rootDir>/libs/easypost/src/$1",
+      "@app/easypost": "<rootDir>/libs/easypost/src"
     }
   }
 }

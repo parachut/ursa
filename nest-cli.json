@@ -61,6 +61,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/recurly/tsconfig.lib.json"
       }
+    },
+    "easypost": {
+      "type": "library",
+      "root": "libs/easypost",
+      "entryFile": "index",
+      "sourceRoot": "libs/easypost/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/easypost/tsconfig.lib.json"
+      }
     }
   }
 }
