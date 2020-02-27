@@ -100,11 +100,12 @@ export class AuthResolver {
     @Phone()
     phone: string,
     @Args('input')
-    { email, name, marketingSource, roles, visitorId }: RegisterInput,
+    { email, name, marketingSource, roles }: RegisterInput,
     @Context() ctx: ContextInterface,
   ): Promise<Token> {
     // Find if there is an existing account
     const userExists = await this.authService.checkUserExists(phone, email);
+    const visitorId = ctx.req.cookies.parac_uid;
 
     if (userExists) {
       throw new Error('Sorry, this user already exists, please try again.');

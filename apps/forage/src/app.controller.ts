@@ -83,12 +83,14 @@ export class AppController {
 
   @Post('/tracker')
   async tracker(
-    @Body() { visitorId, deviceId, affiliateId, marketingSource }: TrackerDto,
+    @Body() { deviceId, affiliateId, marketingSource }: TrackerDto,
     @IpAddress() ipAddress: string,
     @Res()
     res: Response,
     @Req() req: Request,
   ) {
+    const visitorId = req.cookies.parac_uid;
+
     const visit = await this.visitService.recordVisit({
       visitorId,
       deviceId,
