@@ -10,6 +10,7 @@ import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './jwt.strategy';
+import { SlackService } from '../slack.service';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { JwtStrategy } from './jwt.strategy';
     EmailService,
     JwtStrategy,
     RecurlyService,
+    SlackService,
   ],
 })
 export class AuthModule {}

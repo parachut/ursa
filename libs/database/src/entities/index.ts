@@ -1,5 +1,6 @@
 export * from './address.entity';
 export * from './affiliate-link.entity';
+export * from './affiliate-stats.view';
 export * from './visit.entity';
 export * from './billing-info.entity';
 export * from './bin-free-node.entity';

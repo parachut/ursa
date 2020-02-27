@@ -27,9 +27,9 @@ export class Visit extends Model<Visit> {
   @Column(DataType.UUID)
   readonly id!: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column
-  deviceId!: string;
+  deviceId?: string;
 
   @Field()
   @Column(DataType.CIDR)
@@ -61,6 +61,10 @@ export class Visit extends Model<Visit> {
   @Field()
   @Column
   source?: string;
+
+  @Field()
+  @Column
+  program?: string;
 
   @BelongsTo(() => User)
   user?: User;

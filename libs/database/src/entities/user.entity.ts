@@ -44,6 +44,7 @@ import { createRecurlyUser } from '../utils/create-recurly-user';
 import { createFrontContact } from '../utils/create-front-contact';
 import checkClearbit from '../utils/check-clearbit';
 import { UserFunds } from './user-funds.view';
+import { AffiliateStats } from './affiliate-stats.view';
 
 @ObjectType()
 @Table({
@@ -215,6 +216,9 @@ export class User extends Model<User> {
   @HasOne(() => UserFunds, 'userId')
   funds?: UserFunds;
 
+  @HasOne(() => AffiliateStats, 'userId')
+  affiliateStats?: AffiliateStats;
+
   @HasMany(() => UserTermAgreement, 'userId')
   termAgreements?: UserTermAgreement[];
 
@@ -255,15 +259,13 @@ export class User extends Model<User> {
   static async updateAuthy(instance: User) {
     if (instance.changed('phone')) {
       const newAuthy = await createAuthyUser(instance);
-      await Promise.all([
-        instance.sequelize.models.UserIntegration.destroy({
-          where: {
-            userId: instance.id,
-            type: 'AUTHY',
-          },
-        }),
-        instance.$create('integrations', newAuthy),
-      ]);
+      await instance.sequelize.models.UserIntegration.destroy({
+        where: {
+          userId: instance.id,
+          type: 'AUTHY',
+        },
+      });
+      await instance.$create('integrations', newAuthy);
     }
   }
 }

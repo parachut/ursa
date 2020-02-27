@@ -70,6 +70,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/easypost/tsconfig.lib.json"
       }
+    },
+    "affiliate": {
+      "type": "application",
+      "root": "apps/affiliate",
+      "entryFile": "main",
+      "sourceRoot": "apps/affiliate/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/affiliate/tsconfig.app.json"
+      }
     }
   }
 }

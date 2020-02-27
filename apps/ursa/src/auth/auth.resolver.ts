@@ -1,20 +1,18 @@
-import { User, Visit } from '@app/database/entities';
 import { UserRole } from '@app/database/enums';
 import { Logger } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 
 import { Context as ContextInterface } from '../context.interface';
-import { CurrentUser } from '../current-user.decorator';
 import { EmailService } from '../email.service';
-import { IpAddress } from '../ip-address.decorator';
 import { Phone } from '../phone.decorator';
+import { SlackService } from '../slack.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { AuthenticateInput } from './dto/authenticate.input';
+import { RegisterAffiliateInput } from './dto/register-affiliate.input';
 import { RegisterInput } from './dto/register.input';
 import { Token } from './dto/token.type';
-import { VisitCreateInput } from './dto/visit-create.input';
 
 @Resolver(of => Token)
 export class AuthResolver {
@@ -25,6 +23,7 @@ export class AuthResolver {
     private readonly emailService: EmailService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly slackService: SlackService,
   ) {}
 
   @Mutation(returns => Token)
@@ -53,6 +52,47 @@ export class AuthResolver {
         };
       }
     }
+  }
+
+  @Mutation(returns => Token)
+  async registerAffiliate(
+    @Phone()
+    phone: string,
+    @Args('input')
+    input: RegisterAffiliateInput,
+    @Context() ctx: ContextInterface,
+  ): Promise<Token> {
+    const userExists = await this.authService.checkUserExists(
+      phone,
+      input.email,
+    );
+
+    if (!userExists) {
+      await this.userService.createUser(
+        {
+          email: input.email,
+          phone,
+          name: input.first + input.last,
+          site: input.website,
+          location: input.location,
+          businessName: input.businessName,
+        },
+        [UserRole.MEMBER],
+      );
+    }
+
+    await this.emailService.send({
+      to: input.email,
+      from: 'support@parachut.co',
+      id: 16463454,
+      data: input,
+    });
+
+    await this.slackService.affiliateMessage(input);
+
+    return {
+      token: null,
+    };
   }
 
   @Mutation(returns => Token)

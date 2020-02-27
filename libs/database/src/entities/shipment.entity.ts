@@ -297,7 +297,7 @@ export class Shipment extends Model<Shipment> {
       const parcel = new easyPost.Parcel({
         height: instance.height,
         length: instance.length,
-        weight: 1,
+        weight: 2,
         width: instance.width,
       });
 
@@ -317,7 +317,6 @@ export class Shipment extends Model<Shipment> {
             ? address.easyPostId
             : warehouse.easyPostId,
         options: {
-          delivery_confirmation: 'ADULT_SIGNATURE',
           label_size: '4X6',
           address_validation_level: 0,
         },
@@ -327,6 +326,13 @@ export class Shipment extends Model<Shipment> {
             ? warehouse.easyPostId
             : address.easyPostId,
       };
+
+      if (
+        !instance.shipKitId ||
+        instance.direction === ShipmentDirection.INBOUND
+      ) {
+        shipment.options.delivery_confirmation = 'ADULT_SIGNATURE';
+      }
 
       const easyPostShipment = new easyPost.Shipment(shipment);
 
