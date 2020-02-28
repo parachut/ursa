@@ -4819,6 +4819,15 @@
     }],
     "segments": [],
     "actions": [{
+      "name": "500px",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/500px",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
       "name": "Insert Product",
       "type": "global",
       "baseUrl": null,
@@ -4848,10 +4857,55 @@
         "widget": null
       }]
     }, {
-      "name": "Insert Values",
+      "name": "adorama",
       "type": "global",
       "baseUrl": null,
-      "endpoint": "/forest/actions/insert-values",
+      "endpoint": "/forest/actions/adorama",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
+      "name": "bh",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/bh",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
+      "name": "ebay",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/ebay",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
+      "name": "flickr",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/flickr",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
+      "name": "keh",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/keh",
+      "httpMethod": "POST",
+      "redirect": null,
+      "download": false,
+      "fields": []
+    }, {
+      "name": "migrator",
+      "type": "global",
+      "baseUrl": null,
+      "endpoint": "/forest/actions/migrator",
       "httpMethod": "POST",
       "redirect": null,
       "download": false,
@@ -9718,9 +9772,9 @@
     "liana": "forest-express-sequelize",
     "liana_version": "5.7.0",
     "engine": "nodejs",
-    "engine_version": "13.7.0",
+    "engine_version": "12.14.1",
     "framework": "other",
     "framework_version": null,
-    "orm_version": "5.21.3"
+    "orm_version": "5.21.5"
   }
 }

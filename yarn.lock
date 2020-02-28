@@ -4393,6 +4393,14 @@ flatted@^2.0.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-2.0.1.tgz#69e57caa8f0eacbc281d2e2cb458d46fdb449e08"
   integrity sha512-a1hQMktqW9Nmqr5aktAux3JMNqaucxGcjtjWnZLHX7yyPCmlSV3M54nGYbqT8K+0GhF3NBgmJCc3ma+WOgX8Jg==
 
+flickr-sdk@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/flickr-sdk/-/flickr-sdk-3.9.0.tgz#dfa7d26f6a8f67e4c8bf2e25f86bad347d7b30e3"
+  integrity sha512-LQfDBdjiyDEP5gpnAy3/bQC6ipMm6+tr4hArCE0VzXp4LcspF6eYyyvaxvIw8LEZMdIifWPOHkPPBRcgJE7+/g==
+  dependencies:
+    superagent "^3.8.0"
+    xml2js "^0.4.17"
+
 flush-write-stream@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/flush-write-stream/-/flush-write-stream-1.1.1.tgz#8dd7d873a1babc207d94ead0c2e0e44276ebf2e8"
@@ -6570,7 +6578,6 @@ memory-fs@^0.5.0:
     readable-stream "^2.0.1"
 
 merge-deep@^3.0.1, merge-deep@^3.0.2:
-merge-deep@^3.0.1:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/merge-deep/-/merge-deep-3.0.2.tgz#f39fa100a4f1bd34ff29f7d2bf4508fbb8d83ad2"
   integrity sha512-T7qC8kg4Zoti1cFd8Cr0M+qaZfOwjlPDEdZIIPPB2JZctjaPM4fX+i7HOId69tAti2fvO6X5ldfYUONDODsrkA==
@@ -7900,6 +7907,11 @@ ramda@0.23.x:
   resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.23.0.tgz#ccd13fff73497a93974e3e86327bfd87bd6e8e2b"
   integrity sha1-zNE//3NJepOXTj6GMnv9h71ujis=
 
+random-ua@0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/random-ua/-/random-ua-0.0.6.tgz#eb70901b72a4fe0b8d3ab752a6b25122e40c0ad7"
+  integrity sha1-63CQG3Kk/guNOrdSprJRIuQMCtc=
+
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"
@@ -9079,7 +9091,7 @@ superagent@5.0.6:
     readable-stream "^3.4.0"
     semver "^6.1.1"
 
-superagent@^3.8.3:
+superagent@^3.8.0, superagent@^3.8.3:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/superagent/-/superagent-3.8.3.tgz#460ea0dbdb7d5b11bc4f78deba565f86a178e128"
   integrity sha512-GLQtLMCoEIK4eDv6OGtkOoSMt3D+oq0y3dsxMuYuDvaNUvuT8eFBuLmfR0iYYzHC1e8hpzC6ZsxbuP6DIalMFA==
@@ -9979,7 +9991,7 @@ xml-name-validator@^3.0.0:
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
   integrity sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==
 
-xml2js@^0.4.11:
+xml2js@^0.4.11, xml2js@^0.4.17:
   version "0.4.23"
   resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.23.tgz#a0c69516752421eb2ac758ee4d4ccf58843eac66"
   integrity sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==
