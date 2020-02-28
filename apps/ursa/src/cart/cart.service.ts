@@ -1,14 +1,8 @@
-import { Cart, Inventory, Shipment, User } from '@app/database/entities';
-import {
-  InventoryStatus,
-  UserStatus,
-  ShipmentDirection,
-  ShipmentType,
-} from '@app/database/enums';
+import { Cart, Inventory, User } from '@app/database/entities';
+import { InventoryStatus, UserStatus } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
-import { Op } from 'sequelize';
 import numeral from 'numeral';
-import { last, sortBy } from 'lodash';
+import { Op } from 'sequelize';
 
 import { EmailService } from '../email.service';
 import { RecurlyService } from '../recurly.service';
@@ -38,10 +32,6 @@ export class CartService {
 
   private readonly inventoryRepository: typeof Inventory = this.sequelize.getRepository(
     'Inventory',
-  );
-
-  private readonly shipmentRepository: typeof Shipment = this.sequelize.getRepository(
-    'Shipment',
   );
 
   private readonly userRepository: typeof User = this.sequelize.getRepository(
@@ -283,23 +273,6 @@ export class CartService {
 
     if (process.env.NODE_ENV === 'production') {
       await this.slackService.cartMessage(cart, user.name);
-    }
-
-    if (user.subscription) {
-      cart.confirmedAt = new Date();
-
-      const shipment = await this.shipmentRepository.create({
-        direction: ShipmentDirection.OUTBOUND,
-        expedited: cart.service !== 'Ground',
-        type: ShipmentType.ACCESS,
-        service: cart.service,
-        cartId: cart.id,
-      });
-
-      await shipment.$set(
-        'inventory',
-        inventory.map(i => i.id),
-      );
     }
 
     await this.emailService.send({

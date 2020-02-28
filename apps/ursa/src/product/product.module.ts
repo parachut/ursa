@@ -8,7 +8,7 @@ import { ProductResolver } from './product.resolver';
 import { ProductService } from './product.service';
 
 @Module({
-  imports: [DatabaseModule, CalculatorModule],
+  imports: [CalculatorModule],
   providers: [ProductService, ProductResolver, ElasticService, CategoryService],
 })
 export class ProductModule {}

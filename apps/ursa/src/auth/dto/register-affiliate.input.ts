@@ -1,8 +1,5 @@
-import { UserRole } from '@app/database/enums/user-role.enum';
 import { IsEmail, Length } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
-
-import { MarketingSourceInput } from './marketing-source.input';
 
 @InputType()
 export class RegisterAffiliateInput {
@@ -11,7 +8,10 @@ export class RegisterAffiliateInput {
   email!: string;
 
   @Field()
-  name!: string;
+  first!: string;
+
+  @Field()
+  last!: string;
 
   @Field()
   @Length(10)
@@ -40,6 +40,9 @@ export class RegisterAffiliateInput {
 
   @Field({ nullable: true })
   purpose?: string;
+
+  @Field({ nullable: true })
+  demographic?: string;
 
   @Field({ nullable: true })
   promote?: string;

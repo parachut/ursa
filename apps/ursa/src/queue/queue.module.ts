@@ -5,7 +5,7 @@ import { QueueResolver } from './queue.resolver';
 import { QueueService } from './queue.service';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [],
   providers: [QueueService, QueueResolver],
 })
 export class QueueModule {}

@@ -37,21 +37,31 @@ export class EasyPostService {
     };
   }
 
-  async createShipment(
-    easyPostId: string,
-    inbound: boolean,
-    expedited: boolean,
-    width: string,
-    height: string,
-    length: string,
+  async createLabel({
+    easyPostId,
+    inbound,
+    expedited = false,
+    width = 12,
+    height = 12,
+    length = 12,
+    weight = 2,
     warehouseId = 'adr_19cef24ce0ec4669812440be6ce46ee5',
-  ): Promise<Partial<Shipment>> {
+  }: {
+    easyPostId: string;
+    inbound: boolean;
+    expedited?: boolean;
+    width?: number;
+    height?: number;
+    length?: number;
+    weight?: number;
+    warehouseId?: string;
+  }): Promise<Partial<Shipment>> {
     const returnable: Partial<Shipment> = {};
 
     const parcel = new this.easyPostClient.Parcel({
       height,
       length,
-      weight: 1,
+      weight,
       width,
     });
 

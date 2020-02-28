@@ -1,4 +1,5 @@
 import {
+  AffiliateStats,
   BillingInfo,
   Inventory,
   User,
@@ -71,6 +72,11 @@ export class UserResolver {
   @ResolveProperty(type => UserFunds)
   async funds(@Parent() user: User): Promise<UserFunds> {
     return user.$get('funds');
+  }
+
+  @ResolveProperty(type => AffiliateStats)
+  async affiliateStats(@Parent() user: User): Promise<AffiliateStats> {
+    return user.$get('affiliateStats');
   }
 
   @ResolveProperty(type => SubscriptionInfo, { nullable: true })

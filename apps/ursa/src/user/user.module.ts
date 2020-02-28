@@ -6,7 +6,7 @@ import { UserService } from './user.service';
 import { RecurlyService } from '../recurly.service';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [],
   providers: [UserResolver, UserService, RecurlyService],
 })
 export class UserModule {}

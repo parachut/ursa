@@ -11,4 +11,7 @@ export class ShipmentCreateInput {
 
   @Field(type => ShipmentDirection)
   direction?: ShipmentDirection;
+
+  @Field(type => Boolean)
+  expedited?: boolean;
 }

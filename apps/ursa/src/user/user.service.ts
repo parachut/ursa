@@ -3,11 +3,13 @@ import {
   User,
   UserMarketingSource,
   UserTermAgreement,
+  Visit,
 } from '@app/database/entities';
 import { UserRole } from '@app/database/enums';
 import { Inject, Injectable } from '@nestjs/common';
 import { RecurlyService } from '../recurly.service';
 import short from 'short-uuid';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UserService {
@@ -24,6 +26,10 @@ export class UserService {
 
   private readonly userMarketingSourceRepository: typeof UserMarketingSource = this.sequelize.getRepository(
     'UserMarketingSource',
+  );
+
+  private readonly visitRepository: typeof Visit = this.sequelize.getRepository(
+    'Visit',
   );
 
   private readonly translator = short();
