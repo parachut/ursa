@@ -1,9 +1,13 @@
-import { ShipKit, User } from '@app/database/entities';
+import { Address, ShipKit, User } from '@app/database/entities';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class ShipKitService {
   private readonly logger = new Logger(ShipKitService.name);
+
+  private readonly addressRepository: typeof Address = this.sequelize.getRepository(
+    'Address',
+  );
 
   private readonly shipKitRepository: typeof ShipKit = this.sequelize.getRepository(
     'ShipKit',
@@ -93,6 +97,21 @@ export class ShipKitService {
 
     if (!shipKit) {
       throw new NotFoundException(userId);
+    }
+
+    if (!shipKit.addressId) {
+      const address = await this.addressRepository.findOne({
+        where: {
+          userId,
+        },
+        order: [['createdAt', 'DESC']],
+      });
+
+      if (!address) {
+        throw new Error('Unable to find address for shipkit');
+      }
+
+      shipKit.addressId = address.id;
     }
 
     shipKit.completedAt = new Date();

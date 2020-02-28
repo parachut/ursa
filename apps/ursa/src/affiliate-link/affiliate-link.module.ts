@@ -4,7 +4,7 @@ import { AffiliateLinkService } from './affiliate-link.service';
 import { AffiliateLinkResolver } from './affiliate-link.resolver';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [],
   providers: [AffiliateLinkService, AffiliateLinkResolver],
 })
 export class AffiliateLinkModule {}

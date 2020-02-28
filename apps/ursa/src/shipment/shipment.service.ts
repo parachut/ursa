@@ -1,5 +1,6 @@
-import { Inventory, Shipment, User } from '@app/database/entities';
-import { ShipmentDirection, ShipmentType } from '@app/database/enums';
+import { Address, Inventory, Shipment } from '@app/database/entities';
+import { ShipmentDirection } from '@app/database/enums';
+import { EasyPostService } from '@app/easypost';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Op } from 'sequelize';
 
@@ -17,11 +18,14 @@ export class ShipmentService {
     'Inventory',
   );
 
-  private readonly userRepository: typeof User = this.sequelize.getRepository(
-    'User',
+  private readonly addressRepository: typeof Address = this.sequelize.getRepository(
+    'Address',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
+  constructor(
+    @Inject('SEQUELIZE') private readonly sequelize,
+    private readonly easyPostService: EasyPostService,
+  ) {}
 
   async findOne(id: string, userId: string) {
     const shipment = await this.shipmentRepository.findOne({
@@ -45,13 +49,12 @@ export class ShipmentService {
   }
 
   async create(input: ShipmentCreateInput, userId: string) {
-    const user = await this.userRepository.findByPk(userId, {
-      include: ['addresses'],
+    const address = await this.addressRepository.findOne({
+      where: {
+        userId,
+      },
+      order: [['createdAt', 'DESC']],
     });
-
-    const address = user.addresses.length
-      ? user.addresses.find(address => address.primary) || user.addresses[0]
-      : null;
 
     if (!address) {
       throw new NotFoundException(userId);
@@ -61,6 +64,7 @@ export class ShipmentService {
       this.shipmentRepository.create({
         addressId: address.id,
         direction: input.direction,
+        expedited: input.expedited || false,
         type: input.type,
         userId,
       }),
@@ -76,6 +80,18 @@ export class ShipmentService {
         },
       ),
     ]);
+
+    if (!shipment.pickup) {
+      const labelInformation = await this.easyPostService.createLabel({
+        easyPostId: address.easyPostId,
+        inbound: input.direction === ShipmentDirection.INBOUND,
+        expedited: input.expedited,
+      });
+
+      Object.assign(shipment, labelInformation);
+
+      await shipment.save();
+    }
 
     await shipment.$set('inventory', input.inventoryIds);
 

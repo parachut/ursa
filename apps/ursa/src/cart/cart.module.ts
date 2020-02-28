@@ -9,7 +9,7 @@ import { CartResolver } from './cart.resolver';
 import { CartService } from './cart.service';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [],
   providers: [
     CartService,
     CartResolver,

@@ -5,4 +5,4 @@ import { EasyPostService } from './easypost.service';
   providers: [EasyPostService],
   exports: [EasyPostService],
 })
-export class EasypostModule {}
+export class EasyPostModule {}

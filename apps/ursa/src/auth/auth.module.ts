@@ -14,7 +14,6 @@ import { SlackService } from '../slack.service';
 
 @Module({
   imports: [
-    DatabaseModule,
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
