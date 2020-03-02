@@ -21,11 +21,39 @@ Liana.collection('Product', {
       ],
     },
     {
-      name: 'Insert Values',
+      name: 'bh',
+      type: 'global',
+    },
+    {
+      name: 'ebay',
+      type: 'global',
+    },
+    {
+      name: 'adorama',
+      type: 'global',
+    }
+    , {
+      name: 'keh',
       type: 'global',
     },
     {
       name: 'mpb',
+      type: 'global',
+    },
+    {
+      name: 'best',
+      type: 'global',
+    },
+    {
+      name: 'flickr',
+      type: 'global',
+    },
+    {
+      name: '500px',
+      type: 'global',
+    },
+    {
+      name: 'migrator',
       type: 'global',
     }
   ],
