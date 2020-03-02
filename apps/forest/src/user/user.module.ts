@@ -9,7 +9,6 @@ import { EmailService } from './email.service';
 
 @Module({
   imports: [
-    DatabaseModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.FOREST_AUTH_SECRET,
@@ -79,6 +78,5 @@ export class UserModule {
   //       },
   //     ],
   //   });
-
   // }
 }

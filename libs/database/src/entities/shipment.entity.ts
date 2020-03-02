@@ -226,10 +226,14 @@ export class Shipment extends Model<Shipment> {
   static async refundShipment(instance: Shipment) {
     const easyPost = new EasyPost(process.env.EASYPOST);
 
-    const easyPostShipment = await easyPost.Shipment.retrieve(
-      instance.easyPostId,
-    );
+    try {
+      const easyPostShipment = await easyPost.Shipment.retrieve(
+        instance.easyPostId,
+      );
 
-    await easyPostShipment.refund();
+      await easyPostShipment.refund();
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

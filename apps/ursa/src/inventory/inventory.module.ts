@@ -3,21 +3,11 @@ import { Module } from '@nestjs/common';
 
 import { InventoryResolver } from './inventory.resolver';
 import { InventoryService } from './inventory.service';
-import { CartService } from '../cart/cart.service';
+import { CartModule } from '../cart/cart.module';
 import { ShipmentModule } from '../shipment/shipment.module';
-import { EmailService } from '../email.service';
-import { RecurlyService } from '../recurly.service';
-import { SlackService } from '../slack.service';
 
 @Module({
-  imports: [ShipmentModule],
-  providers: [
-    InventoryService,
-    InventoryResolver,
-    CartService,
-    EmailService,
-    RecurlyService,
-    SlackService,
-  ],
+  imports: [ShipmentModule, CartModule],
+  providers: [InventoryService, InventoryResolver],
 })
 export class InventoryModule {}

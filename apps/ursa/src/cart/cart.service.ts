@@ -5,7 +5,7 @@ import numeral from 'numeral';
 import { Op } from 'sequelize';
 
 import { EmailService } from '../email.service';
-import { RecurlyService } from '../recurly.service';
+import { RecurlyService } from '@app/recurly';
 import { SlackService } from '../slack.service';
 
 const plans = {

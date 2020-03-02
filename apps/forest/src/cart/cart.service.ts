@@ -6,10 +6,11 @@ import {
 } from '@app/database/enums';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Op } from 'sequelize';
+import { EasyPostService } from '@app/easypost';
 
 @Injectable()
 export class CartService {
-  private logger = new Logger('CartService')
+  private logger = new Logger('CartService');
   private readonly cartRepository: typeof Cart = this.sequelize.getRepository(
     'Cart',
   );
@@ -22,7 +23,10 @@ export class CartService {
     'Shipment',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) { }
+  constructor(
+    @Inject('SEQUELIZE') private readonly sequelize,
+    private readonly easyPostService: EasyPostService,
+  ) {}
 
   async cancel(id: string) {
     try {
@@ -51,7 +55,10 @@ export class CartService {
       cart.canceledAt = new Date();
       return cart.save();
     } catch (e) {
-      this.logger.error(`Could not findByPk/ update inventory (cancelCart) `, e.stack)
+      this.logger.error(
+        `Could not findByPk/ update inventory (cancelCart) `,
+        e.stack,
+      );
     }
   }
 
@@ -74,6 +81,7 @@ export class CartService {
             include: ['product'],
           },
           'inventory',
+          'address',
         ],
       });
 
@@ -81,18 +89,35 @@ export class CartService {
       await cart.save();
 
       const shipment = await this.shipmentRepository.create({
+        addressId: cart.addressId,
         direction: ShipmentDirection.OUTBOUND,
         expedited: cart.service !== 'Ground',
         type: ShipmentType.ACCESS,
         cartId: id,
       });
 
+      if (!shipment.pickup) {
+        const labelInformation = await this.easyPostService.createLabel({
+          easyPostId: cart.address.easyPostId,
+          inbound: false,
+          expedited: cart.service !== 'Ground',
+          airbox: false,
+        });
+
+        Object.assign(shipment, labelInformation);
+
+        await shipment.save();
+      }
+
       return shipment.$set(
         'inventory',
         cart.inventory.map(item => item.id),
       );
     } catch (e) {
-      this.logger.error(`Could not findByPk/ create shipment (confirmCart) `, e.stack)
+      this.logger.error(
+        `Could not findByPk/ create shipment (confirmCart) `,
+        e.stack,
+      );
     }
   }
 
@@ -102,13 +127,12 @@ export class CartService {
         where:
           ids && ids.length
             ? {
-              id: { [Op.in]: ids },
-              completedAt: { [Op.not]: null },
-
-            }
+                id: { [Op.in]: ids },
+                completedAt: { [Op.not]: null },
+              }
             : {
-              completedAt: { [Op.not]: null },
-            },
+                completedAt: { [Op.not]: null },
+              },
         include: [
           {
             association: 'inventory',
@@ -128,7 +152,7 @@ export class CartService {
           },
         ],
       });
-      const report = carts.map((cart) => {
+      const report = carts.map(cart => {
         let value = cart.items.reduce(
           (r: number, i: any) => r + i.quantity * i.product.points,
           0,
@@ -151,12 +175,12 @@ export class CartService {
             ? cart.inventory.length
             : cart.items.reduce((r: number, i: any) => r + i.quantity, 0),
           createdAt: new Date(cart.createdAt).toLocaleString(),
-          member: cart.user ? cart.user.name : 'no name'
+          member: cart.user ? cart.user.name : 'no name',
         };
       });
-      return report
+      return report;
     } catch (e) {
-      this.logger.error(`Could not carts/generate report `, e.stack)
+      this.logger.error(`Could not carts/generate report `, e.stack);
     }
   }
 }

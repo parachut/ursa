@@ -16,7 +16,7 @@ import { BestBuyService } from './values/bestbuy.service';
 @Module({
   imports: [DatabaseModule],
   providers: [InsertNewProductService, BHService, InsertValueService, AdoramaService, KEHService, MPBService, DailyFlickrService, Daily500pxService, EbayService, MigratorService, AppSearchService, BestBuyService],
+
   controllers: [BPController],
 })
-export class ProductModule { }
-
+export class ProductModule {}

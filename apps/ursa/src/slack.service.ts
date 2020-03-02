@@ -90,57 +90,13 @@ export class SlackService {
           },
           {
             type: 'mrkdwn',
-            text: '*Followers:*\n ' + (input.followers || ''),
-          },
-          {
-            type: 'mrkdwn',
             text: '*Business Name:*\n ' + (input.businessName || ''),
           },
           {
             type: 'mrkdwn',
             text: '*Website:*\n ' + (input.website || ''),
           },
-          {
-            type: 'mrkdwn',
-            text: '*Location:*\n ' + (input.location || ''),
-          },
-          {
-            type: 'mrkdwn',
-            text: '*Traffic:*\n ' + (input.traffic || ''),
-          },
-          {
-            type: 'mrkdwn',
-            text: '*Affiliate Type:*\n ' + (input.affiliateType || ''),
-          },
         ],
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*Purpose of site:*\n ' + (input.purpose || ''),
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*Demographic:*\n ' + (input.demographic || ''),
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*Planning to promote:*\n ' + (input.promote || ''),
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*Two brands a good match:*\n ' + (input.brands || ''),
-        },
       },
     ];
 

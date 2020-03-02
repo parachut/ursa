@@ -4,8 +4,8 @@ import { ShipmentService } from './shipment.service';
 import { ShipmentController } from './shipment.controller';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [],
   controllers: [ShipmentController],
   providers: [ShipmentService],
 })
-export class ShipmentModule { }
+export class ShipmentModule {}

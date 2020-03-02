@@ -4,9 +4,8 @@ import { InventoryController } from './inventory.controller';
 import { InventoryService } from './invetory.service';
 import { CalculatorService } from '@app/calculator';
 @Module({
-  imports: [DatabaseModule],
+  imports: [],
   controllers: [InventoryController],
-  providers: [InventoryService, CalculatorService]
-  ,
+  providers: [InventoryService, CalculatorService],
 })
-export class InventoryModule { }
+export class InventoryModule {}

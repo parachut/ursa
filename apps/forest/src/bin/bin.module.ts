@@ -7,18 +7,14 @@ import { BinController } from './bin.controller';
 import { BinService } from './bin.service';
 
 @Module({
-    imports: [
-        DatabaseModule,
-        PassportModule,
-        JwtModule.register({
-            secret: process.env.FOREST_AUTH_SECRET,
-            signOptions: { expiresIn: '7d' },
-        }),
-    ],
-    controllers: [BinController],
-    providers: [BinService,
-        JwtStrategy
-    ]
-    ,
+  imports: [
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.FOREST_AUTH_SECRET,
+      signOptions: { expiresIn: '7d' },
+    }),
+  ],
+  controllers: [BinController],
+  providers: [BinService, JwtStrategy],
 })
-export class BinModule { }
+export class BinModule {}
