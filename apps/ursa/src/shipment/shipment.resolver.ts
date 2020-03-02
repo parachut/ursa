@@ -13,8 +13,6 @@ import { CurrentUser } from '../current-user.decorator';
 import { GqlAuthGuard } from '../gql-auth.guard';
 import { ShipmentCreateInput } from './dto/shipment-create.input';
 import { ShipmentService } from './shipment.service';
-import { ShipmentType } from '@app/database/enums';
-import { ShipmentTracker } from '@app/database/types/shipment-tracker.type';
 
 @Resolver(of => Shipment)
 export class ShipmentResolver {

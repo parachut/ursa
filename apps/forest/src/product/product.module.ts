@@ -4,9 +4,8 @@ import { BPService } from './insert.service';
 import { DatabaseModule } from '@app/database';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [],
   providers: [BPService],
   controllers: [BPController],
 })
-export class ProductModule { }
-
+export class ProductModule {}

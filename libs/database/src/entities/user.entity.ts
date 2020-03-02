@@ -114,6 +114,11 @@ export class User extends Model<User> {
   @Column
   points!: number;
 
+  @Field(type => Boolean)
+  @Default(false)
+  @Column
+  affiliate?: boolean;
+
   @Field(type => [UserRole])
   @Default([UserRole.MEMBER])
   @Column(

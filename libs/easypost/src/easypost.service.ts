@@ -41,6 +41,7 @@ export class EasyPostService {
     easyPostId,
     inbound,
     expedited = false,
+    airbox = false,
     width = 12,
     height = 12,
     length = 12,
@@ -50,6 +51,7 @@ export class EasyPostService {
     easyPostId: string;
     inbound: boolean;
     expedited?: boolean;
+    airbox?: boolean;
     width?: number;
     height?: number;
     length?: number;
@@ -69,13 +71,16 @@ export class EasyPostService {
       buyer_address: warehouseId,
       from_address: inbound ? easyPostId : warehouseId,
       options: {
-        delivery_confirmation: 'ADULT_SIGNATURE',
         label_size: '4X6',
         address_validation_level: 0,
       },
       parcel,
       to_address: inbound ? warehouseId : easyPostId,
     };
+
+    if (!airbox) {
+      shipment.options.delivery_confirmation = 'ADULT_SIGNATURE';
+    }
 
     const easyPostShipment = new this.easyPostClient.Shipment(shipment);
 

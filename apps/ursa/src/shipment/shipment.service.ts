@@ -1,5 +1,5 @@
 import { Address, Inventory, Shipment } from '@app/database/entities';
-import { ShipmentDirection } from '@app/database/enums';
+import { ShipmentDirection, ShipmentType } from '@app/database/enums';
 import { EasyPostService } from '@app/easypost';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Op } from 'sequelize';
@@ -60,15 +60,21 @@ export class ShipmentService {
       throw new NotFoundException(userId);
     }
 
-    const [shipment] = await Promise.all([
-      this.shipmentRepository.create({
-        addressId: address.id,
-        direction: input.direction,
-        expedited: input.expedited || false,
-        type: input.type,
-        userId,
-      }),
-      this.inventoryRepository.update(
+    const shipment = await this.shipmentRepository.create({
+      addressId: address.id,
+      direction: input.direction,
+      expedited: input.expedited || false,
+      type: input.type,
+      shipKitId: input.shipKitId,
+      cartId: input.cartId,
+      userId,
+    });
+
+    if (
+      input.direction === ShipmentDirection.INBOUND &&
+      input.type === ShipmentType.ACCESS
+    ) {
+      await this.inventoryRepository.update(
         {
           status: 'RETURNING',
         },
@@ -78,14 +84,15 @@ export class ShipmentService {
           },
           individualHooks: true,
         },
-      ),
-    ]);
+      );
+    }
 
     if (!shipment.pickup) {
       const labelInformation = await this.easyPostService.createLabel({
         easyPostId: address.easyPostId,
         inbound: input.direction === ShipmentDirection.INBOUND,
         expedited: input.expedited,
+        airbox: input.airbox,
       });
 
       Object.assign(shipment, labelInformation);
@@ -95,7 +102,10 @@ export class ShipmentService {
 
     await shipment.$set('inventory', input.inventoryIds);
 
-    return shipment;
+    /** This is due to sequelize
+     *  not returning the json fields properly.
+     *  Look for a fix later. */
+    return this.shipmentRepository.findByPk(shipment.get('id'));
   }
 
   async lastByInventory(id: string, direction: ShipmentDirection) {

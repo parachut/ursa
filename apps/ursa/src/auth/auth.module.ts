@@ -4,8 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import { EmailService } from '../email.service';
-import { RecurlyService } from '../recurly.service';
-import { UserService } from '../user/user.service';
+import { UserModule } from '../user/user.module';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
@@ -19,14 +18,13 @@ import { SlackService } from '../slack.service';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '7d' },
     }),
+    UserModule,
   ],
   providers: [
     AuthResolver,
     AuthService,
-    UserService,
     EmailService,
     JwtStrategy,
-    RecurlyService,
     SlackService,
   ],
 })

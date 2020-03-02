@@ -3,10 +3,11 @@ import { Module } from '@nestjs/common';
 
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
-import { RecurlyService } from '../recurly.service';
+import { RecurlyModule } from '@app/recurly';
 
 @Module({
-  imports: [],
-  providers: [UserResolver, UserService, RecurlyService],
+  imports: [RecurlyModule],
+  providers: [UserResolver, UserService],
+  exports: [UserService],
 })
 export class UserModule {}

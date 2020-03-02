@@ -1,5 +1,13 @@
-import { Address, ShipKit, User } from '@app/database/entities';
+import { Address, Inventory, ShipKit, User } from '@app/database/entities';
+import {
+  InventoryStatus,
+  ShipmentDirection,
+  ShipmentType,
+} from '@app/database/enums';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Op } from 'sequelize';
+
+import { ShipmentService } from '../shipment/shipment.service';
 
 @Injectable()
 export class ShipKitService {
@@ -7,6 +15,10 @@ export class ShipKitService {
 
   private readonly addressRepository: typeof Address = this.sequelize.getRepository(
     'Address',
+  );
+
+  private readonly inventoryRepository: typeof Inventory = this.sequelize.getRepository(
+    'Inventory',
   );
 
   private readonly shipKitRepository: typeof ShipKit = this.sequelize.getRepository(
@@ -17,7 +29,10 @@ export class ShipKitService {
     'User',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
+  constructor(
+    @Inject('SEQUELIZE') private readonly sequelize,
+    private readonly shipmentService: ShipmentService,
+  ) {}
 
   async findOne(userId: string) {
     const shipKit = await this.shipKitRepository.findOne({
@@ -113,6 +128,49 @@ export class ShipKitService {
 
       shipKit.addressId = address.id;
     }
+
+    const inventory = await this.inventoryRepository.findAll({
+      where: {
+        userId: userId,
+        status: InventoryStatus.NEW,
+      },
+    });
+
+    await this.shipmentService.create(
+      {
+        direction: ShipmentDirection.INBOUND,
+        type: ShipmentType.EARN,
+        expedited: false,
+        inventoryIds: inventory.map(i => i.id),
+      },
+      userId,
+    );
+
+    if (shipKit.airbox) {
+      await this.shipmentService.create(
+        {
+          direction: ShipmentDirection.INBOUND,
+          type: ShipmentType.EARN,
+          expedited: false,
+          inventoryIds: inventory.map(i => i.id),
+          airbox: true,
+          shipKitId: shipKit.id
+        },
+        userId,
+      );
+    }
+
+    await this.inventoryRepository.update(
+      {
+        status: InventoryStatus.ACCEPTED,
+      },
+      {
+        where: {
+          id: { [Op.in]: inventory.map(i => i.id) },
+        },
+        individualHooks: true,
+      },
+    );
 
     shipKit.completedAt = new Date();
 

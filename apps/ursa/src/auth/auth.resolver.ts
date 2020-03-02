@@ -76,6 +76,7 @@ export class AuthResolver {
           site: input.website,
           location: input.location,
           businessName: input.businessName,
+          affiliate: true,
         },
         [UserRole.MEMBER],
       );

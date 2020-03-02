@@ -451,6 +451,48 @@
     "segments": [],
     "actions": []
   }, {
+    "name": "AffiliateStats",
+    "nameOld": "AffiliateStats",
+    "icon": null,
+    "integration": null,
+    "isReadOnly": false,
+    "isSearchable": true,
+    "isVirtual": false,
+    "onlyForRelationships": false,
+    "paginationType": "page",
+    "fields": [{
+      "field": "user",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": "User.userId",
+      "inverseOf": null,
+      "relationship": "BelongsTo",
+      "validations": []
+    }, {
+      "field": "userId",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }],
+    "segments": [],
+    "actions": []
+  }, {
     "name": "BillingInfo",
     "nameOld": "BillingInfo",
     "icon": null,
@@ -7347,6 +7389,21 @@
       "relationship": "HasMany",
       "validations": []
     }, {
+      "field": "affiliateStats",
+      "type": "Number",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": "AffiliateStats.userId",
+      "inverseOf": null,
+      "relationship": "HasOne",
+      "validations": []
+    }, {
       "field": "avatar",
       "type": "String",
       "defaultValue": null,
@@ -9345,6 +9402,20 @@
       "validations": []
     }, {
       "field": "medium",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
+      "field": "program",
       "type": "String",
       "defaultValue": null,
       "enums": null,

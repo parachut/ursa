@@ -9,9 +9,16 @@ export class ShipmentCreateInput {
   @Field(type => ShipmentType)
   type!: ShipmentType;
 
-  @Field(type => ShipmentDirection)
+  @Field(type => ShipmentDirection, { nullable: true })
   direction?: ShipmentDirection;
 
-  @Field(type => Boolean)
+  @Field(type => Boolean, { nullable: true })
+  pickup?: boolean;
+
   expedited?: boolean;
+
+  airbox?: boolean;
+
+  shipKitId?: string;
+  cartId?: string;
 }
