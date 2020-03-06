@@ -26,6 +26,7 @@ export class InsertValueService {
       const insertNew = [];
 
       for (let i = 0; i < products.length; i++) {
+
         try {
           const searchProducts = await this.productRepository.findOne({
             where: { mfr: products[i].mfr_id ? products[i].mfr_id : products[i].matched_mfr_id }
@@ -51,7 +52,6 @@ export class InsertValueService {
                   insertNew.push(productObj);
                 }
               }
-
             }
           }
 
@@ -126,7 +126,6 @@ export class InsertValueService {
                   console.log(
                     "-----------NEW - First Time Price(Lowest) More Than once " + conditionsEnums + "----------------------"
                   );
-                  // console.log(allConditions);
                   let minExcellent = allConditions[0].price;
 
                   for (let i = 1; i < allConditions.length; i++) {
@@ -169,8 +168,6 @@ export class InsertValueService {
             console.log(
               "--------------------------------------------------"
             );
-
-            console.log(k);
             console.log("###############" + conditionsEnums + "###########");
             console.log(exists[k].source);
             const findSameIds = exists.filter(id => id.id === exists[k].id);
@@ -178,7 +175,6 @@ export class InsertValueService {
             if (findSameIds.length === 1) {
               console.log("Once");
 
-              //-------------------------EXCELLENT-------------------------------
               //new price to check
               const finOnlyExcellent = exists[k].all_prices.filter(
                 condition =>
@@ -314,8 +310,6 @@ export class InsertValueService {
                   );
 
                   if (findMinExcellentDb.length != 0) {
-
-
 
                     let minExcellentDb = parseInt(findMinExcellentDb[0].value);
 
