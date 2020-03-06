@@ -22,7 +22,6 @@ export class InsertValueService {
       'EXCELLENT', 'LIKENEW', 'NEW', 'USED'
     ]
 
-    const arrayNew = [];
     const exists = [];
     const insertNew = [];
 
@@ -39,7 +38,7 @@ export class InsertValueService {
             const productObj = { ...products[i], ...productId };
 
             if (productObj.all_prices.length != 0) {
-              arrayNew.push(productObj);
+
               const searchProducts = await this.productValueRepository.findAll({
                 where: { productId: productObj.id, source: productObj.source }
               });
@@ -60,7 +59,6 @@ export class InsertValueService {
         console.log('Problem on Check', e.message);
       }
     }
-    console.log(arrayNew.length)
     console.log(exists.length);
     console.log(insertNew.length);
 
