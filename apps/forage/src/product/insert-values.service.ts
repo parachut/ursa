@@ -197,7 +197,6 @@ export class InsertValueService {
               finOnlyExcellent.length != 0 &&
               findMinExcellentDb.length != 0
             ) {
-              console.log("Price from DB - to check", parseInt(findMinExcellentDb[0].value));
               console.log("Need Price Check");
               let minExcellentNew = finOnlyExcellent[0].price;
 
