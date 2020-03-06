@@ -4899,15 +4899,6 @@
         "widget": null
       }]
     }, {
-      "name": "adorama",
-      "type": "global",
-      "baseUrl": null,
-      "endpoint": "/forest/actions/adorama",
-      "httpMethod": "POST",
-      "redirect": null,
-      "download": false,
-      "fields": []
-    }, {
       "name": "best",
       "type": "global",
       "baseUrl": null,
@@ -4921,15 +4912,6 @@
       "type": "global",
       "baseUrl": null,
       "endpoint": "/forest/actions/bh",
-      "httpMethod": "POST",
-      "redirect": null,
-      "download": false,
-      "fields": []
-    }, {
-      "name": "ebay",
-      "type": "global",
-      "baseUrl": null,
-      "endpoint": "/forest/actions/ebay",
       "httpMethod": "POST",
       "redirect": null,
       "download": false,
@@ -5200,6 +5182,48 @@
       "validations": []
     }, {
       "field": "id",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
+      "field": "kehName",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
+      "field": "mfr",
+      "type": "String",
+      "defaultValue": null,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
+      "field": "mpbName",
       "type": "String",
       "defaultValue": null,
       "enums": null,
@@ -7450,6 +7474,20 @@
       "reference": "Address.userId",
       "inverseOf": null,
       "relationship": "HasMany",
+      "validations": []
+    }, {
+      "field": "affiliate",
+      "type": "Boolean",
+      "defaultValue": false,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
       "validations": []
     }, {
       "field": "affiliateStats",

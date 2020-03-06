@@ -21,6 +21,12 @@ import { SubscriptionService } from './subscription/subscription.service';
 import { VisitService } from './visit/visit.service';
 import { IpAddress } from './ip-address.decorator';
 
+//CRAWLERS PRICES
+import { KEHService } from './product/price-crawlers/keh.service'
+import { BestBuyService } from './product/price-crawlers/bestbuy.service'
+import { MPBService } from './product/price-crawlers/mpb.service'
+import { BHService } from './product/price-crawlers/b&h.service'
+import { InsertValueService } from './product/insert-values.service'
 @Controller()
 export class AppController {
   constructor(
@@ -30,7 +36,15 @@ export class AppController {
     private readonly inventoryService: InventoryService,
     private readonly subscriptionService: SubscriptionService,
     private readonly visitService: VisitService,
-  ) {}
+
+    //CRAWLERS SERVICES
+    private readonly kehService: KEHService,
+    private readonly bhService: BHService,
+    private readonly bestbuyService: BestBuyService,
+    private readonly mpbService: MPBService,
+    private readonly insertValueService: InsertValueService,
+
+  ) { }
 
   @Post('/easypost')
   async easyPost(
@@ -104,4 +118,79 @@ export class AppController {
       id: visit.id,
     });
   }
+
+
+  @Post('/keh')
+  async pricesKEHCrawl(
+    @Res() res: Response,
+    //  @Headers('x-appengine-cron') cron: string,
+  ) {
+    // if (cron !== 'true') {
+    //   return res.status(401).end();
+    // }
+
+    const products = await this.kehService.insertValues()
+    console.log(products.length)
+
+    if (products.length != 0) {
+      await this.insertValueService.insertValues(products)
+    }
+    return res.status(HttpStatus.OK).send();
+  }
+
+  @Post('/mpb')
+  async pricesMPBCrawl(
+    @Res() res: Response,
+    //  @Headers('x-appengine-cron') cron: string,
+  ) {
+    // if (cron !== 'true') {
+    //   return res.status(401).end();
+    // }
+
+    const products = await this.mpbService.insertValues()
+    console.log(products.length)
+
+    if (products.length != 0) {
+      await this.insertValueService.insertValues(products)
+    }
+
+    return res.status(HttpStatus.OK).send();
+  }
+
+  @Post('/bh')
+  async pricesBHCrawl(
+    @Res() res: Response,
+    // @Headers('x-appengine-cron') cron: string,
+  ) {
+    // if (cron !== 'true') {
+    //   return res.status(401).end();
+    // }
+
+    const products = await this.bhService.insertValues()
+    console.log(products.length)
+    if (products.length != 0) {
+      await this.insertValueService.insertValues(products)
+    }
+
+    return res.status(HttpStatus.OK).send();
+  }
+
+  @Post('/bestbuy')
+  async pricesCrawl(
+    @Res() res: Response,
+    // @Headers('x-appengine-cron') cron: string,
+  ) {
+    // if (cron !== 'true') {
+    //   return res.status(401).end();
+    // }
+
+    const products = await this.bestbuyService.insertValues()
+
+    console.log(products.length)
+    if (products.length != 0) {
+      await this.insertValueService.insertValues(products)
+    }
+    return res.status(HttpStatus.OK).send();
+  }
+
 }
