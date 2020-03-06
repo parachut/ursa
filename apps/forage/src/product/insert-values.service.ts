@@ -19,11 +19,13 @@ export class InsertValueService {
   async insertValues(products): Promise<ProductValue[]> {
 
     const conditions = [
-      'EXCELLENT',
-      'LIKENEW', 'NEW', 'USED'
+      'EXCELLENT', 'LIKENEW', 'NEW', 'USED'
     ]
 
     const arrayNew = [];
+    const exists = [];
+    const insertNew = [];
+
     for (let i = 0; i < products.length; i++) {
       try {
         const searchProducts = await this.productRepository.findOne({
@@ -38,6 +40,17 @@ export class InsertValueService {
 
             if (productObj.all_prices.length != 0) {
               arrayNew.push(productObj);
+              const searchProducts = await this.productValueRepository.findAll({
+                where: { productId: productObj.id, source: productObj.source }
+              });
+
+              if (searchProducts != null && searchProducts.length != 0) {
+                const newArray = { prices: searchProducts };
+                const newArrayAddedPrices = { ...productObj, ...newArray };
+                exists.push(newArrayAddedPrices);
+              } else {
+                insertNew.push(productObj);
+              }
             }
 
           }
@@ -48,28 +61,6 @@ export class InsertValueService {
       }
     }
     console.log(arrayNew.length)
-
-    const exists = [];
-    const insertNew = [];
-
-    for (let i = 0; i < arrayNew.length; i++) {
-      try {
-
-        const searchProducts = await this.productValueRepository.findAll({
-          where: { productId: arrayNew[i].id, source: arrayNew[i].source }
-        });
-
-        if (searchProducts != null && searchProducts.length != 0) {
-          const newArray = { prices: searchProducts };
-          const newArrayAddedPrices = { ...arrayNew[i], ...newArray };
-          exists.push(newArrayAddedPrices);
-        } else {
-          insertNew.push(arrayNew[i]);
-        }
-      } catch (e) {
-        console.log(e.message);
-      }
-    }
     console.log(exists.length);
     console.log(insertNew.length);
 
