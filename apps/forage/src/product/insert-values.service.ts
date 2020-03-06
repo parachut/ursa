@@ -89,7 +89,7 @@ export class InsertValueService {
                 console.log(minExcellent);
 
                 console.log(
-                  Math.round(minExcellent),
+                  minExcellent,
                   insertNew[i].id,
                   findSameExcellent[0].condition,
                   insertNew[i].mfr_id,
@@ -137,7 +137,7 @@ export class InsertValueService {
                 collectInserted.push(insertNew[i].id);
 
                 console.log(
-                  Math.round(minExcellent),
+                  minExcellent,
                   insertNew[i].id,
                   allConditions[0].condition,
                   insertNew[i].mfr_id,
@@ -218,7 +218,7 @@ export class InsertValueService {
                   "---------------------------INSERT " + conditionsEnums + "-------------------------"
                 );
                 console.log(
-                  Math.round(minExcellentNew),
+                  minExcellentNew,
                   exists[k].id,
                   findMinExcellentDb[0].condition,
                   exists[k].mfr_id,
@@ -253,7 +253,7 @@ export class InsertValueService {
                   "---------------------------INSERT " + conditionsEnums + "-------------------------"
                 );
                 console.log(
-                  Math.round(minExcellentNew),
+                  minExcellentNew,
                   exists[k].id,
                   finOnlyExcellent[0].condition,
                   exists[k].mfr_id,
@@ -261,7 +261,7 @@ export class InsertValueService {
                 );
 
                 await this.productValueRepository.create({
-                  value: Math.round(minExcellentNew),
+                  value: minExcellentNew,
                   mfr: exists[k].mfr_id ? exists[k].mfr_id : exists[k].matched_mfr_id,
                   productId: exists[k].id,
                   condition: finOnlyExcellent[0].condition,
@@ -326,15 +326,13 @@ export class InsertValueService {
                   }
                   console.log(minExcellentDb);
 
-                  if (Math.round(minExcellentNew) < minExcellentDb) {
-
-
+                  if (minExcellentNew < minExcellentDb) {
 
                     console.log(
                       "---------------------------INSERT " + conditionsEnums + "-------------------------"
                     );
                     console.log(
-                      Math.round(minExcellentNew),
+                      minExcellentNew,
                       exists[k].id,
                       findMinExcellentDb[0].condition,
                       exists[k].mfr_id,
@@ -361,7 +359,7 @@ export class InsertValueService {
                     "---------------------------INSERT " + conditionsEnums + "-------------------------"
                   );
                   console.log(
-                    Math.round(minExcellentNew),
+                    minExcellentNew,
                     exists[k].id,
                     onlyExcellentArray[0].condition,
                     exists[k].mfr_id,
