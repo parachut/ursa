@@ -37,6 +37,7 @@ import { ShipKit } from './ship-kit.entity';
 import { ShipmentInventory } from './shipment-inventory.entity';
 import { User } from './user.entity';
 import { Warehouse } from './warehouse.entity';
+import { Return } from './return.entity';
 
 @ObjectType()
 @Table({
@@ -194,6 +195,13 @@ export class Shipment extends Model<Shipment> {
 
   @BelongsTo(() => Cart)
   cart?: Cart;
+
+  @ForeignKey(() => Return)
+  @Column(DataType.UUID)
+  returnId?: string;
+
+  @BelongsTo(() => Return)
+  return?: Return;
 
   @ForeignKey(() => Warehouse)
   @Column(DataType.UUID)

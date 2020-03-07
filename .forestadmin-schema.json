@@ -7389,6 +7389,20 @@
       "relationship": "HasMany",
       "validations": []
     }, {
+      "field": "affiliate",
+      "type": "Boolean",
+      "defaultValue": false,
+      "enums": null,
+      "integration": null,
+      "isFilterable": true,
+      "isReadOnly": false,
+      "isRequired": false,
+      "isSortable": true,
+      "isVirtual": false,
+      "reference": null,
+      "inverseOf": null,
+      "validations": []
+    }, {
       "field": "affiliateStats",
       "type": "Number",
       "defaultValue": null,

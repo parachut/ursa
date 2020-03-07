@@ -24,59 +24,44 @@ export class SubscriptionService {
     'CouponRedemption',
   );
 
+  private readonly filterKeys = [
+    'id',
+    'activatedAt',
+    'addOnsTotal',
+    'autoRenew',
+    'bankAccountAuthorizedAt',
+    'canceledAt',
+    'collectionMethod',
+    'currency',
+    'currentPeriodEndsAt',
+    'currentPeriodStartedAt',
+    'currentTermStartedAt',
+    'currentTermEndsAt',
+    'customerNotes',
+    'expirationReason',
+    'netTerms',
+    'object',
+    'quantity',
+    'remainingBillingCycles',
+    'remainingPauseCycles',
+    'renewalBillingCycles',
+    'state',
+    'subtotal',
+    'totalBillingCycles',
+    'unitAmount',
+    'trialEndsAt',
+    'trialStartedAt',
+    'createdAt',
+    'expiresAt',
+    'pausedAt',
+  ];
+
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
     private readonly recurlyService: RecurlyService,
   ) {}
 
-  async updateOrCreate(body: object) {
-    const bodyKeys = [
-      'newSubscriptionNotification',
-      'updatedSubscriptionNotification',
-      'canceledSubscriptionNotification',
-      'expiredSubscriptionNotification',
-      'renewedSubscriptionNotification',
-      'reactivatedAccountNotification',
-      'subscriptionPausedNotification',
-      'subscriptionResumedNotification',
-      'scheduledSubscriptionPauseNotification',
-      'subscriptionPausedModified',
-      'pausedSubscriptionRenewal',
-      'subscriptionPauseCanceled',
-    ];
-
-    const filterKeys = [
-      'id',
-      'activatedAt',
-      'addOnsTotal',
-      'autoRenew',
-      'bankAccountAuthorizedAt',
-      'canceledAt',
-      'collectionMethod',
-      'currency',
-      'currentPeriodEndsAt',
-      'currentPeriodStartedAt',
-      'currentTermStartedAt',
-      'currentTermEndsAt',
-      'customerNotes',
-      'expirationReason',
-      'netTerms',
-      'object',
-      'quantity',
-      'remainingBillingCycles',
-      'remainingPauseCycles',
-      'renewalBillingCycles',
-      'state',
-      'subtotal',
-      'totalBillingCycles',
-      'unitAmount',
-      'trialEndsAt',
-      'trialStartedAt',
-      'createdAt',
-      'expiresAt',
-      'pausedAt',
-    ];
-
+  async createOrUpdate(id: string) {
     const addOnKeys = [
       'id',
       'object',
@@ -98,18 +83,12 @@ export class SubscriptionService {
       'subscriptionId',
       'updatedAt',
     ];
-    const { subscription }: any = bodyKeys.reduce(
-      (r, i) => (!r ? body[i] : r),
-      null,
-    );
 
     try {
-      const recurlySubscription = await this.recurlyService.getSubscription(
-        subscription.uuid,
-      );
+      const recurlySubscription = await this.recurlyService.getSubscription(id);
 
       const dbSubscription: any = {
-        ...pick(recurlySubscription, filterKeys),
+        ...pick(recurlySubscription, this.filterKeys),
         userId: recurlySubscription.account.code,
         planId: recurlySubscription.plan?.id,
       };
@@ -181,6 +160,28 @@ export class SubscriptionService {
     } catch (e) {
       this.logger.error(e);
     }
+  }
+
+  async parseBody(body: object) {
+    const bodyKeys = [
+      'newSubscriptionNotification',
+      'updatedSubscriptionNotification',
+      'canceledSubscriptionNotification',
+      'expiredSubscriptionNotification',
+      'renewedSubscriptionNotification',
+      'reactivatedAccountNotification',
+      'subscriptionPausedNotification',
+      'subscriptionResumedNotification',
+      'scheduledSubscriptionPauseNotification',
+      'subscriptionPausedModified',
+      'pausedSubscriptionRenewal',
+      'subscriptionPauseCanceled',
+    ];
+
+    const { subscription }: any = bodyKeys.reduce(
+      (r, i) => (!r ? body[i] : r),
+      null,
+    );
 
     return true;
   }

@@ -29,6 +29,8 @@ export * from './product-attribute.entity';
 export * from './product-value.entity';
 export * from './product.entity';
 export * from './queue.entity';
+export * from './return.entity';
+export * from './return-inventory.entity';
 export * from './ship-kit-inventory.entity';
 export * from './ship-kit.entity';
 export * from './shipment-inspection-task.entity';

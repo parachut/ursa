@@ -1,4 +1,4 @@
-import { Cart } from '@app/database/entities';
+import { Cart, Return, ShipKit, User } from '@app/database/entities';
 import { Injectable } from '@nestjs/common';
 import {
   ChatPostMessageArguments,
@@ -6,12 +6,23 @@ import {
   WebClient,
 } from '@slack/client';
 import { RegisterAffiliateInput } from './auth/dto/register-affiliate.input';
+import numeral from 'numeral';
 
 @Injectable()
 export class SlackService {
   private readonly slackClient = new WebClient(process.env.SLACK_TOKEN);
 
-  async cartMessage(cart: Cart, name: string, error?: string) {
+  async cartMessage({
+    cart,
+    name,
+    error,
+    affiliate,
+  }: {
+    cart: Cart;
+    name: string;
+    error?: string;
+    affiliate: User;
+  }) {
     const blocks: SectionBlock[] = [
       {
         type: 'section',
@@ -45,6 +56,10 @@ export class SlackService {
           {
             type: 'mrkdwn',
             text: '*Plan:*\n' + cart.planId,
+          },
+          {
+            type: 'mrkdwn',
+            text: '*Affiliate:*\n' + (affiliate ? affiliate.name : 'None'),
           },
         ],
       },
@@ -101,6 +116,112 @@ export class SlackService {
     ];
 
     return this.sendMessage('CUDMSJ9F0', blocks);
+  }
+
+  async shipKitMessage({
+    shipKit,
+    value,
+    shipments,
+    user,
+    affiliate,
+  }: {
+    shipKit: ShipKit;
+    value: number;
+    shipments: number;
+    user: User;
+    affiliate: User;
+  }) {
+    const blocks: SectionBlock[] = [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text:
+            '*New ship kit:* ' +
+            user.name +
+            '\n<https://app.forestadmin.com/Parachut/Production/Operations/data/2309969/index/record/2309969/' +
+            shipKit.id +
+            '/summary|' +
+            shipKit.id +
+            '>',
+        },
+      },
+      {
+        type: 'section',
+        fields: [
+          {
+            type: 'mrkdwn',
+            text: '*Completed:*\n' + new Date().toLocaleString(),
+          },
+          {
+            type: 'mrkdwn',
+            text: '*Airbox:*\n' + (shipKit.airbox ? 'Yes' : 'No'),
+          },
+          {
+            type: 'mrkdwn',
+            text: '*Value:*\n' + numeral(value).format('$0,00.00'),
+          },
+          {
+            type: 'mrkdwn',
+            text: '*Shipments:*\n' + shipments,
+          },
+          {
+            type: 'mrkdwn',
+            text: '*Affiliate:*\n' + (affiliate ? affiliate.name : 'None'),
+          },
+        ],
+      },
+    ];
+
+    return this.sendMessage('CK3807X3L', blocks);
+  }
+
+  async returnMessage({
+    _return,
+    value,
+    shipments,
+    user,
+  }: {
+    _return: Return;
+    value: number;
+    shipments: number;
+    user: User;
+  }) {
+    const blocks: SectionBlock[] = [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text:
+            '*New ship kit:* ' +
+            user.name +
+            '\n<https://app.forestadmin.com/Parachut/Production/Operations/data/2309969/index/record/2309969/' +
+            _return.id +
+            '/summary|' +
+            _return.id +
+            '>',
+        },
+      },
+      {
+        type: 'section',
+        fields: [
+          {
+            type: 'mrkdwn',
+            text: '*Completed:*\n' + new Date().toLocaleString(),
+          },
+          {
+            type: 'mrkdwn',
+            text: '*Value:*\n' + numeral(value).format('$0,00.00'),
+          },
+          {
+            type: 'mrkdwn',
+            text: '*Shipments:*\n' + shipments,
+          },
+        ],
+      },
+    ];
+
+    return this.sendMessage('CK3807X3L', blocks);
   }
 
   async sendMessage(

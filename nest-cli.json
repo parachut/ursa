@@ -79,6 +79,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/affiliate/tsconfig.app.json"
       }
+    },
+    "packer": {
+      "type": "library",
+      "root": "libs/packer",
+      "entryFile": "index",
+      "sourceRoot": "libs/packer/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/packer/tsconfig.lib.json"
+      }
     }
   }
 }

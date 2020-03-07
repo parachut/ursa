@@ -1,11 +1,12 @@
 import { Cart, Inventory, User } from '@app/database/entities';
 import { InventoryStatus, UserStatus } from '@app/database/enums';
+import { RecurlyService } from '@app/recurly';
 import { Inject, Injectable } from '@nestjs/common';
+import orderBy from 'lodash/orderBy';
 import numeral from 'numeral';
 import { Op } from 'sequelize';
 
 import { EmailService } from '../email.service';
-import { RecurlyService } from '@app/recurly';
 import { SlackService } from '../slack.service';
 
 const plans = {
@@ -165,9 +166,18 @@ export class CartService {
           include: ['product'],
         },
         'subscription',
+        {
+          association: 'visits',
+          include: ['affiliate'],
+        },
       ],
       order: [['carts', 'createdAt', 'DESC']],
     });
+
+    const affiliate =
+      user.visits && user.visits.length
+        ? orderBy(user.visits, 'createdAt', 'desc')[0].affiliate
+        : null;
 
     const [cart] = user.carts;
 
@@ -250,7 +260,12 @@ export class CartService {
       }
     } catch (e) {
       if (process.env.NODE_ENV === 'production') {
-        await this.slackService.cartMessage(cart, user.name, e.message);
+        await this.slackService.cartMessage({
+          cart,
+          name: user.name,
+          affiliate,
+          error: e.message,
+        });
       }
 
       throw new Error(e.message);
@@ -272,7 +287,11 @@ export class CartService {
     );
 
     if (process.env.NODE_ENV === 'production') {
-      await this.slackService.cartMessage(cart, user.name);
+      await this.slackService.cartMessage({
+        cart,
+        name: user.name,
+        affiliate,
+      });
     }
 
     await this.emailService.send({

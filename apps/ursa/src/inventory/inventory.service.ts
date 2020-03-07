@@ -158,17 +158,14 @@ export class InventoryService {
 
         groups.push(access);
       } else {
-        if (groups.length) {
+        if (groups.length > 0) {
           last(groups).in = shipment.carrierReceivedAt;
         }
       }
 
       const final = last(groups);
 
-      if (
-        (final && (final.in || final.in === null)) ||
-        i === shipments.length - 1
-      ) {
+      if (final && i === shipments.length - 1) {
         final.days = differenceInCalendarDays(
           final.in || new Date(),
           final.out,

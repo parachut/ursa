@@ -9,6 +9,8 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { UserModule } from './user/user.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { VisitModule } from './visit/visit.module';
+import { AddOnModule } from './add-on/add-on.module';
+import { CouponModule } from './coupon/coupon.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { VisitModule } from './visit/visit.module';
     InventoryModule,
     UserModule,
     VisitModule,
+    AddOnModule,
+    CouponModule,
   ],
   controllers: [AppController],
   providers: [RecurlyService],

@@ -45,6 +45,7 @@ import { createFrontContact } from '../utils/create-front-contact';
 import checkClearbit from '../utils/check-clearbit';
 import { UserFunds } from './user-funds.view';
 import { AffiliateStats } from './affiliate-stats.view';
+import { Visit } from './visit.entity';
 
 @ObjectType()
 @Table({
@@ -217,6 +218,12 @@ export class User extends Model<User> {
 
   @HasMany(() => UserBankBalance, 'userId')
   bankBalances?: UserBankBalance[];
+
+  @HasMany(() => Visit, 'userId')
+  visits?: Visit[];
+
+  @HasMany(() => Visit, 'affiliateId')
+  affiliateVisits?: Visit[];
 
   @HasOne(() => UserFunds, 'userId')
   funds?: UserFunds;

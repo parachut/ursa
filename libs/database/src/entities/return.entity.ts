@@ -1,6 +1,4 @@
-import pMap from 'p-map';
 import {
-  AfterUpdate,
   BelongsTo,
   BelongsToMany,
   Column,
@@ -17,33 +15,24 @@ import {
 } from 'sequelize-typescript';
 import { Field, ID, ObjectType } from 'type-graphql';
 
-import { InventoryStatus } from '../enums/inventory-status.enum';
-import { ShipmentDirection } from '../enums/shipment-direction.enum';
-import { ShipmentType } from '../enums/shipment-type.enum';
 import { Address } from './address.entity';
 import { Inventory } from './inventory.entity';
-import { ShipKitInventory } from './ship-kit-inventory.entity';
+import { ReturnInventory } from './return-inventory.entity';
 import { Shipment } from './shipment.entity';
 import { User } from './user.entity';
 
 @ObjectType()
 @Table({
-  tableName: 'shipkits',
+  tableName: 'returns',
   underscored: true,
 })
-export class ShipKit extends Model<ShipKit> {
-  /**
-   * ID
-   */
+export class Return extends Model<Return> {
   @Field(type => ID)
   @PrimaryKey
-  @Default(Sequelize.literal('uuid_generate_v4()'))
+  @Default(Sequelize.fn('uuid_generate_v4'))
   @Column(DataType.UUID)
   readonly id!: string;
 
-  /**
-   * Database Fields
-   */
   @Field({ nullable: true })
   @Column
   completedAt?: Date;
@@ -51,11 +40,6 @@ export class ShipKit extends Model<ShipKit> {
   @Field({ nullable: true })
   @Column
   confirmedAt?: Date;
-
-  @Field()
-  @Default(true)
-  @Column
-  airbox!: boolean;
 
   /**
    * Database Relationships
@@ -74,12 +58,12 @@ export class ShipKit extends Model<ShipKit> {
   @Column(DataType.UUID)
   addressId?: string;
 
-  @HasMany(() => Shipment, 'shipKitId')
+  @HasMany(() => Shipment, 'returnId')
   shipments: Shipment[];
 
   @BelongsToMany(
     () => Inventory,
-    () => ShipKitInventory,
+    () => ReturnInventory,
   )
   inventory: Inventory[];
 

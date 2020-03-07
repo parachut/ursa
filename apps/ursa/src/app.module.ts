@@ -17,6 +17,7 @@ import { QueueModule } from './queue/queue.module';
 import { ShipKitModule } from './ship-kit/ship-kit.module';
 import { ShipmentModule } from './shipment/shipment.module';
 import { UserModule } from './user/user.module';
+import { ReturnModule } from './return/return.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { UserModule } from './user/user.module';
       autoSchemaFile: true,
       context: ({ req }) => ({ req }),
     }),
+    ReturnModule,
   ],
   controllers: [],
   providers: [],

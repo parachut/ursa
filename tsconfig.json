@@ -37,6 +37,12 @@
       ],
       "@app/easypost/*": [
         "libs/easypost/src/*"
+      ],
+      "@app/packer": [
+        "libs/packer/src"
+      ],
+      "@app/packer/*": [
+        "libs/packer/src/*"
       ]
     }
   },
