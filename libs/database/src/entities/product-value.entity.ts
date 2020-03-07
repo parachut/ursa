@@ -59,4 +59,16 @@ export class ProductValue extends Model<ProductValue> {
   @Field(() => Date)
   @UpdatedAt
   updatedAt!: Date;
+
+  @Field()
+  @Column
+  mfr!: string;
+
+  @Field()
+  @Column
+  kehName!: string;
+
+  @Field()
+  @Column
+  mpbName!: string;
 }

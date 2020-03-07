@@ -20,13 +20,5 @@ Liana.collection('Product', {
         },
       ],
     },
-    {
-      name: 'Insert Values',
-      type: 'global',
-    },
-    {
-      name: 'mpb',
-      type: 'global',
-    }
   ],
 });

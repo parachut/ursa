@@ -2,3 +2,19 @@ cron:
   - description: 'hourly commission'
     url: /forage/hourly-commission
     schedule: every 1 hours
+
+    - description: 'best buy'
+    url: /forest/bestbuy
+    schedule: every 24 hours
+
+    - description: 'bh'
+    url: /forest/bh
+    schedule: every 24 hours
+
+    - description: 'mpb'
+    url: /forest/mpb
+    schedule: every 24 hours
+
+    - description: 'keh'
+    url: /forest/keh
+    schedule: every 24 hours

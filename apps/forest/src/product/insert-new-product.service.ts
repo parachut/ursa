@@ -12,7 +12,7 @@ import request from 'request';
 import { Storage } from '@google-cloud/storage';
 
 @Injectable()
-export class BPService {
+export class InsertNewProductService {
   private logger = new Logger('BPService');
 
   private readonly productRepository: typeof Product = this.sequelize.getRepository(
@@ -31,7 +31,7 @@ export class BPService {
     'ProductAttributeValue',
   );
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) {}
+  constructor(@Inject('SEQUELIZE') private readonly sequelize) { }
 
   async insertItem(bhUrl, bhPrice): Promise<Product[]> {
     //////////////---------------------------------------------------- INSERT PICTURE TO GCP------------------------------------
@@ -69,7 +69,8 @@ export class BPService {
         });
         req.on('error', err => console.error(err));
       } catch (e) {
-        this.logger.error(`Picture Was Not Inserted`, e.stack);
+        console.log(e)
+        //  this.logger.error(`Picture Was Not Inserted`, e.stack);
       }
     }
 
@@ -101,34 +102,34 @@ export class BPService {
             .text();
           const name = cameraString
             ? cameraString
-                .replace(' Body', '')
-                .replace(' (Body Only, ', ' (')
-                .replace(', Body Only), ', ')')
-                .replace(' (Body Only)', '')
-                .replace(' DSLR', '')
-                .replace(' SLR', '')
-                .replace(' Camera', '')
-                .replace(' Digital', '')
-                .replace(' Mirrorless', '')
-                .replace(' Rangefinder', '')
-                .replace(' Micro Four Thirds', '')
-                .replace(' Format', '')
-                .replace(' Medium', '')
-                .replace(' Point-and-Shoot', '')
-                .replace(' (Camera Body)', '')
-                .replace(' Lens', '')
-                .replace('FUJIFILM', 'Fujifilm')
-                .trim()
+              .replace(' Body', '')
+              .replace(' (Body Only, ', ' (')
+              .replace(', Body Only), ', ')')
+              .replace(' (Body Only)', '')
+              .replace(' DSLR', '')
+              .replace(' SLR', '')
+              .replace(' Camera', '')
+              .replace(' Digital', '')
+              .replace(' Mirrorless', '')
+              .replace(' Rangefinder', '')
+              .replace(' Micro Four Thirds', '')
+              .replace(' Format', '')
+              .replace(' Medium', '')
+              .replace(' Point-and-Shoot', '')
+              .replace(' (Camera Body)', '')
+              .replace(' Lens', '')
+              .replace('FUJIFILM', 'Fujifilm')
+              .trim()
             : '';
 
           const slug = cameraString
             ? name
-                .toLocaleLowerCase()
-                .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
-                .replace(/\ -/g, '')
-                .replace(/\ /g, '-')
-                .replace(/\---/g, '-')
-                .replace(/\--/g, '-')
+              .toLocaleLowerCase()
+              .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
+              .replace(/\ -/g, '')
+              .replace(/\ /g, '-')
+              .replace(/\---/g, '-')
+              .replace(/\--/g, '-')
             : '';
 
           //CAMERA PRICE/POINTS
@@ -137,8 +138,8 @@ export class BPService {
             .text();
           const points = cameraPriceSearch
             ? Math.ceil(
-                parseInt(cameraPriceSearch.replace('$', '').replace(',', '')),
-              )
+              parseInt(cameraPriceSearch.replace('$', '').replace(',', '')),
+            )
             : 0;
 
           //IMG SRC
@@ -165,28 +166,28 @@ export class BPService {
           const brand = brandSrcString
             ? brandSrcString.replace('FUJIFILM', 'Fujifilm')
             : brandSrcString1
-            ? brandSrcString1
+              ? brandSrcString1
                 .replace(' <!-- -->', '')
                 .replace('<!-- --> ', '')
                 .replace('FUJIFILM', 'Fujifilm')
-            : '';
+              : '';
           const brandSlug = brandSrcString
             ? brand
-                .toLocaleLowerCase()
-                .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
-                .replace(/\ -/g, '')
-                .replace(/\ /g, '-')
-                .replace(/\---/g, '-')
-                .replace(/\--/g, '-')
+              .toLocaleLowerCase()
+              .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
+              .replace(/\ -/g, '')
+              .replace(/\ /g, '-')
+              .replace(/\---/g, '-')
+              .replace(/\--/g, '-')
             : brandSrcString1
-            ? brand
+              ? brand
                 .toLocaleLowerCase()
                 .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
                 .replace(/\ -/g, '')
                 .replace(/\ /g, '-')
                 .replace(/\---/g, '-')
                 .replace(/\--/g, '-')
-            : '';
+              : '';
 
           //CATEGORY
           const categoryString = $('a[class^="linkCrumb_"]')
@@ -195,12 +196,12 @@ export class BPService {
           const category = categoryString ? categoryString : '';
           const categorySlug = categoryString
             ? category
-                .toLowerCase()
-                .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
-                .replace(/\ -/g, '')
-                .replace(/\ /g, '-')
-                .replace(/\--/g, '-')
-                .replace(/\---/g, '-')
+              .toLowerCase()
+              .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
+              .replace(/\ -/g, '')
+              .replace(/\ /g, '-')
+              .replace(/\--/g, '-')
+              .replace(/\---/g, '-')
             : '';
 
           //CATEGORY PARENT
@@ -212,12 +213,12 @@ export class BPService {
             : '';
           const categoryParentSlug = categoryParent
             ? categoryParent
-                .toLowerCase()
-                .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
-                .replace(/\ -/g, '')
-                .replace(/\ /g, '-')
-                .replace(/\--/g, '-')
-                .replace(/\---/g, '-')
+              .toLowerCase()
+              .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
+              .replace(/\ -/g, '')
+              .replace(/\ /g, '-')
+              .replace(/\--/g, '-')
+              .replace(/\---/g, '-')
             : '';
 
           //CATEGORY GRANDPARENT
@@ -229,12 +230,12 @@ export class BPService {
             : '';
           const categoryGrandParentSlug = categoryGrandParentString
             ? categoryGrandParent
-                .toLowerCase()
-                .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
-                .replace(/\ -/g, '')
-                .replace(/\ /g, '-')
-                .replace(/\--/g, '-')
-                .replace(/\---/g, '-')
+              .toLowerCase()
+              .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
+              .replace(/\ -/g, '')
+              .replace(/\ /g, '-')
+              .replace(/\--/g, '-')
+              .replace(/\---/g, '-')
             : '';
 
           //MFR
@@ -248,7 +249,7 @@ export class BPService {
 
           //KEY FEATURES
           const featureSearch = $('li[class^="listItem"]')
-            .map(function() {
+            .map(function () {
               return $(this).text();
             })
             .get();
@@ -256,7 +257,7 @@ export class BPService {
 
           //IN THE BOX
           const inTheBoxSearch = $('*[class^="list_2Pr"] li')
-            .map(function() {
+            .map(function () {
               return $(this).text();
             })
             .get();
@@ -283,8 +284,10 @@ export class BPService {
               inTheBox,
               features,
               images,
+              imagesHtml,
               createdAt,
               updatedAt,
+              url: url,
             },
             brand_info: {
               createdAt,
@@ -303,8 +306,8 @@ export class BPService {
               categoryGrandParent,
               categoryGrandParentSlug,
             },
-            imagesHtml,
-            url: url,
+
+
           };
         });
       } catch (e) {
@@ -315,7 +318,7 @@ export class BPService {
         dataSpecs = await page.evaluate(() => {
           //SPECS LABLES
           const lablesSearch = $('td[class^="label_"]')
-            .map(function() {
+            .map(function () {
               return $(this).text();
             })
             .get();
@@ -327,7 +330,7 @@ export class BPService {
           }
           //SPECS VALUES
           const valuesSearch = $('td[class^="value_"] span')
-            .map(function() {
+            .map(function () {
               return $(this)
                 .html()
                 .replace(/\<br\>/g, '\n')
@@ -762,8 +765,8 @@ export class BPService {
                 data.general.images = 'none';
               } else {
                 const fileName = uuidv1() + '.jpg';
-                data.general.images = [fileName];
-                //  await saveToStorage(data.general.images, data.imageId);
+                data.general.images = fileName;
+                await saveToStorage(data.general.imagesHtml, data.general.images);
               }
               if (data.general.points === 0) {
                 data.general.points = bhPrice;
@@ -779,7 +782,7 @@ export class BPService {
               try {
                 const brand = newItem.brand_info;
                 let brandId;
-                console.log(brand);
+
                 brandId = await this.brandRepository.findOne({
                   where: { slug: brand.brandSlug },
                 });
@@ -804,7 +807,7 @@ export class BPService {
                 categoryId = await this.categoryRepository.findOne({
                   where: { slug: category.categorySlug },
                 });
-                if (categoryId.id === undefined) {
+                if (categoryId === null) {
                   const parentCategoryId = await this.categoryRepository.findOne(
                     {
                       where: { slug: category.categoryParentSlug },
@@ -814,7 +817,7 @@ export class BPService {
                     .create({
                       name: category.category,
                       slug: category.categorySlug,
-                      parentId: category.id,
+                      parentId: parentCategoryId.id,
                       createdAt: category.createdAt,
                       updatedAt: category.updatedAt,
                     })
@@ -830,7 +833,8 @@ export class BPService {
                 console.log(categoryId.id);
 
                 const product = newItem.general;
-                const specifications = newItem.specs;
+                const specifications = newItem.specs.specifications;
+
                 await this.productRepository
                   .create({
                     slug: product.slug,
@@ -846,15 +850,15 @@ export class BPService {
                     updatedAt: product.updatedAt,
                     brandId: brandId.id,
                     categoryId: categoryId.id,
-                    images: product.imageId,
+                    images: [product.images],
                     points: product.points,
                   })
                   .then(async newRecord => {
                     if (specifications.length != 0) {
                       try {
                         for (const specification of specifications) {
-                          let specNameId;
-                          specNameId = await this.productAttributeRepository.findOne(
+
+                          let specNameId = await this.productAttributeRepository.findOne(
                             {
                               where: { name: specification.name },
                             },
@@ -864,8 +868,6 @@ export class BPService {
                             await this.productAttributeRepository
                               .create({
                                 name: specification.name,
-                                createdAt: specification.createdAt,
-                                updatedAt: specification.updatedAt,
                               })
                               .then(async specName => {
                                 console.log(
@@ -884,8 +886,6 @@ export class BPService {
                               value: specification.value,
                               productAttributeId: specNameId.id,
                               productId: newRecord.id,
-                              createdAt: specification.createdAt,
-                              updatedAt: specification.updatedAt,
                             })
                             .then(async specValue => {
                               console.log(

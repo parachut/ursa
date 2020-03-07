@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 
 import { ShipmentModule } from './shipment/shipment.module';
+import { ProductModule } from './product/product.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { UserModule } from './user/user.module';
@@ -23,6 +24,7 @@ import { CouponModule } from './coupon/coupon.module';
     VisitModule,
     AddOnModule,
     CouponModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [RecurlyService],
