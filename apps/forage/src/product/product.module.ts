@@ -7,10 +7,10 @@ import { MPBService } from './price-crawlers/mpb.service';
 import { BHService } from './price-crawlers/b&h.service';
 import { InsertValueService } from './insert-values.service';
 import { SearchService } from './app-search.service';
-
+import { Daily500pxService } from './social-crawlers/500px.service';
 @Module({
   imports: [DatabaseModule],
-  providers: [KEHService, BestBuyService, MPBService, BHService, InsertValueService, SearchService],
-  exports: [KEHService, BHService, MPBService, BestBuyService, InsertValueService],
+  providers: [KEHService, BestBuyService, MPBService, BHService, InsertValueService, SearchService, Daily500pxService],
+  exports: [KEHService, BHService, MPBService, BestBuyService, InsertValueService, Daily500pxService],
 })
 export class ProductModule { }
