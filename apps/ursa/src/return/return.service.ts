@@ -8,9 +8,9 @@ import { PackerService } from '@app/packer';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Op } from 'sequelize';
 
-import { EmailService } from '../email.service';
+import { EmailService } from '@app/email';
 import { ShipmentService } from '../shipment/shipment.service';
-import { SlackService } from '../slack.service';
+import { SlackService } from '@app/slack';
 
 @Injectable()
 export class ReturnService {
@@ -97,7 +97,7 @@ export class ReturnService {
     });
   }
 
-  async complete(inventoryIds: string[], userId: string) {
+  async complete(inventoryIds: string[], reason: string, userId: string) {
     let address;
 
     const _return = await this.returnRepository.findOne({

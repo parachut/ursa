@@ -6,8 +6,8 @@ import orderBy from 'lodash/orderBy';
 import numeral from 'numeral';
 import { Op } from 'sequelize';
 
-import { EmailService } from '../email.service';
-import { SlackService } from '../slack.service';
+import { EmailService } from '@app/email';
+import { SlackService } from '@app/slack';
 
 const plans = {
   '1500': 149,

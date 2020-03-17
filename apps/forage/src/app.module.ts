@@ -12,6 +12,7 @@ import { InventoryModule } from './inventory/inventory.module';
 import { VisitModule } from './visit/visit.module';
 import { AddOnModule } from './add-on/add-on.module';
 import { CouponModule } from './coupon/coupon.module';
+import { ReturnModule } from './return/return.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CouponModule } from './coupon/coupon.module';
     AddOnModule,
     CouponModule,
     ProductModule,
+    ReturnModule,
   ],
   controllers: [AppController],
   providers: [RecurlyService],

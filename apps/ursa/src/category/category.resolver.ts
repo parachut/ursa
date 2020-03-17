@@ -21,8 +21,8 @@ export class CategoryResolver {
     return this.categoryService.findOne(id);
   }
 
-  @Query(type => Category)
-  async categories(@Args('id') id: string): Promise<Category[]> {
+  @Query(type => [Category])
+  async categories(): Promise<Category[]> {
     return this.categoryService.find();
   }
 

@@ -1,6 +1,6 @@
-import { Product } from '@app/database/entities';
+import { Product, ProductView } from '@app/database/entities';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Op } from 'sequelize';
+import { Op, fn, col } from 'sequelize';
 
 import { ElasticService } from '../elastic.service';
 import { ProductFilterInput } from './dto/product-filter.input';
@@ -19,12 +19,17 @@ export class ProductService {
   private readonly productRepository: typeof Product = this.sequelize.getRepository(
     'Product',
   );
+
+  private readonly productViewRepository: typeof ProductView = this.sequelize.getRepository(
+    'ProductView',
+  );
+
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
     private readonly elasticService: ElasticService,
   ) {}
 
-  async findOne(slug: string) {
+  async findOne(slug: string, userId: string, ipAddress: string) {
     const product = await this.productRepository.findOne({
       where: {
         slug,
@@ -33,6 +38,16 @@ export class ProductService {
 
     if (!product) {
       throw new NotFoundException(slug);
+    }
+
+    try {
+      await this.productViewRepository.create({
+        ipAddress,
+        productId: product.id,
+        userId: userId || null,
+      });
+    } catch (e) {
+      // do nothing;
     }
 
     return product;
@@ -62,5 +77,43 @@ export class ProductService {
       total: body.hits.total.value,
       hasMore: body.hits.total.value < from + size,
     };
+  }
+
+  async estimatedEarnings(product: Product) {
+    if (
+      product.estimatedEarnings &&
+      product.estimatedEarnings.length &&
+      !isNaN(product.estimatedEarnings[0])
+    ) {
+      return product.estimatedEarnings;
+    }
+
+    const [minMax] = (await this.productRepository.findAll({
+      attributes: [
+        [fn('max', col('demand')), 'max'],
+        [fn('min', col('demand')), 'min'],
+      ],
+    })) as any;
+
+    let normalizedDemand =
+      (product.demand - minMax.get('min')) /
+      (minMax.get('max') - minMax.get('min'));
+
+    if (normalizedDemand > 0.8) {
+      normalizedDemand = 0.8;
+    }
+
+    const twelve = Array.from(Array(12).keys());
+    const demandCurve = twelve.map(() => {
+      return (Math.min(Math.random() + normalizedDemand, 1) * 100) / 100;
+    });
+
+    const max = Math.max(...demandCurve);
+    const min = Math.min(...demandCurve);
+
+    product.estimatedEarnings = demandCurve.map(d => (d - min) / (max - min));
+    await product.save();
+
+    return demandCurve;
   }
 }

@@ -2,21 +2,15 @@ import { DatabaseModule } from '@app/database';
 import { Module } from '@nestjs/common';
 
 import { CartItemService } from '../cart-item/cart-item.service';
-import { EmailService } from '../email.service';
+import { EmailModule } from '@app/email';
 import { RecurlyModule } from '@app/recurly';
-import { SlackService } from '../slack.service';
+import { SlackModule } from '@app/slack';
 import { CartResolver } from './cart.resolver';
 import { CartService } from './cart.service';
 
 @Module({
-  imports: [RecurlyModule],
-  providers: [
-    CartService,
-    CartResolver,
-    CartItemService,
-    EmailService,
-    SlackService,
-  ],
+  imports: [RecurlyModule, SlackModule, EmailModule],
+  providers: [CartService, CartResolver, CartItemService],
   exports: [CartService],
 })
 export class CartModule {}

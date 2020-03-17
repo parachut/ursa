@@ -10,9 +10,9 @@ import { unit } from 'mathjs';
 import { Op } from 'sequelize';
 import orderBy from 'lodash/orderBy';
 
-import { EmailService } from '../email.service';
+import { EmailService } from '@app/email';
 import { ShipmentService } from '../shipment/shipment.service';
-import { SlackService } from '../slack.service';
+import { SlackService } from '@app/slack';
 
 @Injectable()
 export class ShipKitService {

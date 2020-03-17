@@ -88,6 +88,42 @@
       "compilerOptions": {
         "tsConfigPath": "libs/packer/tsconfig.lib.json"
       }
+    },
+    "email": {
+      "type": "library",
+      "root": "libs/email",
+      "entryFile": "index",
+      "sourceRoot": "libs/email/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/email/tsconfig.lib.json"
+      }
+    },
+    "slack": {
+      "type": "library",
+      "root": "libs/slack",
+      "entryFile": "index",
+      "sourceRoot": "libs/slack/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/slack/tsconfig.lib.json"
+      }
+    },
+    "twilio": {
+      "type": "library",
+      "root": "libs/twilio",
+      "entryFile": "index",
+      "sourceRoot": "libs/twilio/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/twilio/tsconfig.lib.json"
+      }
+    },
+    "growl": {
+      "type": "application",
+      "root": "apps/growl",
+      "entryFile": "main",
+      "sourceRoot": "apps/growl/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/growl/tsconfig.app.json"
+      }
     }
   }
 }

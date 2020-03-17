@@ -43,6 +43,24 @@
       ],
       "@app/packer/*": [
         "libs/packer/src/*"
+      ],
+      "@app/email": [
+        "libs/email/src"
+      ],
+      "@app/email/*": [
+        "libs/email/src/*"
+      ],
+      "@app/slack": [
+        "libs/slack/src"
+      ],
+      "@app/slack/*": [
+        "libs/slack/src/*"
+      ],
+      "@app/twilio": [
+        "libs/twilio/src"
+      ],
+      "@app/twilio/*": [
+        "libs/twilio/src/*"
       ]
     }
   },

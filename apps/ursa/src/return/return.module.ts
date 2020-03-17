@@ -1,15 +1,14 @@
 import { PackerModule } from '@app/packer';
 import { Module } from '@nestjs/common';
 
-import { EmailService } from '../email.service';
+import { EmailModule } from '@app/email';
 import { ShipmentModule } from '../shipment/shipment.module';
-import { SlackService } from '../slack.service';
+import { SlackModule } from '@app/slack';
 import { ReturnService } from './return.service';
-import { ReturnResolver } from './return.resolver';
 
 @Module({
-  imports: [ShipmentModule, PackerModule],
-  providers: [ReturnService, ReturnResolver, EmailService, SlackService],
+  imports: [ShipmentModule, PackerModule, SlackModule, EmailModule],
+  providers: [ReturnService],
   exports: [ReturnService],
 })
 export class ReturnModule {}

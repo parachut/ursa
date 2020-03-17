@@ -1,18 +1,20 @@
+import { UserToken } from '@app/database/entities';
 import { UserRole } from '@app/database/enums';
 import { Logger } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 
 import { Context as ContextInterface } from '../context.interface';
-import { EmailService } from '../email.service';
+import { EmailService } from '@app/email';
 import { Phone } from '../phone.decorator';
-import { SlackService } from '../slack.service';
+import { SlackService } from '@app/slack';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { AuthenticateInput } from './dto/authenticate.input';
 import { RegisterAffiliateInput } from './dto/register-affiliate.input';
 import { RegisterInput } from './dto/register.input';
 import { Token } from './dto/token.type';
+import { IpAddress } from '../ip-address.decorator';
 
 @Resolver(of => Token)
 export class AuthResolver {
@@ -54,6 +56,15 @@ export class AuthResolver {
     }
   }
 
+  @Mutation(returns => UserToken)
+  async growl(
+    @Args('input') { identifier }: AuthenticateInput,
+    @IpAddress() ipAddress: string,
+    @Context() ctx: ContextInterface,
+  ): Promise<UserToken> {
+    return this.authService.growl(identifier, ipAddress, ctx.req);
+  }
+
   @Mutation(returns => Token)
   async registerAffiliate(
     @Phone()
@@ -74,7 +85,6 @@ export class AuthResolver {
           phone,
           name: input.first + input.last,
           site: input.website,
-          location: input.location,
           businessName: input.businessName,
           affiliate: true,
         },

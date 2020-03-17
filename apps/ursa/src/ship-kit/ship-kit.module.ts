@@ -4,12 +4,12 @@ import { PackerModule } from '@app/packer';
 import { ShipKitResolver } from './ship-kit.resolver';
 import { ShipKitService } from './ship-kit.service';
 import { ShipmentModule } from '../shipment/shipment.module';
-import { EmailService } from '../email.service';
-import { SlackService } from '../slack.service';
+import { EmailModule } from '@app/email';
+import { SlackModule } from '@app/slack';
 
 @Module({
-  imports: [ShipmentModule, PackerModule],
-  providers: [ShipKitService, ShipKitResolver, EmailService, SlackService],
+  imports: [ShipmentModule, PackerModule, EmailModule, SlackModule],
+  providers: [ShipKitService, ShipKitResolver],
   exports: [ShipKitService],
 })
 export class ShipKitModule {}

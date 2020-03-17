@@ -5,8 +5,17 @@ import {
   SectionBlock,
   WebClient,
 } from '@slack/client';
-import { RegisterAffiliateInput } from './auth/dto/register-affiliate.input';
 import numeral from 'numeral';
+
+interface AffiliateInput {
+  email: string;
+  first: string;
+  last: string;
+  phone: string;
+  instagram?: string;
+  businessName?: string;
+  website?: string;
+}
 
 @Injectable()
 export class SlackService {
@@ -75,7 +84,7 @@ export class SlackService {
     return this.sendMessage('CGX5HELCT', blocks);
   }
 
-  async affiliateMessage(input: RegisterAffiliateInput) {
+  async affiliateMessage(input: AffiliateInput) {
     const blocks: SectionBlock[] = [
       {
         type: 'section',
