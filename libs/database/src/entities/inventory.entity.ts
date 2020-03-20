@@ -312,8 +312,6 @@ export class Inventory extends Model<Inventory> {
               ).toString('base64'),
           },
         });
-
-        console.log(res);
       } else {
         if (
           !instance.changed('markedForReturn') &&

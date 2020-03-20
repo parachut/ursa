@@ -20,6 +20,8 @@
     "test:e2e": "jest --config ./apps/ursa/test/jest-e2e.json"
   },
   "dependencies": {
+    "3d-bin-packing": "^1.1.3",
+    "@axelspringer/graphql-google-pubsub": "^2.1.0",
     "@easypost/api": "^3.8.0",
     "@elastic/app-search-node": "^7.6.0",
     "@elastic/elasticsearch": "^7.5.1",
@@ -66,10 +68,13 @@
     "express": "^4.17.1",
     "express-xml-bodyparser": "^0.3.0",
     "fetch": "^1.1.0",
+    "firebase-admin": "^8.9.2",
     "flickr-sdk": "^3.9.0",
     "forest-express-sequelize": "^5.7.0",
     "graphql": "^14.6.0",
+    "graphql-subscriptions": "^1.1.0",
     "lodash": "^4.17.15",
+    "mathjs": "^6.6.1",
     "node-fetch": "^2.6.0",
     "numeral": "^2.0.6",
     "p-map": "^3.0.0",
@@ -86,6 +91,7 @@
     "puppeteer-extra-plugin-recaptcha": "^3.1.10",
     "puppeteer-extra-plugin-stealth": "^2.4.9",
     "random-ua": "0.0.6",
+    "random-words": "^1.1.0",
     "rebrandly": "^2.0.1",
     "recurly": "^3.3.1",
     "reflect-metadata": "^0.1.13",
@@ -96,6 +102,7 @@
     "sequelize": "^5.21.3",
     "sequelize-typescript": "^1.1.0",
     "short-uuid": "^3.1.1",
+    "twilio": "^3.40.0",
     "type-graphql": "^0.17.6",
     "validatorjs": "^3.18.1"
   },
@@ -105,6 +112,7 @@
     "@nestjs/testing": "^6.10.14",
     "@types/express": "^4.17.2",
     "@types/jest": "25.1.1",
+    "@types/mathjs": "^6.0.4",
     "@types/node": "^13.1.6",
     "@types/passport-local": "^1.0.33",
     "@types/puppeteer": "^2.0.0",
@@ -153,7 +161,15 @@
       "@app/recurly/(.*)": "<rootDir>/libs/recurly/src/$1",
       "@app/recurly": "<rootDir>/libs/recurly/src",
       "@app/easypost/(.*)": "<rootDir>/libs/easypost/src/$1",
-      "@app/easypost": "<rootDir>/libs/easypost/src"
+      "@app/easypost": "<rootDir>/libs/easypost/src",
+      "@app/packer/(.*)": "<rootDir>/libs/packer/src/$1",
+      "@app/packer": "<rootDir>/libs/packer/src",
+      "@app/email/(.*)": "<rootDir>/libs/email/src/$1",
+      "@app/email": "<rootDir>/libs/email/src",
+      "@app/slack/(.*)": "<rootDir>/libs/slack/src/$1",
+      "@app/slack": "<rootDir>/libs/slack/src",
+      "@app/twilio/(.*)": "<rootDir>/libs/twilio/src/$1",
+      "@app/twilio": "<rootDir>/libs/twilio/src"
     }
   }
 }

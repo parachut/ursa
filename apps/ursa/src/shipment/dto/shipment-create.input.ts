@@ -16,9 +16,12 @@ export class ShipmentCreateInput {
   pickup?: boolean;
 
   expedited?: boolean;
-
   airbox?: boolean;
-
   shipKitId?: string;
+  returnId?: string;
   cartId?: string;
+
+  width?: number;
+  height?: number;
+  length?: number;
 }

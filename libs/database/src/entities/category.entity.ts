@@ -53,13 +53,13 @@ export class Category extends Model<Category> {
   @Column(DataType.ARRAY(DataType.STRING(1024)))
   includedEssentials?: string[];
 
-  @Field(type => Category, { nullable: true })
   @BelongsTo(() => Category)
   parent?: Category;
 
+  @Field(type => String, { nullable: true })
   @ForeignKey(() => Category)
   @Column(DataType.UUID)
-  parentId!: string;
+  parentId?: string;
 
   @HasMany(() => Category, 'parentId')
   children!: Category[];

@@ -4,10 +4,15 @@ import {
   ShipmentDirection,
   ShipmentType,
 } from '@app/database/enums';
+import { PackerService } from '@app/packer';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { unit } from 'mathjs';
 import { Op } from 'sequelize';
+import orderBy from 'lodash/orderBy';
 
+import { EmailService } from '@app/email';
 import { ShipmentService } from '../shipment/shipment.service';
+import { SlackService } from '@app/slack';
 
 @Injectable()
 export class ShipKitService {
@@ -32,6 +37,9 @@ export class ShipKitService {
   constructor(
     @Inject('SEQUELIZE') private readonly sequelize,
     private readonly shipmentService: ShipmentService,
+    private readonly emailService: EmailService,
+    private readonly packerService: PackerService,
+    private readonly slackService: SlackService,
   ) {}
 
   async findOne(userId: string) {
@@ -106,16 +114,33 @@ export class ShipKitService {
   }
 
   async complete(userId: string) {
+    let address;
+
     const shipKit = await this.shipKitRepository.findOne({
       where: { userId, completedAt: null },
+      include: ['user', 'address'],
     });
+
+    const user = await this.userRepository.findByPk(userId, {
+      include: [
+        {
+          association: 'visits',
+          include: ['affiliate'],
+        },
+      ],
+    });
+
+    const affiliate =
+      user.visits && user.visits.length
+        ? orderBy(user.visits, 'createdAt', 'desc')[0].affiliate
+        : null;
 
     if (!shipKit) {
       throw new NotFoundException(userId);
     }
 
     if (!shipKit.addressId) {
-      const address = await this.addressRepository.findOne({
+      address = await this.addressRepository.findOne({
         where: {
           userId,
         },
@@ -134,30 +159,71 @@ export class ShipKitService {
         userId: userId,
         status: InventoryStatus.NEW,
       },
+      include: ['product'],
     });
 
-    await this.shipmentService.create(
-      {
-        direction: ShipmentDirection.INBOUND,
-        type: ShipmentType.EARN,
-        expedited: false,
-        inventoryIds: inventory.map(i => i.id),
-      },
-      userId,
-    );
+    const bins = await this.packerService.pack(inventory);
 
-    if (shipKit.airbox) {
-      await this.shipmentService.create(
+    for (const bin of bins) {
+      const outbound = await this.shipmentService.create(
         {
           direction: ShipmentDirection.INBOUND,
           type: ShipmentType.EARN,
           expedited: false,
-          inventoryIds: inventory.map(i => i.id),
-          airbox: true,
-          shipKitId: shipKit.id
+          inventoryIds: bin.items.map(i => i.name),
+          width: bin.width,
+          height: bin.height,
+          length: bin.depth,
         },
         userId,
       );
+
+      if (shipKit.airbox) {
+        await this.shipmentService.create(
+          {
+            direction: ShipmentDirection.OUTBOUND,
+            type: ShipmentType.EARN,
+            expedited: false,
+            inventoryIds: bin.items.map(i => i.name),
+            airbox: true,
+            shipKitId: shipKit.id,
+            width: bin.width,
+            height: bin.height,
+            length: bin.depth,
+          },
+          userId,
+        );
+
+        await this.emailService.send({
+          to: shipKit.user.email,
+          from: 'support@parachut.co',
+          id: 13493488,
+          data: {
+            name: shipKit.user.parsedName.first,
+            formattedAddress: address
+              ? address.formattedAddress
+              : shipKit.address.formattedAddress,
+            trackerUrl: outbound.tracker.publicUrl,
+            chutItems: bin.items.map(i => ({
+              name: inventory.find(ii => ii.id === i.name).product.name,
+            })),
+          },
+        });
+      } else {
+        await this.emailService.send({
+          to: shipKit.user.email,
+          from: 'support@parachut.co',
+          id: 13394094,
+          data: {
+            name: shipKit.user.parsedName.first,
+            labelUrl: outbound.postage.labelUrl,
+            trackerUrl: outbound.tracker.publicUrl,
+            chutItems: bin.items.map(i => ({
+              name: inventory.find(ii => ii.id === i.name).product.name,
+            })),
+          },
+        });
+      }
     }
 
     await this.inventoryRepository.update(
@@ -170,6 +236,19 @@ export class ShipKitService {
         },
         individualHooks: true,
       },
+    );
+
+    await this.slackService.shipKitMessage({
+      shipKit,
+      affiliate,
+      user,
+      shipments: bins.length,
+      value: inventory.reduce((r, i) => r + i.product.points, 0),
+    });
+
+    await shipKit.$set(
+      'inventory',
+      inventory.map(i => i.id),
     );
 
     shipKit.completedAt = new Date();

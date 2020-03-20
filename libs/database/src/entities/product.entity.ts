@@ -72,6 +72,10 @@ export class Product extends Model<Product> {
   @Column(DataType.ARRAY(DataType.STRING(1024)))
   inTheBox?: string[];
 
+  @Default([])
+  @Column(DataType.ARRAY(DataType.FLOAT))
+  estimatedEarnings?: number[];
+
   @Default(new Date())
   @Column
   lastInventoryCreated!: Date;

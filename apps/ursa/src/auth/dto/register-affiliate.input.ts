@@ -21,32 +21,8 @@ export class RegisterAffiliateInput {
   instagram?: string;
 
   @Field({ nullable: true })
-  followers?: string;
-
-  @Field({ nullable: true })
   businessName?: string;
 
   @Field({ nullable: true })
   website?: string;
-
-  @Field({ nullable: true })
-  location?: string;
-
-  @Field({ nullable: true })
-  traffic?: string;
-
-  @Field({ nullable: true })
-  affiliateType?: string;
-
-  @Field({ nullable: true })
-  purpose?: string;
-
-  @Field({ nullable: true })
-  demographic?: string;
-
-  @Field({ nullable: true })
-  promote?: string;
-
-  @Field({ nullable: true })
-  brands?: string;
 }

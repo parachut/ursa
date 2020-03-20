@@ -3,13 +3,14 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { EmailService } from '../email.service';
+import { EmailModule } from '@app/email';
 import { UserModule } from '../user/user.module';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './jwt.strategy';
-import { SlackService } from '../slack.service';
+import { SlackModule } from '@app/slack';
+import { TwilioModule } from '@app/twilio';
 
 @Module({
   imports: [
@@ -19,13 +20,10 @@ import { SlackService } from '../slack.service';
       signOptions: { expiresIn: '7d' },
     }),
     UserModule,
+    SlackModule,
+    EmailModule,
+    TwilioModule,
   ],
-  providers: [
-    AuthResolver,
-    AuthService,
-    EmailService,
-    JwtStrategy,
-    SlackService,
-  ],
+  providers: [AuthResolver, AuthService, JwtStrategy],
 })
 export class AuthModule {}

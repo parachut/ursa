@@ -1,0 +1,24 @@
+runtime: nodejs12
+service: growl
+instance_class: F1
+
+env_variables:
+  NODE_ENV: production
+  POSTGRES_HOST: 10.114.81.10
+  USERNAME: RW3VLJQf6M6iCzDCRHP32dwLnFqAGQu8
+  PASSWORD: cVm86FmuBoBheq74frqBM3hkZxRJVZo4
+entrypoint: node dist/apps/growl/apps/growl/src/main.js
+
+vpc_access_connector:
+  name: 'projects/parachut-216816/locations/us-central1/connectors/stateless-vpc'
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
+    redirect_http_response_code: 301
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  min_instances: 1
+  max_instances: 4

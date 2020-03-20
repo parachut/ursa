@@ -66,8 +66,12 @@ export class ShipmentService {
       expedited: input.expedited || false,
       type: input.type,
       shipKitId: input.shipKitId,
+      returnId: input.returnId,
       cartId: input.cartId,
       userId,
+      width: input.width,
+      height: input.height,
+      length: input.length,
     });
 
     if (
@@ -93,6 +97,9 @@ export class ShipmentService {
         inbound: input.direction === ShipmentDirection.INBOUND,
         expedited: input.expedited,
         airbox: input.airbox,
+        width: shipment.width,
+        length: shipment.length,
+        height: shipment.height,
       });
 
       Object.assign(shipment, labelInformation);

@@ -13,7 +13,9 @@ import { CategoryModule } from './category/category.module';
 import { DepositModule } from './deposit/deposit.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { ProductModule } from './product/product.module';
+import { pubSubProvider } from './pubsub.provider';
 import { QueueModule } from './queue/queue.module';
+import { ReturnModule } from './return/return.module';
 import { ShipKitModule } from './ship-kit/ship-kit.module';
 import { ShipmentModule } from './shipment/shipment.module';
 import { UserModule } from './user/user.module';
@@ -37,12 +39,14 @@ import { UserModule } from './user/user.module';
     RecurlyModule,
     AffiliateLinkModule,
     GraphQLModule.forRoot({
-      installSubscriptionHandlers: false,
+      installSubscriptionHandlers: true,
       autoSchemaFile: true,
-      context: ({ req }) => ({ req }),
+      context: ({ req, connection }) =>
+        connection ? { req: connection.context } : { req },
     }),
+    ReturnModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [pubSubProvider],
 })
 export class AppModule {}

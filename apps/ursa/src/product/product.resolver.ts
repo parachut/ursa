@@ -1,5 +1,5 @@
 import { CalculatorService } from '@app/calculator';
-import { Brand, Category, Product } from '@app/database/entities';
+import { Brand, Category, Product, User } from '@app/database/entities';
 import { Logger } from '@nestjs/common';
 import {
   Args,
@@ -11,10 +11,12 @@ import {
 import { Float, Int } from 'type-graphql';
 
 import { CategoryService } from '../category/category.service';
+import { CurrentUser } from '../current-user.decorator';
 import { ProductFilterInput } from './dto/product-filter.input';
 import { ProductSort } from './dto/product-sort.enum';
 import { ProductsResponse } from './dto/products-response.type';
 import { ProductService } from './product.service';
+import { IpAddress } from '../ip-address.decorator';
 
 @Resolver(of => Product)
 export class ProductResolver {
@@ -27,8 +29,12 @@ export class ProductResolver {
   ) {}
 
   @Query(type => Product)
-  async product(@Args('slug') slug: string): Promise<Product> {
-    return this.productService.findOne(slug);
+  async product(
+    @Args('slug') slug: string,
+    @CurrentUser() user: User,
+    @IpAddress() ipAddress: string,
+  ): Promise<Product> {
+    return this.productService.findOne(slug, user?.id, ipAddress);
   }
 
   @Query(returns => ProductsResponse)
@@ -84,5 +90,10 @@ export class ProductResolver {
   @ResolveProperty(type => Int)
   async total(@Parent() product: Product): Promise<number> {
     return product.$count('inventory');
+  }
+
+  @ResolveProperty(type => [Number])
+  async estimatedEarnings(@Parent() product: Product): Promise<number[]> {
+    return this.productService.estimatedEarnings(product);
   }
 }

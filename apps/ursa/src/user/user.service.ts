@@ -59,6 +59,8 @@ export class UserService {
 
     const user = await this.userRepository.create({
       ...input,
+      email: input.email?.trim(),
+      phone: input.phone?.trim(),
       roles: filteredRoles,
       marketingSources: [marketingSource],
     });

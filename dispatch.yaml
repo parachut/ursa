@@ -5,5 +5,7 @@ dispatch:
     service: forest
   - url: '*/forage*'
     service: forage
+  - url: '*/growl*'
+    service: growl
   - url: 'a.parachut.co/*'
     service: affiliate

@@ -9,7 +9,6 @@ import Recurly from 'recurly';
 @Injectable()
 export class RecurlyService {
   private readonly logger = new Logger(RecurlyService.name);
-
   private readonly recurlyClient = new Recurly.Client(process.env.RECURLY);
 
   findRecurlyIntegration(user: User): string {
@@ -160,7 +159,13 @@ export class RecurlyService {
     return this.recurlyClient.getInvoice('number-' + invoiceNumber);
   }
 
-  async getSubscription(subscriptionId: string) {
-    return this.recurlyClient.getSubscription('uuid-' + subscriptionId);
+  async getSubscription(subscriptionId: string, uuid = false) {
+    return this.recurlyClient.getSubscription(
+      (uuid ? 'uuid-' : '') + subscriptionId,
+    );
+  }
+
+  async getCoupon(couponId: string, uuid = false) {
+    return this.recurlyClient.getCoupon((uuid ? 'uuid-' : '') + couponId);
   }
 }
