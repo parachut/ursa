@@ -165,13 +165,14 @@ export class ShipKitService {
     const bins = await this.packerService.pack(inventory);
 
     for (const bin of bins) {
-      const outbound = await this.shipmentService.create(
+      const inbound = await this.shipmentService.create(
         {
           direction: ShipmentDirection.INBOUND,
           type: ShipmentType.EARN,
           expedited: false,
           inventoryIds: bin.items.map(i => i.name),
           width: bin.width,
+          shipKitId: shipKit.id,
           height: bin.height,
           length: bin.depth,
         },
@@ -179,7 +180,7 @@ export class ShipKitService {
       );
 
       if (shipKit.airbox) {
-        await this.shipmentService.create(
+        const outbound = await this.shipmentService.create(
           {
             direction: ShipmentDirection.OUTBOUND,
             type: ShipmentType.EARN,
@@ -216,8 +217,8 @@ export class ShipKitService {
           id: 13394094,
           data: {
             name: shipKit.user.parsedName.first,
-            labelUrl: outbound.postage.labelUrl,
-            trackerUrl: outbound.tracker.publicUrl,
+            labelUrl: inbound.postage.labelUrl,
+            trackerUrl: inbound.tracker.publicUrl,
             chutItems: bin.items.map(i => ({
               name: inventory.find(ii => ii.id === i.name).product.name,
             })),

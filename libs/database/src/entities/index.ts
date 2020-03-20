@@ -26,6 +26,7 @@ export * from './plan-add-on.entity';
 export * from './plan.entity';
 export * from './product-attribute-value.entity';
 export * from './product-attribute.entity';
+export * from './product-popularity.entity';
 export * from './product-value.entity';
 export * from './product-view.entity';
 export * from './product.entity';

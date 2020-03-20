@@ -80,6 +80,7 @@ export class EasyPostService {
 
     if (!airbox) {
       shipment.options.delivery_confirmation = 'ADULT_SIGNATURE';
+      shipment.carrier_accounts = ['ca_bd2f1d92ae7b45c79a92a1ae82f67327'];
     }
 
     const easyPostShipment = new this.easyPostClient.Shipment(shipment);
