@@ -31,4 +31,4 @@ import { ReturnModule } from './return/return.module';
   controllers: [AppController],
   providers: [RecurlyService],
 })
-export class AppModule {}
+export class AppModule { }

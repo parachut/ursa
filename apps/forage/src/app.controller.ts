@@ -27,6 +27,7 @@ import { BestBuyService } from './product/price-crawlers/bestbuy.service'
 import { MPBService } from './product/price-crawlers/mpb.service'
 import { BHService } from './product/price-crawlers/b&h.service'
 import { InsertValueService } from './product/insert-values.service'
+import { Daily500pxService } from './product//social-crawlers/500px.service';
 @Controller()
 export class AppController {
   constructor(
@@ -43,6 +44,8 @@ export class AppController {
     private readonly bestbuyService: BestBuyService,
     private readonly mpbService: MPBService,
     private readonly insertValueService: InsertValueService,
+    private readonly social500pxService: Daily500pxService,
+
 
   ) { }
 
@@ -190,6 +193,21 @@ export class AppController {
     if (products.length != 0) {
       await this.insertValueService.insertValues(products)
     }
+    return res.status(HttpStatus.OK).send();
+  }
+
+  @Post('/500px')
+  async social50pxCrawl(
+    @Res() res: Response,
+    // @Headers('x-appengine-cron') cron: string,
+  ) {
+    // if (cron !== 'true') {
+    //   return res.status(401).end();
+    // }
+
+    const products = await this.social500pxService.daily500px()
+
+
     return res.status(HttpStatus.OK).send();
   }
 

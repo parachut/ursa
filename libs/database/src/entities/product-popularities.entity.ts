@@ -14,23 +14,19 @@ import {
 import { Field, ID, ObjectType } from 'type-graphql';
 
 import { Product } from './product.entity';
-import { InventoryCondition } from '../enums/inventory-condition.enum';
+
 
 @ObjectType()
 @Table({
-  tableName: 'product_values',
+  tableName: 'product_popularities',
   underscored: true,
 })
-export class ProductValue extends Model<ProductValue> {
+export class ProductPopularity extends Model<ProductPopularity> {
   @Field(type => ID)
   @PrimaryKey
   @Default(Sequelize.fn('uuid_generate_v4'))
   @Column(DataType.UUID)
   readonly id!: string;
-
-  @Field()
-  @Column
-  value!: string;
 
   @BelongsTo(() => Product)
   product: Product;
@@ -39,18 +35,29 @@ export class ProductValue extends Model<ProductValue> {
   @Column(DataType.UUID)
   productId!: string;
 
-  @Field(type => InventoryCondition)
-  @Default(InventoryCondition.NEW)
-  @Column(
-    DataType.ENUM({
-      values: Object.values(InventoryCondition),
-    }),
-  )
-  condition!: InventoryCondition;
+  @Field()
+  @Column
+  popularity!: number;
 
   @Field()
   @Column
-  source!: string;
+  views!: number;
+
+  @Field()
+  @Column
+  count!: number;
+
+  @Field()
+  @Column
+  comments!: number;
+
+  @Field()
+  @Column
+  likes!: number;
+
+  @Field()
+  @Column
+  ratings!: number;
 
   @Field(() => Date)
   @CreatedAt
@@ -62,22 +69,26 @@ export class ProductValue extends Model<ProductValue> {
 
   @Field()
   @Column
-  mfr!: string;
+  minLikes!: number;
 
   @Field()
   @Column
-  kehName!: string;
-
-
-  @Field()
-  @Column
-  lensAuthName!: string;
+  maxLikes!: number;
 
   @Field()
   @Column
-  photoProName!: string;
+  minViews!: number;
 
   @Field()
   @Column
-  mpbName!: string;
+  maxViews!: number;
+
+  @Field()
+  @Column
+  minComments!: number;
+
+  @Field()
+  @Column
+  maxComments!: number;
+
 }
