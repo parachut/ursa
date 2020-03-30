@@ -2,19 +2,21 @@ require('dotenv').config();
 import { Injectable, Inject, Logger, } from '@nestjs/common';
 import { get, pick } from 'lodash';
 import { fetchUrl } from 'fetch'
-//import { BigQuery } from "@google-cloud/bigquery";
-
+import { BigQuery } from "@google-cloud/bigquery";
+import { Client } from '@elastic/elasticsearch'
 
 @Injectable()
 export class Daily500pxService {
   private logger = new Logger('Daily500pxService')
 
-  constructor(@Inject('SEQUELIZE') private readonly sequelize) { }
-
   async daily500px() {
-    // const bigQueryClient = new BigQuery();
-    // const datasetId = "crawler_500px_flickr";
-    // const tableId = "500px_daily";
+    const elasti = new Client({
+      node:
+        "https://elastic:acNbgQRsl0OUznitAboYVss6@cb0a068fb8d64b3294ede898764e8f96.us-central1.gcp.cloud.es.io:9243"
+    });
+    const bigQueryClient = new BigQuery();
+    const datasetId = "crawler_500px_flickr";
+    const tableId = "500px_daily";
     const BigQueryKeys = [
       'id',
       'last_crawl',
@@ -46,7 +48,6 @@ export class Daily500pxService {
       'camera_name'
     ];
 
-
     try {
       let i = 1
       let totalPageNumbers
@@ -61,6 +62,7 @@ export class Daily500pxService {
             totalPageNumbers = pageFresh.total_pages
 
             console.log(totalPageNumbers);
+            //pageFresh.photos.length
             for (let i = 0; i < 2; i++) {
 
               if (pageFresh.photos[i].camera != null) {
@@ -77,10 +79,6 @@ export class Daily500pxService {
                             const page = JSON.parse(body.toString('utf-8'))
                             const _id = pageFresh.photos[i].id.toString()
                             const getID = get(page.photos, `${_id}`)
-                            // console.log(getID)
-
-                            //  getID;
-
 
                             const newPicture = {
                               id: parseFloat(getID.id),
@@ -108,24 +106,156 @@ export class Daily500pxService {
                               tags: getID.tags,
                               rating: getID.rating,
                               feature: getID.feature,
-                              lens_name: "",
+                              lens_name: null,
                               _namefound: true,
-                              camera_name: ""
+                              camera_name: null
                             }
                             console.log(newPicture)
 
                             try {
-                              const bigQueryFlickr: any = {
-                                ...pick(newPicture, BigQueryKeys)
-                              };
 
-                              // await bigQueryClient
-                              //   .dataset(datasetId)
-                              //   .table(tableId)
-                              //   .insert([
-                              //     bigQueryFlickr
-                              //   ]);
-                              console.log("Post Inserted");
+                              let cameraBody;
+                              if (newPicture.camera != null) {
+                                try {
+                                  const { body } = await elasti.search({
+                                    index: "products_crawl",
+                                    body: {
+                                      query: {
+                                        bool: {
+                                          must: {
+                                            term: {
+                                              camera: true
+                                            }
+                                          },
+                                          should: [
+                                            {
+                                              match: {
+                                                aliases: {
+                                                  query: newPicture.camera.replace("CORPORATION", "").toLowerCase(),
+                                                  operator: "or",
+                                                  boost: 10
+                                                }
+                                              }
+                                            },
+                                            {
+                                              match: {
+                                                name: {
+                                                  query: newPicture.camera.replace("CORPORATION", "").toLowerCase(),
+                                                  operator: 'or',
+                                                  analyzer: 'standard',
+                                                },
+                                              },
+                                            },
+                                            {
+                                              match: {
+                                                name: {
+                                                  query: newPicture.camera.replace("CORPORATION", "").toLowerCase(),
+                                                  operator: 'and',
+                                                  boost: 3,
+                                                },
+                                              },
+                                            },
+                                          ],
+                                        },
+                                      },
+                                    }
+                                  });
+                                  cameraBody = body;
+                                  console.log("CAMERA  ->", body.hits.hits[0]._source.name)
+                                  console.log(body.hits.hits[0]._score)
+                                  if (body.hits.hits[0]._score > 46) {
+                                    if (body.hits.hits[0]._source.name.includes("Kit") === false) {
+                                      newPicture.camera_name = body.hits.hits[0]._source.name
+                                      newPicture.camera_name = newPicture.camera_name
+                                    }
+                                  }
+                                } catch (e) { console.log(e.message) }
+                              }
+                              if (newPicture.lens != null) {
+                                try {
+                                  let name = newPicture.lens.toLowerCase()
+
+                                  if (typeof cameraBody !== "undefined") {
+                                    const brand = cameraBody.hits.hits[0]
+                                      ? cameraBody.hits.hits[0]._source.brand.name
+                                      : null;
+
+                                    if (brand && name.search(brand.toLowerCase()) === -1) {
+                                      name = cameraBody.hits.hits[0]._source.brand.name + " " + name;
+                                    }
+                                  }
+                                  name = name.replace(/[^0-9](?=[0-9])/g, '$& ')
+                                  console.log(name)
+                                  const { body } = await elasti.search({
+                                    index: "products_crawl",
+                                    body: {
+                                      query: {
+                                        bool: {
+                                          must: {
+                                            term: {
+                                              lens: true
+                                            }
+                                          },
+                                          should: [
+                                            {
+                                              match: {
+                                                aliases: {
+                                                  query: name,
+                                                  operator: "or",
+                                                }
+                                              }
+                                            },
+                                            {
+                                              match: {
+                                                name: {
+                                                  query: name,
+                                                  operator: 'or',
+                                                  analyzer: 'standard',
+                                                },
+                                              },
+                                            },
+                                            {
+                                              match: {
+                                                name: {
+                                                  query: name,
+                                                  operator: 'and',
+                                                  fuzziness: 1,
+                                                },
+                                              },
+                                            },
+                                          ],
+                                        },
+                                      },
+                                    }
+                                  });
+
+                                  console.log("LENS  ->", body.hits.hits[0]._source.name)
+                                  console.log(body.hits.hits[0]._score)
+                                  if (body.hits.hits[0]._score > 23) {
+                                    if (body.hits.hits[0]._source.name.includes("Kit") === false) {
+                                      newPicture.lens_name = body.hits.hits[0]._source.name
+                                      newPicture.lens_name = newPicture.lens_name
+                                    }
+                                  }
+                                } catch (e) {
+                                  console.log(e.message)
+                                }
+                              }
+
+                              if (newPicture.camera_name != null || newPicture.lens_name != null) {
+                                console.log(newPicture)
+                                const bigQueryFlickr: any = {
+                                  ...pick(newPicture, BigQueryKeys)
+                                };
+
+                                await bigQueryClient
+                                  .dataset(datasetId)
+                                  .table(tableId)
+                                  .insert([
+                                    bigQueryFlickr
+                                  ]);
+                                console.log("Post Inserted");
+                              }
                             } catch (e) {
                               console.log(JSON.stringify(e));
                             }
