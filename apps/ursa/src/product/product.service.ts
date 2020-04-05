@@ -59,7 +59,7 @@ export class ProductService {
     from: number,
     size: number,
   ): Promise<ProductFindResponse> {
-    const { body } = await this.elasticService.searchProducts(
+    const body = await this.elasticService.searchProducts(
       filter,
       sort,
       from,
@@ -67,15 +67,13 @@ export class ProductService {
     );
 
     const products = await this.productRepository.findAll({
-      where: { id: { [Op.in]: body.hits.hits.map(hit => hit._source.id) } },
+      where: { id: { [Op.in]: body.results.map(hit => hit.id.raw) } },
     });
 
     return {
-      items: body.hits.hits.map(hit =>
-        products.find(i => i.id === hit._source.id),
-      ),
-      total: body.hits.total.value,
-      hasMore: body.hits.total.value < from + size,
+      items: body.results.map(hit => products.find(i => i.id === hit.id.raw)),
+      total: body.meta.page.total_results,
+      hasMore: body.meta.page.total_results < from + size,
     };
   }
 

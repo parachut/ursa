@@ -3,12 +3,32 @@ import { Client } from '@elastic/elasticsearch';
 import { camelCase } from 'lodash';
 import { ProductFilterInput } from './product/dto/product-filter.input';
 import { ProductSort } from './product/dto/product-sort.enum';
+import AppSearchClient from '@elastic/app-search-node';
+
+/**
+ * 
+ * @Field(type => String, { nullable: true })
+  search?: string;
+
+  @Field(type => String, { nullable: true })
+  brand?: string;
+
+  @Field(type => Boolean, { nullable: true, defaultValue: false })
+  inStock?: boolean;
+
+  @Field(type => Int, { nullable: true, defaultValue: 100000 })
+  maxPoints?: number;
+
+  @Field(type => Int, { nullable: true, defaultValue: 0 })
+  minPoints?: number;
+ */
 
 @Injectable()
 export class ElasticService {
-  private readonly elasticClient = new Client({
-    node: process.env.ELASTIC_URL,
-  });
+  private readonly elasticClient = new AppSearchClient(
+    'host-qg17uk',
+    'private-2w3xpb17ov3kqf1w7ewbpiaq',
+  );
 
   async searchProducts(
     filter: ProductFilterInput,
@@ -16,122 +36,52 @@ export class ElasticService {
     from: number,
     size: number,
   ) {
+    const searchFields = { id: {} };
+    const resultFields = { id: { raw: {} } };
+    const options: any = {
+      search_fields: searchFields,
+      result_fields: resultFields,
+    };
+
     const lastIndex = sort.lastIndexOf('_');
 
-    let sortBy: any = [
+    options.sort = [
+      { _score: 'desc' },
       {
-        [camelCase(sort.substr(0, lastIndex))]: {
-          order: camelCase(sort.substr(lastIndex)),
-        },
+        [camelCase(sort.substr(0, lastIndex))]: camelCase(
+          sort.substr(lastIndex),
+        ),
       },
     ];
 
     const filtered = [];
 
-    if (sort.startsWith('LAST_INVENTORY_CREATED')) {
-      filtered.push({
-        exists: {
-          field: 'lastInventoryCreated',
-        },
-      });
-    }
-
     if (sort.startsWith('POPULAR')) {
-      sortBy.unshift({
-        _script: {
-          type: 'number',
-          script: {
-            lang: 'painless',
-            source: 'doc.stock.value * params.factor + doc.popularity.value',
-            params: {
-              factor: 100,
-            },
+      options.boosts = {
+        stock: [
+          {
+            type: 'functional',
+            function: 'linear',
+            operation: 'add',
+            factor: 2,
           },
-          order: 'desc',
-        },
-      });
-
-      sortBy.push('_score');
+        ],
+      };
     }
 
-    const filterDefault = {
-      minPoints: 0,
-      maxPoints: 100000,
-      ...filter,
+    options.filters = {
+      points: {
+        from: filter.minPoints || 0,
+        to: filter.maxPoints || 500000,
+      },
     };
 
-    const must: any = [
-      {
-        range: {
-          points: {
-            gte: filterDefault.minPoints,
-            lte: filterDefault.maxPoints,
-          },
-        },
-      },
-    ];
-
-    if (filterDefault.inStock) {
-      must.push({
-        range: { stock: { gte: 1 } },
-      });
+    if (filter.inStock) {
+      options.filters.inStock = {
+        stock: { from: 1 },
+      };
     }
 
-    if (filterDefault.search) {
-      filtered.push({
-        multi_match: {
-          fields: [
-            'name',
-            'aliases',
-            'name._2gram',
-            'name._3gram',
-            'aliases._2gram',
-            'aliases._3gram',
-          ],
-          query: filterDefault.search.toLowerCase(),
-          type: 'best_fields',
-          tie_breaker: 0.3,
-        },
-      });
-
-      if (sort === 'DEMAND_DESC') {
-        sortBy = [
-          {
-            _script: {
-              type: 'number',
-              script: {
-                lang: 'painless',
-                source: '_score + (params.factor * doc.popularity.value)',
-                params: {
-                  factor: 0.01,
-                },
-              },
-              order: 'desc',
-            },
-          },
-        ];
-      }
-    }
-
-    if (filterDefault.brand) {
-      must.push({
-        term: { brand: filterDefault.brand.toLowerCase() },
-      });
-    }
-
-    return this.elasticClient.search({
-      index: 'products',
-      body: {
-        track_scores: true,
-        from,
-        size,
-        sort: sortBy,
-        query: {
-          bool: {
-            must: [...must, ...filtered],
-          },
-        },
-      },
-    });
+    return this.elasticClient.search('parachut', filter.search || '', options);
   }
 }
