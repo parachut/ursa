@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from '@elastic/elasticsearch';
-import { camelCase } from 'lodash';
+import { snakeCase } from 'lodash';
 import { ProductFilterInput } from './product/dto/product-filter.input';
 import { ProductSort } from './product/dto/product-sort.enum';
 import AppSearchClient from '@elastic/app-search-node';
@@ -48,7 +48,7 @@ export class ElasticService {
     options.sort = [
       { _score: 'desc' },
       {
-        [camelCase(sort.substr(0, lastIndex))]: camelCase(
+        [snakeCase(sort.substr(0, lastIndex))]: snakeCase(
           sort.substr(lastIndex),
         ),
       },
@@ -70,16 +70,22 @@ export class ElasticService {
     }
 
     options.filters = {
-      points: {
-        from: filter.minPoints || 0,
-        to: filter.maxPoints || 500000,
-      },
+      all: [
+        {
+          points: {
+            from: filter.minPoints || 0,
+            to: filter.maxPoints || 500000,
+          },
+        },
+      ],
     };
 
     if (filter.inStock) {
-      options.filters.inStock = {
-        stock: { from: 1 },
-      };
+      options.filters.all.push({
+        stock: {
+          from: 1,
+        },
+      });
     }
 
     return this.elasticClient.search('parachut', filter.search || '', options);
