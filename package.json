@@ -66,6 +66,7 @@
     "dwolla-v2": "^3.1.0",
     "ebay-node-client": "0.0.9",
     "express": "^4.17.1",
+    "express-gql": "^0.0.4",
     "express-xml-bodyparser": "^0.3.0",
     "fetch": "^1.1.0",
     "firebase-admin": "^8.9.2",
