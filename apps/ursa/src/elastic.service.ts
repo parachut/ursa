@@ -36,7 +36,7 @@ export class ElasticService {
     from: number,
     size: number,
   ) {
-    const searchFields = { id: {} };
+    const searchFields = { name: {} };
     const resultFields = { id: { raw: {} } };
     const options: any = {
       search_fields: searchFields,
