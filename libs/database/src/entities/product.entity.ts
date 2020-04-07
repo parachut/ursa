@@ -1,4 +1,3 @@
-import { Client } from '@elastic/elasticsearch';
 import slugify from '@sindresorhus/slugify';
 import {
   AfterCreate,
@@ -27,10 +26,11 @@ import { Inventory } from './inventory.entity';
 import { ProductAttributeValue } from './product-attribute-value.entity';
 import { Queue } from './queue.entity';
 
-const elasti = new Client({
-  node:
-    'https://elastic:acNbgQRsl0OUznitAboYVss6@cb0a068fb8d64b3294ede898764e8f96.us-central1.gcp.cloud.es.io:9243',
-});
+//App Search 
+import AppSearchClient from '@elastic/app-search-node'
+const appSearch = new AppSearchClient('host-qg17uk',
+  'private-2w3xpb17ov3kqf1w7ewbpiaq')
+
 
 @ObjectType()
 @Table({
@@ -173,73 +173,70 @@ export class Product extends Model<Product> {
   }
 
   @AfterCreate
-  static async createElastic(instance: Product) {
+  static async createAppSearch(instance: Product) {
     const [brand, category, inventory] = await Promise.all([
       instance.$get('brand'),
       instance.$get('category'),
       instance.$get('inventory'),
     ]);
 
-    await elasti.index({
-      index: 'products',
-      body: {
-        id: instance.id,
-        name: instance.name,
-        category: category
-          ? {
-              name: category.name,
-              id: category.id,
-              slug: category.slug,
-            }
-          : null,
-        brand: brand
-          ? {
-              name: brand.name,
-              id: brand.id,
-              slug: brand.slug,
-            }
-          : null,
-        slug: instance.slug,
-        aliases: instance.aliases
-          ? instance.aliases.split(',').map(a => a.trim())
-          : null,
-        stock: inventory.filter(i => i.status === 'INWAREHOUSE').length,
-        points: instance.points,
-        images: instance.images,
-        popularity: instance.popularity,
-        demand: instance.demand,
-        lastInventoryCreated: instance.lastInventoryCreated,
-      },
-    });
+    const product = {
+      id: instance.id,
+      name: instance.name,
+      mfr: instance.mfr,
+      camera: category.name.includes('Camera')
+        ? true
+        : false,
+      lens: category.name.includes('Lens')
+        ? true
+        : false,
+      category_name: category
+        ? category.name : null,
+      category_id: category
+        ? category.id : null,
+      category_slug: category
+        ? category.slug : null,
+      brand_id: brand
+        ? brand.id : null,
+      brand_name: brand
+        ? brand.name : null,
+      brand_slug: brand
+        ? brand.slug : null,
+      slug: instance.slug,
+      stock: inventory.filter((i) => i.status === 'INWAREHOUSE').length,
+      points: instance.points,
+      images: instance.images ? (instance.images[0] ? instance.images[0] : null) : null,
+      popularity: instance.popularity,
+      demand: instance.demand,
+      last_inventory_created: instance.lastInventoryCreated,
+    }
+
+    await appSearch
+      .indexDocuments('parachut', product)
+      .then(response => console.log(response))
+      .catch(error => console.log(error))
+
   }
 
   @AfterUpdate
-  static async updateElastic(instance: Product) {
+  static async updateAppSearch(instance: Product) {
     if (instance.id) {
-      try {
-        await elasti.updateByQuery({
-          index: 'products',
-          body: {
-            query: {
-              match_phrase: { id: instance.get('id') },
-            },
-            script: {
-              source:
-                'ctx._source.stock = params.stock; ctx._source.points = params.points; ctx._source.popularity = params.popularity; ctx._source.demand = params.demand; ctx._source.lastInventoryCreated = params.lastInventoryCreated;',
-              params: {
-                stock: instance.stock,
-                points: instance.points,
-                popularity: instance.popularity,
-                demand: instance.demand,
-                lastInventoryCreated:
-                  instance.lastInventoryCreated || new Date(),
-              },
-            },
-          },
-        });
-      } catch (e) {
-        console.log(e);
-      }
+
+      await appSearch
+        .indexDocuments('parachut',
+          {
+            id: instance.get('id'),
+            stock: instance.stock,
+            points: instance.points,
+            popularity: instance.popularity,
+            demand: instance.demand,
+            lastInventoryCreated:
+              instance.lastInventoryCreated || new Date(),
+          })
+        .then(response => console.log(response))
+        .catch(error => console.log(error))
+
     }
   }
+
 }
