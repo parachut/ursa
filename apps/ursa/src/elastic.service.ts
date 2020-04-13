@@ -41,6 +41,7 @@ export class ElasticService {
     const options: any = {
       search_fields: searchFields,
       result_fields: resultFields,
+      page: { size, current: size / from },
     };
 
     const lastIndex = sort.lastIndexOf('_');
