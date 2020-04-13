@@ -43,7 +43,7 @@ export class ElasticService {
       result_fields: resultFields,
       page: {
         size: size ? Number(size) : 21,
-        current: from ? Math.round(Number(size) / Number(from)) : 1,
+        current: from ? Math.round(Number(size) / Number(from)) + 1 : 1,
       },
     };
 
